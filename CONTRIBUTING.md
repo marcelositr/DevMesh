@@ -1,63 +1,69 @@
-# Contributing to DevMesh
+# Como contribuir com o DevMesh
 
-Thank you for considering a contribution to DevMesh. We welcome bug reports, documentation improvements, testing, ideas, and code.
+Obrigado pelo interesse em contribuir com o DevMesh. São bem-vindos relatos de erros, melhorias na documentação, testes, ideias e código.
 
-DevMesh is an independent, community-oriented MQTT infrastructure project intended to support Meshtastic-compatible radio networks and future integrations. It is not an official Meshtastic project. See [README.md](README.md) for the project overview and [GOVERNANCE.md](GOVERNANCE.md) for decision-making and roles.
+O DevMesh é um projeto independente e comunitário de infraestrutura MQTT, planejado para dar suporte a redes de rádio compatíveis com Meshtastic e a futuras integrações. Não é um projeto oficial do Meshtastic. Consulte o [README.md](README.md) para conhecer o projeto e [GOVERNANCE.md](GOVERNANCE.md) para entender os papéis e o processo de decisão.
 
-## Before you contribute
+## Antes de contribuir
 
-1. Search existing issues and discussions to avoid duplicating work.
-2. For a substantial change, open an issue or discussion first so its purpose and scope can be discussed.
-3. Keep contributions focused. Prefer small, understandable changes over unrelated changes bundled together.
-4. Do not include passwords, access tokens, private keys, recovery codes, personal data, or other secrets in issues, commits, logs, or test fixtures.
-5. For suspected vulnerabilities, do not open a public issue. Follow [SECURITY.md](SECURITY.md) once the security reporting process is available; until then, contact the project lead privately through an appropriate channel.
+1. Pesquise as questões e discussões existentes para evitar trabalho duplicado.
+2. Antes de uma alteração substancial, abra uma questão ou discussão para que o objetivo e o escopo possam ser debatidos.
+3. Mantenha as contribuições focadas. Prefira alterações pequenas e compreensíveis a conjuntos de mudanças sem relação entre si.
+4. Não inclua senhas, tokens de acesso, chaves privadas, códigos de recuperação, dados pessoais ou outros segredos em questões, commits, registros ou arquivos de teste.
+5. Se suspeitar de uma vulnerabilidade, não publique detalhes técnicos em uma questão pública. Consulte [SECURITY.md](SECURITY.md). Enquanto não houver um canal privado de segurança publicado, peça uma forma privada de contato sem incluir detalhes sensíveis.
 
-## Issues and proposals
+## Idioma e convenções
 
-When reporting a bug, include the observed behavior, expected behavior, steps to reproduce, and relevant environment details. Remove secrets and personal data from logs before sharing them.
+O idioma preferencial da documentação voltada às pessoas é o português brasileiro. Comentários explicativos no código e comentários em arquivos de configuração também devem ser escritos em português brasileiro sempre que possível.
 
-When proposing a feature, explain the problem it solves, who benefits, possible alternatives, and any effect on privacy, security, network traffic, or compatibility.
+O código-fonte, nomes de variáveis e funções, identificadores de programação, nomes de protocolos, chaves de configuração exigidas por ferramentas e interfaces públicas devem seguir as convenções técnicas do ecossistema correspondente, normalmente em inglês. Não traduza identificadores exigidos por protocolos ou ferramentas. Quando útil, explique seu significado em português na documentação ou em comentários.
 
-An issue or discussion is a proposal, not a commitment to implement the change.
+## Questões e propostas
 
-## Pull requests
+Ao relatar um erro, descreva o comportamento observado, o comportamento esperado, os passos para reproduzi-lo e os detalhes relevantes do ambiente. Remova segredos e dados pessoais dos registros antes de compartilhá-los.
 
-- Explain what changed and why.
-- Link related issues or decision records where applicable.
-- Update documentation when behavior, setup, configuration, or user expectations change.
-- Include tests or reproducible verification steps when practical. Do not claim tests passed unless they were actually run.
-- Identify known limitations and any behavior that still needs testing.
-- Keep each pull request focused and make it easy to review.
-- Be prepared to revise a contribution in response to review.
+Ao propor um recurso, explique o problema que ele resolve, quem se beneficia, as alternativas possíveis e os efeitos sobre privacidade, segurança, tráfego de rede e compatibilidade.
 
-Do not introduce a new dependency, protocol behavior, public API, or breaking change without explaining the need and alternatives.
+Uma questão ou discussão é uma proposta, não um compromisso de implementação.
 
-## Technical and network considerations
+## Solicitações de alteração (*pull requests*)
 
-Because DevMesh is intended to work with MQTT and radio networks, contributions should consider:
+- Explique o que mudou e por quê.
+- Relacione questões ou registros de decisão pertinentes, quando houver.
+- Atualize a documentação quando o comportamento, a instalação, a configuração ou as expectativas de uso mudarem.
+- Inclua testes ou passos reproduzíveis de verificação quando viável. Não afirme que testes passaram se eles não foram executados.
+- Identifique limitações conhecidas e comportamentos que ainda precisam ser testados.
+- Mantenha cada solicitação focada e fácil de revisar.
+- Esteja preparado para revisar a contribuição conforme o retorno da revisão.
 
-- unnecessary message volume and potential LoRa airtime impact;
-- packet formats, compatibility, and encryption boundaries;
-- authentication and topic-level authorization;
-- privacy-sensitive metadata and logging;
-- failure handling, reconnect behavior, and duplicate messages.
+Não introduza dependências, mudanças de protocolo, APIs públicas ou alterações incompatíveis sem explicar a necessidade e as alternativas.
 
-These are review considerations, not claims that all controls or technical designs have already been implemented. The project will document verified behavior as testing progresses.
+## Considerações técnicas e de rede
 
-## Review and decisions
+Como o DevMesh pretende trabalhar com MQTT e redes de rádio, as contribuições devem considerar:
 
-Contributions are reviewed according to [GOVERNANCE.md](GOVERNANCE.md). Submitting a pull request does not guarantee acceptance. Maintainers may request changes, defer work, or close a proposal with an explanation.
+- volume desnecessário de mensagens e possível impacto no tempo de transmissão LoRa;
+- formatos de pacotes, compatibilidade e limites da criptografia;
+- autenticação e autorização por tópico;
+- metadados sensíveis à privacidade e registros de eventos;
+- tratamento de falhas, reconexões e mensagens duplicadas.
 
-Significant technical decisions should be recorded in [docs/decisions/](docs/decisions/), linking to the relevant discussion instead of repeating it.
+Esses itens são critérios de revisão, não afirmações de que todos os controles ou projetos técnicos já estejam implementados. O comportamento confirmado será documentado à medida que os testes avançarem.
 
-Please follow the project's [Code of Conduct](CODE_OF_CONDUCT.md). If that policy has not yet been published, participate respectfully and avoid harassment, threats, discrimination, or personal attacks.
+## Revisão e decisões
 
-## Licensing and attribution
+As contribuições são avaliadas conforme [GOVERNANCE.md](GOVERNANCE.md). Enviar uma solicitação de alteração não garante sua aceitação. Mantenedores podem pedir ajustes, adiar o trabalho ou encerrar uma proposta com uma explicação.
 
-By submitting a contribution, you agree that it may be distributed under the project's applicable license, currently intended to be **GNU AGPL v3.0 or later**, subject to the license files and the rights you hold in the contribution. Only submit material you have the right to contribute, and identify third-party material and its license.
+Decisões técnicas relevantes devem ser registradas em [docs/decisions/](docs/decisions/), com links para a discussão pertinente em vez de repetir seu conteúdo.
 
-The project's license and governance are distinct. See [LICENSE](LICENSE) and [GOVERNANCE.md](GOVERNANCE.md). If licensing terms or the status of a contribution are unclear, ask before submitting it.
+Siga o [Código de Conduta](CODE_OF_CONDUCT.md).
 
-## Current project stage
+## Licença e atribuição
 
-DevMesh is in an early planning and validation stage. Some technical choices, test procedures, and operational policies are not final. Please distinguish verified results from assumptions, and do not describe proposed features as implemented.
+Ao enviar uma contribuição, você concorda que ela poderá ser distribuída sob a licença aplicável ao projeto, atualmente prevista como **GNU AGPL versão 3 ou posterior**, conforme os arquivos de licença e os direitos que você detém sobre a contribuição. Envie apenas material que tenha direito de contribuir e identifique material de terceiros e suas licenças.
+
+A licença e a governança do projeto são assuntos distintos. Consulte [LICENSE](LICENSE) e [GOVERNANCE.md](GOVERNANCE.md). Se houver dúvida sobre os termos ou a situação de uma contribuição, pergunte antes de enviá-la.
+
+## Estágio atual do projeto
+
+O DevMesh está na fase inicial de planejamento e validação. Algumas escolhas técnicas, procedimentos de teste e políticas operacionais ainda não são definitivos. Diferencie resultados verificados de suposições e não descreva recursos propostos como se já estivessem implementados.
