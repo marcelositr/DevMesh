@@ -1,52 +1,52 @@
-# Security Policy
+# Política de Segurança
 
-## Project Status
+## Situação do projeto
 
-DevMesh is an early-stage project. Security practices and infrastructure may change as the project develops. Do not assume that a dedicated security team, private reporting system, bug bounty, or guaranteed response time is available.
+O DevMesh está em fase inicial. As práticas e a infraestrutura de segurança podem mudar à medida que o projeto evoluir. Não presuma que já exista uma equipe de segurança dedicada, um sistema privado de recebimento de relatos, um programa de recompensa ou um prazo garantido de resposta.
 
-Before production use or a broader public launch, the project maintainers should publish a working private channel for reporting vulnerabilities and identify who is responsible for receiving and coordinating reports.
+Antes do uso em produção ou de uma divulgação pública mais ampla, os responsáveis pelo projeto devem publicar um canal privado funcional para comunicação de vulnerabilidades e identificar quem ficará responsável por receber e coordenar esses relatos.
 
-## Reporting a Vulnerability
+## Como comunicar uma vulnerabilidade
 
-Please do not publish details of an unpatched vulnerability in a public issue, discussion, pull request, or community channel.
+Não publique detalhes de uma vulnerabilidade ainda não corrigida em questões, discussões, solicitações de alteração ou canais comunitários públicos.
 
-Use a private contact method explicitly published by the project lead or a designated maintainer, if one is available. If no private reporting method has been published, do not post exploit details publicly. Ask the project lead or a maintainer for a private reporting route without including sensitive technical details in that request.
+Use um método privado de contato explicitamente publicado pela pessoa responsável pelo projeto ou por um mantenedor designado, se houver. **Atualmente, este documento não identifica um canal privado específico.** Se nenhum canal tiver sido publicado, não divulgue detalhes técnicos publicamente. Peça à pessoa responsável pelo projeto ou a um mantenedor uma forma de contato privado, sem incluir detalhes sensíveis nesse pedido.
 
-When a private route is available, include only the information needed to assess the report:
+Quando houver um canal privado disponível, forneça apenas as informações necessárias para avaliar o relato:
 
-- Affected component, version, commit, or configuration, if known.
-- A concise description of the potential security impact.
-- Reproduction steps or a proof of concept, where safe and necessary.
-- Relevant logs or evidence, with credentials, tokens, personal data, and unrelated information removed.
-- A way to contact you for clarification, if you want to provide one.
+- Componente, versão, commit ou configuração afetada, se conhecida.
+- Descrição concisa do possível impacto de segurança.
+- Passos para reproduzir o problema ou uma prova de conceito, quando for seguro e necessário.
+- Registros ou evidências pertinentes, sem credenciais, tokens, dados pessoais ou informações irrelevantes.
+- Uma forma de contato para esclarecimentos, caso queira fornecê-la.
 
-Do not attach secrets, private keys, access tokens, real users' personal data, or full production datasets.
+Não anexe segredos, chaves privadas, tokens de acesso, dados pessoais de usuários reais ou conjuntos completos de dados de produção.
 
-## Safe and Authorized Testing
+## Testes seguros e autorizados
 
-Only test systems, devices, networks, and services that you own or are explicitly authorized to assess. Do not exploit, disrupt, access, or modify third-party systems or other people's devices while investigating a potential issue.
+Teste apenas sistemas, dispositivos, redes e serviços que sejam seus ou para os quais você tenha autorização explícita. Não explore, interrompa, acesse ou modifique sistemas de terceiros ou dispositivos de outras pessoas durante a investigação.
 
-Avoid tests that could cause radio-frequency interference, unnecessary LoRa traffic, service disruption, data exposure, or damage. Use a controlled test environment whenever practical.
+Evite testes que possam causar interferência de radiofrequência, tráfego LoRa desnecessário, interrupção de serviços, exposição de dados ou danos. Sempre que possível, use um ambiente de teste controlado.
 
-## Triage and Disclosure
+## Triagem e divulgação
 
-When a report is received through an available private channel, the project lead or designated maintainer should:
+Quando um relato chegar por um canal privado disponível, a pessoa responsável pelo projeto ou o mantenedor designado deverá:
 
-1. Acknowledge receipt when reasonably possible. No fixed response time is promised at this stage.
-2. Assess the report's validity, severity, affected versions, and potential impact.
-3. Coordinate investigation and mitigation with the relevant maintainers.
-4. Keep report details limited to people who need them while the issue is being handled.
-5. Coordinate public disclosure after a fix or mitigation is available, where practical and appropriate.
-6. Publish relevant security guidance or an advisory when warranted and feasible.
+1. Confirmar o recebimento quando for razoavelmente possível. Nesta fase, não há prazo fixo de resposta.
+2. Avaliar a validade, a gravidade, as versões afetadas e o possível impacto.
+3. Coordenar a investigação e a mitigação com os mantenedores pertinentes.
+4. Limitar os detalhes do relato às pessoas que precisem deles durante o tratamento.
+5. Coordenar a divulgação pública após a disponibilização de uma correção ou mitigação, quando viável e apropriado.
+6. Publicar orientações de segurança ou um comunicado quando necessário e possível.
 
-The project does not currently promise a bug bounty, a CVE assignment, or a particular disclosure deadline. These may be considered later, but must not be assumed to exist.
+O projeto não promete atualmente recompensa por vulnerabilidades, atribuição de CVE ou prazo específico de divulgação. Essas possibilidades poderão ser consideradas no futuro, mas não devem ser tratadas como serviços existentes.
 
-Researchers will be credited in a public advisory only when appropriate and with their consent. Please do not disclose another person's identity or report details without permission, except where disclosure is required by law.
+Pesquisadores só serão identificados em um comunicado público quando isso for apropriado e houver consentimento. Não divulgue a identidade de outra pessoa nem detalhes de seu relato sem autorização, exceto quando a divulgação for exigida por lei.
 
-## Scope and Governance
+## Escopo e governança
 
-Security reports are distinct from reports about community conduct. For community-related concerns, see the [Code of Conduct](CODE_OF_CONDUCT.md).
+Relatos de segurança são diferentes de relatos sobre conduta na comunidade. Para questões de convivência, consulte o [Código de Conduta](CODE_OF_CONDUCT.md).
 
-Project decisions about security handling and maintainer responsibilities should follow [Governance](GOVERNANCE.md). For general contributions, see [Contributing](CONTRIBUTING.md). DevMesh's licensing information is in [LICENSE](LICENSE).
+As decisões sobre tratamento de segurança e responsabilidades dos mantenedores devem seguir [GOVERNANCE.md](GOVERNANCE.md). Para contribuições gerais, consulte [CONTRIBUTING.md](CONTRIBUTING.md). As informações de licenciamento estão em [LICENSE](LICENSE).
 
-This policy will be reviewed as the project gains maintainers, infrastructure, and operational experience.
+Esta política deve ser revisada conforme o projeto ganhar mantenedores, infraestrutura e experiência operacional.
