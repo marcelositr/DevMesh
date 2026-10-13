@@ -1,87 +1,87 @@
-# DevMesh Code of Conduct
+# Código de Conduta do DevMesh
 
-## Our commitment
+## Nosso compromisso
 
-DevMesh aims to be a constructive, respectful community for people building and using independent MQTT infrastructure and Meshtastic-compatible integrations. Participation is open to people with different backgrounds, experience levels, and viewpoints.
+O DevMesh busca construir uma comunidade respeitosa e colaborativa para pessoas que desenvolvem e utilizam infraestrutura MQTT independente e integrações compatíveis com Meshtastic. A participação é aberta a pessoas com diferentes origens, experiências e opiniões.
 
-This Code of Conduct applies to project spaces, including repository issues, pull requests, discussions, community channels managed by the project, and project-related events.
+Este Código de Conduta se aplica aos espaços do projeto, incluindo questões, solicitações de alteração, discussões, canais comunitários administrados pelo projeto e eventos relacionados ao projeto.
 
-## Expected behavior
+## Comportamentos esperados
 
-Participants are expected to:
+Espera-se que participantes:
 
-- Be respectful, patient, and constructive.
-- Critique ideas and technical work without attacking people.
-- Explain disagreements using evidence and project goals where possible.
-- Welcome genuine questions and help newcomers understand the project.
-- Respect privacy and avoid publishing personal information without permission.
-- Follow the project's contribution, governance, and security-reporting processes.
-- Act responsibly when discussing radio networks, public services, and security-sensitive behavior.
+- Se comuniquem com respeito, paciência e espírito construtivo.
+- Critiquem ideias e trabalho técnico sem atacar pessoas.
+- Expliquem divergências com base em evidências e nos objetivos do projeto sempre que possível.
+- Recebam perguntas genuínas e ajudem pessoas iniciantes a entender o projeto.
+- Respeitem a privacidade e não publiquem informações pessoais sem autorização.
+- Sigam os processos de contribuição, governança e comunicação de vulnerabilidades.
+- Ajam com responsabilidade ao discutir redes de rádio, serviços públicos e comportamentos sensíveis à segurança.
 
-## Unacceptable behavior
+## Comportamentos inaceitáveis
 
-The following behavior is not acceptable:
+Não são aceitáveis:
 
-- Harassment, threats, intimidation, stalking, or sustained personal attacks.
-- Discriminatory or degrading conduct targeting personal characteristics.
-- Sexual harassment or unwanted sexual attention.
-- Publishing private information, credentials, or identifying details without consent.
-- Deliberate disruption of project spaces, including repeated abusive or knowingly deceptive participation.
-- Retaliation against someone who raises a concern in good faith.
-- Knowingly using community access to compromise users, systems, or infrastructure.
+- Assédio, ameaças, intimidação, perseguição ou ataques pessoais persistentes.
+- Condutas discriminatórias ou degradantes dirigidas a características pessoais.
+- Assédio sexual ou atenção sexual indesejada.
+- Divulgação de informações privadas, credenciais ou dados identificáveis sem consentimento.
+- Interrupção deliberada dos espaços do projeto, incluindo participação abusiva repetida ou deliberadamente enganosa.
+- Retaliação contra quem apresenta uma preocupação de boa-fé.
+- Uso consciente do acesso à comunidade para comprometer usuários, sistemas ou infraestrutura.
 
-Good-faith technical disagreement, respectful criticism, and reasonable questions about project decisions are not violations by themselves.
+Divergências técnicas de boa-fé, críticas respeitosas e perguntas razoáveis sobre decisões do projeto não constituem, por si só, violações.
 
-## Reporting a concern
+## Como relatar uma preocupação
 
-Do not post sensitive allegations, private information, or security vulnerabilities in a public issue.
+Não publique acusações sensíveis, informações privadas ou vulnerabilidades de segurança em uma questão pública.
 
-For conduct concerns, contact the project lead or a designated maintainer privately through a project contact channel. Include a concise description, relevant links or evidence, and the outcome you are seeking, if known. Share only information necessary to explain the concern.
+Para relatar problemas de conduta, entre em contato em particular com a pessoa responsável pelo projeto ou com um mantenedor designado, por um canal de contato do projeto que tenha sido efetivamente publicado. Inclua uma descrição concisa, links ou evidências pertinentes e, se souber, o resultado que busca. Compartilhe apenas o necessário para explicar a preocupação.
 
-If the person named in a report is the usual contact, or you believe that contact has a conflict of interest, use another trusted maintainer if one is available. Do not put passwords, access tokens, private keys, or recovery codes in a report.
+Se a pessoa citada no relato for o contato habitual, ou se houver conflito de interesse, procure outro mantenedor de confiança, caso exista. Não inclua senhas, tokens de acesso, chaves privadas ou códigos de recuperação no relato.
 
-DevMesh is an early-stage project and may not yet have a dedicated reporting service or independent moderation team. Until a separate channel is published, do not assume that a dedicated confidential intake system exists. The project should document the actual contact method before inviting sensitive reports.
+O DevMesh está em fase inicial e pode ainda não ter um serviço específico de denúncias ou uma equipe independente de moderação. Não presuma que exista um sistema privado de recebimento de relatos até que um canal real seja publicado. Antes de solicitar relatos sensíveis, o projeto deve documentar como recebê-los de forma adequada.
 
-## Handling reports
+## Tratamento dos relatos
 
-Reports should be handled as discreetly as reasonably possible, fairly, and with attention to safety. The person handling a report should:
+Os relatos devem ser tratados com discrição razoável, imparcialidade e atenção à segurança. A pessoa responsável pelo tratamento deve:
 
-1. Acknowledge receipt when practical.
-2. Review relevant information and seek clarification where appropriate.
-3. Give involved people a reasonable opportunity to respond when safe and appropriate.
-4. Avoid unnecessary disclosure of identities or sensitive details.
-5. Record the decision and rationale in a privacy-preserving way.
-6. Identify conflicts of interest and, where practical, ask an uninvolved maintainer to review the matter.
+1. Confirmar o recebimento quando for viável.
+2. Analisar as informações pertinentes e pedir esclarecimentos quando necessário.
+3. Dar às pessoas envolvidas uma oportunidade razoável de resposta quando for seguro e apropriado.
+4. Evitar a divulgação desnecessária de identidades ou detalhes sensíveis.
+5. Registrar a decisão e sua justificativa de forma a preservar a privacidade.
+6. Identificar conflitos de interesse e, quando possível, solicitar a revisão por um mantenedor não envolvido.
 
-Public documentation should not expose private reports or personal information. The project must not promise absolute confidentiality, guaranteed response times, or independent review where those capabilities have not been established.
+A documentação pública não deve expor relatos privados nem informações pessoais. O projeto não deve prometer confidencialidade absoluta, prazos garantidos de resposta ou revisão independente quando essas capacidades ainda não estiverem estabelecidas.
 
-## Possible responses
+## Medidas possíveis
 
-Depending on severity, context, and repeated behavior, responses may include:
+De acordo com a gravidade, o contexto e a reincidência, as medidas podem incluir:
 
-- A private or public reminder of the expected standards.
-- A request to edit or remove harmful content.
-- A formal warning.
-- Temporary restrictions on participation in project spaces.
-- Removal of content or revocation of project-managed access where justified.
-- Permanent exclusion from project-managed spaces for severe or repeated violations.
+- Lembrete privado ou público dos padrões esperados.
+- Solicitação para editar ou remover conteúdo prejudicial.
+- Advertência formal.
+- Restrições temporárias de participação nos espaços do projeto.
+- Remoção de conteúdo ou revogação de acesso administrado pelo projeto, quando justificada.
+- Exclusão permanente dos espaços administrados pelo projeto em casos graves ou repetidos.
 
-Any action should be proportionate, documented to the extent safe, and consistent with [GOVERNANCE.md](GOVERNANCE.md). Immediate temporary action may be necessary to protect people or infrastructure, followed by review when appropriate.
+As medidas devem ser proporcionais, documentadas na medida em que for seguro e coerentes com [GOVERNANCE.md](GOVERNANCE.md). Pode ser necessária uma ação temporária imediata para proteger pessoas ou infraestrutura, seguida de revisão quando apropriado.
 
-## Appeals and conflicts of interest
+## Recursos e conflitos de interesse
 
-A person affected by a moderation decision may request a review by explaining why the decision should be reconsidered. Review by someone not involved in the original decision is preferred when such a person is available.
+Uma pessoa afetada por uma decisão de moderação pode solicitar revisão, explicando por que a decisão deveria ser reconsiderada. Sempre que houver alguém disponível, é preferível que a revisão seja feita por uma pessoa que não participou da decisão original.
 
-If no independent reviewer exists, the project must be honest about that limitation and record the conflict. No one should be required to disclose sensitive personal information publicly to request a review.
+Se não houver uma pessoa revisora independente, o projeto deve reconhecer essa limitação e registrar o conflito. Ninguém deve ser obrigado a divulgar informações pessoais sensíveis publicamente para solicitar revisão.
 
-## Relationship to other policies
+## Relação com as demais políticas
 
-- [GOVERNANCE.md](GOVERNANCE.md) defines roles, authority, and decision-making.
-- [CONTRIBUTING.md](CONTRIBUTING.md) explains how to participate in project development.
-- [SECURITY.md](SECURITY.md) is intended to define vulnerability reporting and response.
+- [GOVERNANCE.md](GOVERNANCE.md) define papéis, autoridade e tomada de decisões.
+- [CONTRIBUTING.md](CONTRIBUTING.md) explica como participar do desenvolvimento.
+- [SECURITY.md](SECURITY.md) define a política pretendida para comunicação e tratamento de vulnerabilidades.
 
-This Code of Conduct does not replace applicable law, platform rules, or the project's security process.
+Este Código de Conduta não substitui a legislação aplicável, as regras da plataforma ou o processo de segurança do projeto.
 
-## Review
+## Revisão
 
-This policy should be reviewed as the community and its communication channels grow. Any material amendment must follow the applicable process in [GOVERNANCE.md](GOVERNANCE.md).
+Esta política deve ser revisada conforme a comunidade e seus canais de comunicação crescerem. Alterações relevantes devem seguir o processo aplicável em [GOVERNANCE.md](GOVERNANCE.md).
