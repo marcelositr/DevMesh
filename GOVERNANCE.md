@@ -1,108 +1,111 @@
-# DevMesh Governance
+# Governança do DevMesh
 
-**Status:** Initial policy  
-**Version:** 0.1  
-**Last updated:** 2026-10-13
+**Status:** política inicial  
+**Versão:** 0.1  
+**Última atualização:** 2026-10-13
 
-This document defines how the DevMesh project is maintained and how project decisions are made. It is intentionally concise; technical contribution steps belong in [CONTRIBUTING.md](CONTRIBUTING.md), security reporting belongs in [SECURITY.md](SECURITY.md), and the project license defines copyright and software-use permissions.
+Este documento define como o projeto DevMesh é mantido e como as decisões são tomadas. As etapas técnicas de contribuição estão em [CONTRIBUTING.md](CONTRIBUTING.md), o tratamento de vulnerabilidades está em [SECURITY.md](SECURITY.md), e a licença define os direitos autorais e as permissões de uso do software.
 
-## 1. Mission and scope
+## 1. Missão e escopo
 
-DevMesh is an independent, community-oriented MQTT infrastructure project intended to support Meshtastic-compatible radio networks, with room for Brazilian public-service integrations, APIs, and bots.
+O DevMesh é um projeto independente e comunitário de infraestrutura MQTT, planejado para oferecer suporte a redes de rádio compatíveis com Meshtastic e permitir futuras integrações com APIs, serviços públicos brasileiros e bots.
 
-DevMesh is not an official Meshtastic project and must not imply endorsement by Meshtastic or any other third party.
+O DevMesh não é um projeto oficial do Meshtastic e não deve sugerir endosso ou afiliação por parte do Meshtastic ou de terceiros.
 
-## 2. Governance principles
+## 2. Princípios de governança
 
-Project governance follows these principles:
+A governança do projeto segue estes princípios:
 
-- **Transparency:** significant decisions and their rationale are recorded publicly whenever doing so does not expose security-sensitive information or personal data.
-- **Community participation:** anyone may propose improvements, report problems, and participate respectfully in public discussions.
-- **Accountability:** maintainers must explain significant decisions and manage conflicts of interest.
-- **Security and privacy:** public participation does not entitle anyone to access credentials, private user data, production systems, or administrative permissions.
-- **Proportionality:** requirements should protect the project without creating unnecessary process for routine work.
-- **Continuity:** project knowledge, access recovery, and succession must not depend solely on undocumented personal arrangements.
+- **Transparência:** decisões relevantes e seus fundamentos são registrados publicamente sempre que isso não expuser informações pessoais ou dados sensíveis à segurança.
+- **Participação comunitária:** qualquer pessoa pode propor melhorias, relatar problemas e participar respeitosamente das discussões públicas.
+- **Responsabilidade:** mantenedores devem explicar decisões relevantes e administrar conflitos de interesse.
+- **Segurança e privacidade:** a participação pública não concede acesso a credenciais, dados privados de usuários, sistemas de produção ou permissões administrativas.
+- **Proporcionalidade:** os processos devem proteger o projeto sem criar burocracia desnecessária para tarefas rotineiras.
+- **Continuidade:** o conhecimento do projeto, a recuperação de acesso e a sucessão não devem depender exclusivamente de acordos pessoais não documentados.
 
-## 3. Roles and authority
+## 3. Papéis e autoridade
 
-### Founder and project lead
+### Fundador e responsável pelo projeto
 
-During the initial stage, the founder acts as project lead and is responsible for project direction, releases, repository administration, and appointing additional maintainers. The project lead must document significant decisions and follow the protected-change process in Section 5.
+Na fase inicial, o fundador atua como responsável pelo projeto e coordena sua direção, as versões publicadas, a administração do repositório e a nomeação de outros mantenedores. Decisões relevantes devem ser documentadas e seguir o processo de alteração protegida da Seção 5.
 
-This initial arrangement is not a permanent entitlement to control every future community service. As the project gains active maintainers, responsibilities should be delegated under documented criteria.
+Essa organização inicial não representa um direito permanente de controlar todos os serviços comunitários futuros. À medida que o projeto ganhar mantenedores ativos, as responsabilidades deverão ser delegadas com critérios documentados.
 
-### Maintainers
+### Mantenedores
 
-Maintainers are trusted contributors explicitly invited to take on ongoing responsibilities. Their scope of authority must be stated when appointed, for example code review, releases, infrastructure, documentation, or security response.
+Mantenedores são colaboradores de confiança convidados explicitamente a assumir responsabilidades contínuas. O escopo de autoridade deve ser registrado na nomeação, por exemplo: revisão de código, versões, infraestrutura, documentação ou resposta a incidentes de segurança.
 
-Maintainers should review changes within their assigned scope, disclose relevant conflicts of interest, and avoid approving their own high-impact changes when an independent review is reasonably available.
+Mantenedores devem revisar alterações dentro de suas responsabilidades, declarar conflitos de interesse relevantes e evitar aprovar suas próprias alterações de alto impacto quando uma revisão independente estiver razoavelmente disponível.
 
-### Contributors and community members
+### Colaboradores e comunidade
 
-Anyone may contribute through public issues, discussions, documentation, testing, or pull requests. Participation does not automatically grant maintainer status or administrative access.
+Qualquer pessoa pode contribuir por meio de questões, discussões, documentação, testes ou solicitações de alteração (*pull requests*). Participar não concede automaticamente o status de mantenedor nem acesso administrativo.
 
-## 4. Decision-making
+## 4. Tomada de decisões
 
-- Routine, reversible changes may be handled through the normal contribution workflow.
-- Significant technical or operational decisions should have a written rationale and record of alternatives considered.
-- Decisions affecting security, privacy, network access, community rules, or project direction require extra care and an opportunity for public feedback when disclosure is safe.
-- Maintainers should seek consensus where practical. When consensus is not reached, the responsible decision-maker must explain the outcome and rationale.
-- Emergency actions may be taken to protect users or infrastructure. The action and rationale should be documented afterward as soon as it is safe to do so.
+- Alterações rotineiras e reversíveis podem seguir o fluxo normal de contribuição.
+- Decisões técnicas ou operacionais relevantes devem registrar seus fundamentos e as alternativas consideradas.
+- Decisões que afetem segurança, privacidade, acesso à rede, regras comunitárias ou direção do projeto exigem cuidado adicional e oportunidade de manifestação pública quando a divulgação for segura.
+- Os mantenedores devem buscar consenso quando viável. Se não houver consenso, a pessoa responsável pela decisão deverá explicar o resultado e seus fundamentos.
+- Ações emergenciais podem ser tomadas para proteger usuários ou infraestrutura. A ação e sua justificativa devem ser documentadas assim que for seguro fazê-lo.
 
-Decision records belong in [docs/decisions/](docs/decisions/). Each record should link to relevant discussions rather than copying them.
+Os registros de decisão ficam em [docs/decisions/](docs/decisions/). Cada registro deve apontar para as discussões relevantes em vez de copiá-las integralmente.
 
-## 5. Protected changes to governance
+## 5. Alterações protegidas na governança
 
-Changes to this document or to the project's fundamental governance principles must not be merged as routine edits.
+Alterações neste documento ou nos princípios fundamentais de governança não podem ser incorporadas como edições rotineiras.
 
-A proposed change must:
+Uma proposta deve:
 
-1. Be announced in a public issue or discussion, with the exact proposed change and its rationale.
-2. Remain open for community comment for at least 14 calendar days, except when a narrowly scoped urgent change is required to address an immediate security or legal risk.
-3. Summarize material objections and explain how they were addressed.
-4. Receive explicit approval from the project lead during the founder-led stage.
-5. Once a maintainer group has been formally established, also receive approval from at least two-thirds of active maintainers, rounded up, in addition to project-lead approval. An emergency exception must be documented and reviewed afterward.
+1. Ser anunciada em uma questão ou discussão pública, com a alteração exata e sua justificativa.
+2. Permanecer aberta a comentários por pelo menos 14 dias corridos, exceto quando uma alteração urgente e estritamente delimitada for necessária para responder a um risco legal ou de segurança imediato.
+3. Resumir objeções relevantes e explicar como foram consideradas.
+4. Receber aprovação explícita da pessoa responsável pelo projeto durante a fase liderada pelo fundador.
+5. Depois da formalização de um grupo de mantenedores, receber também a aprovação de pelo menos dois terços dos mantenedores ativos, arredondada para cima, além da aprovação da pessoa responsável pelo projeto. Uma exceção emergencial deve ser documentada e revisada posteriormente.
 
-The project must not describe a change as community-approved unless the required process actually took place. GitHub permissions and branch protections should be configured to support this policy where the available plan and repository settings permit them.
+O projeto não deve afirmar que uma alteração foi aprovada pela comunidade se o processo exigido não tiver sido realizado. As permissões do GitHub e as proteções de branch deverão ser configuradas para apoiar esta política quando o plano e as configurações do repositório permitirem.
 
-## 6. Appointing and removing maintainers
+## 6. Nomeação e remoção de mantenedores
 
-Appointments must be explicit, accepted by the person appointed, and documented with their responsibilities.
+As nomeações devem ser explícitas, aceitas pela pessoa nomeada e documentadas com suas responsabilidades.
 
-A maintainer may step down at any time. Access may be suspended immediately when reasonably necessary to contain a security incident or prevent harm. Other removals should include a documented reason and a fair opportunity to respond when doing so is safe and appropriate.
+Um mantenedor pode deixar a função a qualquer momento. O acesso pode ser suspenso imediatamente quando isso for razoavelmente necessário para conter um incidente de segurança ou evitar danos. Outras remoções devem ter justificativa documentada e, quando for seguro e apropriado, uma oportunidade justa de resposta.
 
-Where the person affected is the project lead, the succession and dispute-handling arrangements should be followed rather than treating the project lead as exempt from accountability.
+Quando a pessoa envolvida for a responsável pelo projeto, os procedimentos de sucessão e resolução de conflitos devem ser seguidos. A liderança não está isenta de responsabilidade.
 
-## 7. Conflicts of interest and disputes
+## 7. Conflitos de interesse e divergências
 
-People participating in decisions should disclose material conflicts of interest. Disagreements should focus on evidence, project goals, and consequences rather than personal attacks.
+Pessoas que participem de decisões devem declarar conflitos de interesse relevantes. Divergências devem se concentrar em evidências, objetivos do projeto e consequências, sem ataques pessoais.
 
-Reports of misconduct should be handled discreetly and fairly. Security reports, personal information, and sensitive allegations must not be forced into public issues.
+Relatos de conduta inadequada devem ser tratados com discrição e imparcialidade. Relatos de segurança, informações pessoais e acusações sensíveis não devem ser obrigados a passar por questões públicas.
 
-## 8. Continuity and succession
+## 8. Continuidade e sucessão
 
-The project should maintain a succession plan that covers:
+O projeto deve manter um plano de sucessão que contemple:
 
-- recovery of repository and essential service access;
-- secure storage and rotation of credentials outside the repository;
-- backups of critical configuration and project records;
-- delegation of emergency maintenance to trusted people;
-- transfer or recovery of operational responsibilities if the project lead becomes unavailable.
+- recuperação de acesso ao repositório e aos serviços essenciais;
+- armazenamento seguro e rotação de credenciais fora do repositório;
+- cópias de segurança de configurações e registros essenciais;
+- delegação de manutenção emergencial a pessoas de confiança;
+- transferência ou recuperação das responsabilidades operacionais caso a liderança fique indisponível.
 
-This document does not itself transfer ownership of a GitHub account, domain, hosting account, trademark, or other asset. Those assets require appropriate access and recovery arrangements outside this document. No passwords, tokens, private keys, or recovery codes may be committed to the repository.
+O procedimento detalhado está em [docs/CONTINUITY.md](docs/CONTINUITY.md).
 
-Until a successor or delegated maintainer has explicitly accepted responsibility, no person should be assumed to have authority merely because they contributed to the project.
+Este documento não transfere, por si só, a titularidade de uma conta do GitHub, domínio, hospedagem, marca ou outro ativo. Esses recursos exigem procedimentos adequados de acesso e recuperação fora deste documento. Senhas, tokens, chaves privadas e códigos de recuperação nunca devem ser enviados ao repositório.
 
-## 9. Relationship to other policies
+Até que uma pessoa sucessora ou mantenedora delegada aceite explicitamente a responsabilidade, ninguém deve ser considerado autorizado apenas por ter contribuído para o projeto.
 
-- [README.md](README.md): public-facing project overview.
-- [CONTRIBUTING.md](CONTRIBUTING.md): contribution workflow.
-- [SECURITY.md](SECURITY.md): vulnerability reporting and response.
-- [TRADEMARKS.md](TRADEMARKS.md): name and identity usage.
-- [License](LICENSE): copyright and software licensing terms.
+## 9. Relação com as demais políticas
 
-If policies conflict, legal license terms govern software permissions; security-sensitive matters should be handled through the security process; governance decisions should be interpreted consistently with this document and applicable law.
+- [README.md](README.md): apresentação pública do projeto.
+- [CONTRIBUTING.md](CONTRIBUTING.md): fluxo de contribuição.
+- [SECURITY.md](SECURITY.md): comunicação e tratamento de vulnerabilidades.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md): convivência comunitária.
+- [TRADEMARKS.md](TRADEMARKS.md): uso do nome e da identidade visual.
+- [LICENSE](LICENSE): termos de direitos autorais e licenciamento do software.
 
-## 10. Amendments and review
+Em caso de conflito, os termos legais da licença determinam as permissões de uso do software; questões sensíveis de segurança devem seguir o processo de segurança; e as decisões de governança devem ser interpretadas de forma coerente com este documento e com a legislação aplicável.
 
-This is the initial governance policy. It should be reviewed after the first practical prototype, when additional maintainers are appointed, and whenever the project’s operational risks change materially. Reviews must not be used to bypass Section 5.
+## 10. Alterações e revisão
+
+Esta é a política inicial de governança. Ela deve ser revisada após o primeiro protótipo prático, quando novos mantenedores forem nomeados e sempre que os riscos operacionais do projeto mudarem de forma relevante. A revisão não pode ser usada para contornar a Seção 5.
