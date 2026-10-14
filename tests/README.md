@@ -102,3 +102,23 @@ Os testes não comprovam interoperabilidade integral com hardware, criptografia 
 A workflow criptográfica também executa `scripts/check_firmware_crypto_protobuf_mqtt.sh` após a suíte oficial. O script recolhe o ciphertext do quinto caso produzido por `CryptoEngine::encryptPacket()`, constrói um `ServiceEnvelope` com o esquema oficial fixado, verifica a decodificação Protobuf e publica o envelope binário num Mosquitto descartável. Dois clientes recebem a mensagem e comparam o envelope recebido byte a byte com o publicado.
 
 Essa verificação liga a saída do código criptográfico do firmware (em teste nativo e com entradas sintéticas) à serialização Protobuf e ao transporte MQTT. Não é uma captura de rádio, não comprova interoperabilidade integral de um dispositivo e não testa ACL nem segurança geral do sistema. O broker anônimo e a mensagem retida existem somente no ambiente descartável do teste.
+
+## Matriz consolidada dos três nós simulados
+
+A cobertura é composta por testes independentes e integrados no CI; não é um único ensaio ponta a ponta dos três nós.
+
+| Cenário | Nó A | Nó B | Nó C | Verificação existente | O que isso demonstra |
+|---|---|---|---|---|---|
+| Tópico público autorizado | Publica | Recebe | Recebe | `scripts/check_mqtt_smoke.sh` e `scripts/check_mqtt_acl.sh` | Entrega MQTT a assinantes autorizados no tópico público do teste. |
+| Tópico restrito por ACL | Publica no tópico A/B | Recebe | Não pode publicar nem receber nesse tópico | `scripts/check_mqtt_acl.sh` | A ACL do broker controla o acesso ao tópico; não é criptografia de canal. |
+| Prefixo doméstico `msh/#` | Cliente `devmesh` autenticado | Mesma identidade compartilhada na configuração doméstica | A conta `devmesh` também teria acesso a `msh/#` | `scripts/check_home_deployment.sh` | Autenticação, rejeição de acesso anônimo/senha errada e bloqueio fora do prefixo. A configuração doméstica não separa permissões por nó. |
+| Payload binário Meshtastic sintético | Publica um `ServiceEnvelope` | Recebe os mesmos bytes | Recebe os mesmos bytes | `scripts/check_meshtastic_mqtt.sh` e `scripts/check_meshtastic_protobuf.sh` | Preservação dos bytes no transporte e estrutura compatível com o esquema Protobuf fixado. O fixture não veio de rádio real. |
+| Modelo de canal AES-CTR | Publica ciphertext sintético | Recebe e decifra com a chave correta | Recebe os mesmos bytes, mas usa uma chave diferente e não recupera o texto original | `scripts/check_meshtastic_crypto_model.sh` | Ilustra separadamente o transporte de ciphertext e o efeito de uma chave incorreta. AES-CTR isolado não autentica nem detecta adulteração. |
+| Criptografia do firmware integrada a Protobuf/MQTT | O teste nativo do firmware produz ciphertext sintético | Recebe o envelope transportado | Recebe o mesmo envelope transportado | Workflow `meshtastic-firmware-crypto.yml` | Compara o ciphertext do `CryptoEngine` com OpenSSL e verifica o transporte dos mesmos bytes. Não é teste de ACL, dispositivo físico ou rádio. |
+
+### Leitura correta dos resultados
+
+- **Permissão de tópico:** controlada pelo broker MQTT. Na instalação doméstica atual, os nós usam uma conta compartilhada com acesso a todo `msh/#`; a ACL não cria isolamento entre esses nós.
+- **Confidencialidade do payload:** depende da configuração e do comportamento criptográfico Meshtastic. Receber os mesmos bytes não prova, por si só, que o conteúdo esteja cifrado.
+- **Autenticidade e integridade:** AES-CTR sozinho não oferece autenticação. Os testes AEAD/AES-CCM do firmware fixado cobrem rejeição de adulteração em casos unitários, mas não provam que cada dispositivo real esteja usando essa modalidade.
+- **Estado da validação:** os testes de CI aprovados demonstram os cenários sintéticos descritos acima. Ainda faltam ensaios com dispositivos reais, captura de tráfego LoRa/MQTT e confirmação da configuração efetiva dos nós.
