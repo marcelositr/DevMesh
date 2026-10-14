@@ -95,7 +95,7 @@ node_sub_once outside-prefix/check "$TEMP_DIR/acl-output.txt" "$TEMP_DIR/acl-err
 ACL_STATUS=$?
 set -e
 [[ ! -s "$TEMP_DIR/acl-output.txt" && "$ACL_STATUS" -ne 0 ]] \
-    || fail "A ACL permitiu acesso fora do prefixo msh/#."
+    || fail "O prefixo fora de msh/# ficou acessível ao cliente autorizado."
 printf 'OK: a ACL bloqueou leitura fora de msh/#.\n'
 printf 'PASSOU: configuração doméstica validada com Mosquitto real em contêiner descartável.\n'
 printf 'LIMITE: não valida TLS, payloads de rádio real nem prontidão para produção.\n'
