@@ -1,0 +1,31 @@
+name: MQTT smoke check
+
+on:
+  push:
+    branches:
+      - main
+      - "test/**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mqtt-smoke-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mqtt-smoke:
+    name: Mosquitto connectivity and topic routing
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Run isolated MQTT smoke check
+        run: bash scripts/check_mqtt_smoke.sh
