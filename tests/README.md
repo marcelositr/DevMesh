@@ -36,6 +36,18 @@ Requisitos: Git, `protoc` e `xxd`. O teste baixa a versão fixada, decodifica o 
 
 **Limite:** o fixture não é uma captura de dispositivo real. A validação confirma a estrutura segundo a versão fixada do esquema, não criptografia real, interoperabilidade integral com firmware, downlink ou funcionamento de rádio LoRa. O esquema é obtido durante o teste e não é incorporado ao código do DevMesh.
 
+## Modelo de criptografia AES-CTR de canal
+
+O script `scripts/check_meshtastic_crypto_model.sh` cria texto de teste, cifra com OpenSSL AES-128-CTR usando uma chave e um nonce sintéticos, publica os bytes cifrados num broker descartável e verifica que B e C recebem o mesmo ciphertext. B recupera o texto com a chave correta; C usa uma chave diferente e não recupera o texto original.
+
+```sh
+bash scripts/check_meshtastic_crypto_model.sh
+```
+
+O nonce segue a disposição documentada para tráfego de canal Meshtastic: `packet_id` little-endian de 64 bits, `from_node` little-endian de 32 bits e contador de bloco little-endian de 32 bits. O teste usa apenas um bloco curto e não inclui segredos reais.
+
+**Limites:** é um modelo independente da operação AES-CTR, não uma execução do `CryptoEngine.cpp` nem uma captura de dispositivo. Não comprova interoperabilidade integral com firmware. AES-CTR não autentica o conteúdo, e uma saída diferente com chave errada não equivale a uma garantia criptográfica geral. O teste também não cobre mensagens diretas PKI/AES-CCM, assinatura ou integridade.
+
 ## Verificação básica de autenticação
 
 O script `scripts/check_mqtt_auth.sh` inicia um broker descartável com autenticação obrigatória e credenciais temporárias.

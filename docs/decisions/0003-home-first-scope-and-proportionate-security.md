@@ -17,7 +17,7 @@ O escopo inicial será uma instalação doméstica com Mosquitto, três nós sim
 
 A evolução seguirá estas etapas:
 
-1. **Protótipo e CI:** testar conectividade e roteamento MQTT, transporte binário de um fixture sintético, autenticação básica e ACLs por tópico num broker efêmero. O fixture é uma amostra estática, não um pacote capturado de um dispositivo real. A validação estrutural usa as definições oficiais Protobuf do Meshtastic numa versão fixada, mas não valida criptografia real nem interoperabilidade integral com firmware.
+1. **Protótipo e CI:** testar conectividade e roteamento MQTT, transporte binário de um fixture sintético, um modelo independente AES-CTR, autenticação básica e ACLs por tópico num broker efêmero. O fixture é uma amostra estática, não um pacote capturado de um dispositivo real. A validação estrutural usa as definições oficiais Protobuf do Meshtastic numa versão fixada, mas não valida criptografia real nem interoperabilidade integral com firmware.
 2. **Configuração doméstica:** não expor o broker diretamente à internet. Ao preparar uma configuração de uso real, habilitar autenticação para clientes de rede e manter credenciais fora do controle de versão.
 3. **Permissões por tópico:** aplicar regras de ACL adequadas ao modelo de confiança para separar clientes e limitar publicação/assinatura. O teste atual cobre somente o cenário mínimo de três nós; regras de uma instalação real devem ser definidas para os clientes e tópicos efetivamente usados.
 4. **Acesso por redes não confiáveis:** não oferecer acesso remoto direto como parte da primeira versão. Se esse cenário for adicionado, definir e testar a proteção do transporte, preferencialmente com TLS ou uma VPN adequadamente configurada, além das permissões de acesso necessárias.
@@ -28,7 +28,7 @@ A evolução seguirá estas etapas:
 - **ACL de broker e criptografia de canal são controles diferentes.** A ACL atual bloqueia o nó C no tópico MQTT de teste. Isso não representa, por si só, um canal privado Meshtastic: numa malha com criptografia de canal, um nó sem a chave ainda pode receber e retransmitir bytes cifrados, mas não consegue decifrar a mensagem.
 - O teste de autenticação comprova apenas o comportamento básico do broker descartável com credenciais de teste. Não valida o armazenamento de segredos nem a configuração de uma instalação doméstica.
 - O teste de ACL verifica permissões de publicação e assinatura no cenário simulado de tópicos públicos e privados. Não certifica uma política de ACL de produção nem cobre todas as convenções de tópicos do Meshtastic.
-- O teste MQTT binário verifica que o broker transporta bytes sem alterá-los no tópico escolhido e que dois assinantes recebem o mesmo fixture sintético. O teste Protobuf valida a estrutura desse fixture contra as definições oficiais fixadas e confirma a recodificação dos mesmos bytes. Nenhum dos testes comprova que firmware Meshtastic aceite o fixture nem que o payload tenha sido cifrado por um dispositivo real.
+- O teste MQTT binário verifica que o broker transporta bytes sem alterá-los no tópico escolhido e que dois assinantes recebem o mesmo fixture sintético. Um teste independente com OpenSSL modela AES-CTR e confirma que a chave correta recupera o texto enquanto uma chave diferente não o recupera, mas não executa o firmware nem comprova interoperabilidade integral. O teste Protobuf valida a estrutura desse fixture contra as definições oficiais fixadas e confirma a recodificação dos mesmos bytes. Nenhum dos testes comprova que firmware Meshtastic aceite o fixture nem que o payload tenha sido cifrado por um dispositivo real.
 - A opção de criptografia do módulo MQTT do Meshtastic influencia se os pacotes enviados ao broker são cifrados ou enviados em forma decifrada. Não presumir que a chave configurada no canal, sozinha, garanta que o conteúdo encaminhado ao MQTT continue cifrado. A integração deverá verificar explicitamente essa configuração e o tipo de payload.
 - TLS protege o transporte entre os pontos da conexão, mas não transforma por si só o payload em conteúdo criptografado de ponta a ponta.
 - A criptografia de canais Meshtastic é uma camada separada. O DevMesh não deve prometer confidencialidade ou compatibilidade sem testes específicos do tipo de pacote e do encaminhamento MQTT.
@@ -36,7 +36,7 @@ A evolução seguirá estas etapas:
 
 ## Critérios para ampliar o escopo
 
-Próximo passo de protocolo: adicionar uma simulação explícita em que A publica um payload cifrado opaco, B e C recebem os mesmos bytes, e a documentação deixa claro que o nó C não tem chave para decifrá-los. A prova de não decifragem exige uma implementação criptográfica Meshtastic compatível com vetores e formatos oficiais; o fixture atual não basta para afirmar esse resultado.
+Próximo passo de protocolo: comparar este modelo independente com o código de criptografia do firmware fixado numa versão e, se for necessário afirmar compatibilidade integral, acrescentar um vetor de referência reproduzível gerado ou validado pelo firmware. O modelo atual não deve ser descrito como execução real do firmware.
 
 Adicionar autenticação avançada, regras de ACL mais detalhadas, TLS, acesso remoto ou serviços auxiliares somente quando houver um cenário de uso claro. Cada ampliação deve explicar o risco ou a necessidade que atende e incluir testes proporcionais.
 
@@ -45,7 +45,7 @@ Antes de declarar uma configuração pronta para uso real, revisar a configuraç
 ## Consequências
 
 - O protótipo continua pequeno e adequado a uma Raspberry Pi.
-- Os testes verificam conectividade, roteamento, transporte binário de um fixture, validação estrutural Protobuf, autenticação básica e ACLs em ambientes descartáveis, sem afirmar controles que não testam.
+- Os testes verificam conectividade, roteamento, transporte binário de um fixture, validação estrutural Protobuf, modelo independente AES-CTR, autenticação básica e ACLs em ambientes descartáveis, sem afirmar controles que não testam.
 - Segurança avançada não será implementada sem necessidade demonstrável; requisitos necessários para uma exposição futura não serão esquecidos.
 - A documentação deve distinguir sempre entre planejado, implementado e verificado.
 
