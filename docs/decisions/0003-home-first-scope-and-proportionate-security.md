@@ -25,14 +25,18 @@ A evolução seguirá estas etapas:
 ## Limites de segurança e compatibilidade
 
 - Autenticação identifica o cliente; ACLs restringem o que ele pode publicar ou assinar. Uma não substitui a outra.
+- **ACL de broker e criptografia de canal são controles diferentes.** A ACL atual bloqueia o nó C no tópico MQTT de teste. Isso não representa, por si só, um canal privado Meshtastic: numa malha com criptografia de canal, um nó sem a chave ainda pode receber e retransmitir bytes cifrados, mas não consegue decifrar a mensagem.
 - O teste de autenticação comprova apenas o comportamento básico do broker descartável com credenciais de teste. Não valida o armazenamento de segredos nem a configuração de uma instalação doméstica.
 - O teste de ACL verifica permissões de publicação e assinatura no cenário simulado de tópicos públicos e privados. Não certifica uma política de ACL de produção nem cobre todas as convenções de tópicos do Meshtastic.
-- O teste MQTT binário verifica que o broker transporta bytes sem alterá-los no tópico escolhido. O teste Protobuf valida o fixture sintético contra as definições oficiais fixadas e confirma a recodificação dos mesmos bytes. Nenhum dos testes comprova que firmware Meshtastic aceite o fixture nem que o payload tenha sido cifrado por um dispositivo real.
+- O teste MQTT binário verifica que o broker transporta bytes sem alterá-los no tópico escolhido e que dois assinantes recebem o mesmo fixture sintético. O teste Protobuf valida a estrutura desse fixture contra as definições oficiais fixadas e confirma a recodificação dos mesmos bytes. Nenhum dos testes comprova que firmware Meshtastic aceite o fixture nem que o payload tenha sido cifrado por um dispositivo real.
+- A opção de criptografia do módulo MQTT do Meshtastic influencia se os pacotes enviados ao broker são cifrados ou enviados em forma decifrada. Não presumir que a chave configurada no canal, sozinha, garanta que o conteúdo encaminhado ao MQTT continue cifrado. A integração deverá verificar explicitamente essa configuração e o tipo de payload.
 - TLS protege o transporte entre os pontos da conexão, mas não transforma por si só o payload em conteúdo criptografado de ponta a ponta.
 - A criptografia de canais Meshtastic é uma camada separada. O DevMesh não deve prometer confidencialidade ou compatibilidade sem testes específicos do tipo de pacote e do encaminhamento MQTT.
 - Testes com nós simulados validam o comportamento do software e do broker, não o alcance, a qualidade do sinal ou o comportamento físico de um enlace LoRa.
 
 ## Critérios para ampliar o escopo
+
+Próximo passo de protocolo: adicionar uma simulação explícita em que A publica um payload cifrado opaco, B e C recebem os mesmos bytes, e a documentação deixa claro que o nó C não tem chave para decifrá-los. A prova de não decifragem exige uma implementação criptográfica Meshtastic compatível com vetores e formatos oficiais; o fixture atual não basta para afirmar esse resultado.
 
 Adicionar autenticação avançada, regras de ACL mais detalhadas, TLS, acesso remoto ou serviços auxiliares somente quando houver um cenário de uso claro. Cada ampliação deve explicar o risco ou a necessidade que atende e incluir testes proporcionais.
 

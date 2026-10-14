@@ -10,17 +10,17 @@ bash scripts/check_mqtt_smoke.sh
 
 Requisitos: Docker com permissão para iniciar contêineres e acesso à imagem `eclipse-mosquitto:2.1.2-alpine`.
 
-O teste usa três clientes simulados: A publica em tópicos públicos, B e C recebem mensagens autorizadas e assinaturas em tópicos diferentes demonstram o isolamento básico por tópico. O broker permite acesso anônimo somente no ambiente descartável.
+O teste usa três clientes simulados: A publica mensagens, B e C recebem mensagens em tópicos públicos autorizados e assinaturas em tópicos diferentes demonstram roteamento por tópico. O broker permite acesso anônimo somente no ambiente descartável.
 
 ## Transporte binário Meshtastic entre três nós
 
-O script `scripts/check_meshtastic_mqtt.sh` simula o nó A publicando um fixture binário `ServiceEnvelope`. Os nós B e C assinam o filtro público LongFast e verificam que os bytes recebidos são idênticos aos publicados.
+O script `scripts/check_meshtastic_mqtt.sh` simula o nó A publicando um fixture binário `ServiceEnvelope` num tópico com formato Meshtastic. Os nós B e C assinam o filtro de tópico e verificam que os bytes recebidos são idênticos aos publicados.
 
 ```sh
 bash scripts/check_meshtastic_mqtt.sh
 ```
 
-O fixture `tests/fixtures/meshtastic-service-envelope.hex` é sintético e contém um `MeshPacket` com bytes no campo `encrypted`. Este teste valida a entrega a dois assinantes e a preservação exata dos bytes. Não valida ACL nem decodifica Protobuf.
+O fixture `tests/fixtures/meshtastic-service-envelope.hex` é sintético e contém um `MeshPacket` com bytes no campo `encrypted`. O teste comprova entrega e preservação de bytes, mas **não** comprova que esses bytes resultem de criptografia real nem que o nó C não consiga decifrá-los. Ele não valida ACL nem decodifica Protobuf.
 
 ## Validação estrutural Protobuf com o esquema oficial
 
@@ -52,9 +52,9 @@ O script `scripts/check_mqtt_acl.sh` inicia um broker descartável com credencia
 bash scripts/check_mqtt_acl.sh
 ```
 
-O teste verifica que B e C recebem mensagens no tópico público autorizado, B recebe mensagens privadas de A e C não consegue publicar nem receber mensagens no tópico privado de A/B.
+O teste verifica que B e C recebem mensagens no tópico público autorizado, B recebe mensagens no tópico restrito de A/B e C não consegue publicar nem receber nesse tópico.
 
-Autenticação identifica o cliente; ACL restringe as operações permitidas por tópico. Essas regras não são uma configuração pronta para produção.
+**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber os bytes cifrados, mas não ler o conteúdo. A simulação criptográfica real ainda não está implementada.
 
 ## Limitações conhecidas
 

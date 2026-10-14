@@ -12,6 +12,8 @@ A primeira etapa valida uma base simples para uso doméstico, inclusive numa Ras
 
 O CI verifica conectividade MQTT, roteamento por tópico, autenticação básica e ACLs num broker descartável. Também simula o nó A publicando um fixture binário Meshtastic sintético que os nós B e C recebem sem alteração. A validação estrutural usa `protoc` com as definições oficiais Meshtastic fixadas numa versão específica, decodifica o `ServiceEnvelope`, verifica campos esperados e confirma o ciclo de recodificação. Isso valida a estrutura do fixture e o transporte MQTT, não criptografia real, interoperabilidade integral com firmware ou rádio LoRa.
 
+**Criptografia Meshtastic e ACL MQTT são coisas diferentes.** O teste de ACL impede que o nó C acesse um tópico restrito no broker. O teste binário mostra que dois assinantes recebem os mesmos bytes, mas ainda não prova que o nó C não consiga decifrar uma mensagem. Também é necessário verificar a opção de criptografia do módulo MQTT: a chave de canal, sozinha, não garante que o payload publicado no broker continue cifrado.
+
 A configuração anônima usada em alguns testes existe somente para brokers efêmeros de CI e não deve ser reutilizada numa instalação real. As credenciais do teste de autenticação são temporárias. A configuração doméstica deve evitar exposição pública do broker e prever autenticação para clientes de rede. ACLs e proteção do transporte serão aplicadas conforme o modelo de confiança e antes de qualquer acesso por redes não confiáveis. O acesso remoto não faz parte do escopo inicial.
 
 Consulte a [decisão sobre escopo doméstico e segurança proporcional](docs/decisions/0003-home-first-scope-and-proportionate-security.md) para os limites e os critérios de evolução.
