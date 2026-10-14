@@ -46,7 +46,7 @@ bash scripts/check_meshtastic_crypto_model.sh
 
 O nonce do modelo segue a disposição de canal documentada e conferida no código fixado de `CryptoEngine.cpp`: `packet_id` little-endian de 64 bits, `from_node` little-endian de 32 bits e contador de bloco de 32 bits. O teste usa chaves e texto sintéticos, sem segredos reais.
 
-O modelo publica o ciphertext no broker descartável. B e C recebem os mesmos bytes; B recupera o texto com a chave correta e C, usando outra chave, não recupera o texto original.
+O modelo publica o ciphertext no broker descartável. B e C recebem os mesmos bytes; B recupera o texto com a chave correta e C, usando outra chave, não recupera o texto original. O teste também altera deliberadamente um bit do ciphertext e verifica que o bit correspondente do texto decifrado muda sem erro de autenticação, demonstrando na prática que AES-CTR não detecta adulteração.
 
 ## Suíte criptográfica oficial do firmware
 
