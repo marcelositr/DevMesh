@@ -60,9 +60,9 @@ Siga o [Código de Conduta](CODE_OF_CONDUCT.md).
 
 ## Licença e atribuição
 
-Ao enviar uma contribuição, você concorda que ela poderá ser distribuída sob a licença aplicável ao projeto, atualmente prevista como **GNU AGPL versão 3 ou posterior**, conforme os arquivos de licença e os direitos que você detém sobre a contribuição. Envie apenas material que tenha direito de contribuir e identifique material de terceiros e suas licenças.
+A contribuição deverá ser distribuída sob os termos de licença aplicáveis ao projeto, respeitando os direitos que você possui sobre o material enviado. O arquivo [LICENSE](LICENSE) identifica a licença pretendida como **GNU AGPL versão 3 ou posterior**, mas atualmente contém um aviso resumido, não o texto integral da licença. A incorporação e conferência do texto completo ainda são uma pendência documental importante; o aviso não substitui o texto oficial.
 
-A licença e a governança do projeto são assuntos distintos. Consulte [LICENSE](LICENSE) e [GOVERNANCE.md](GOVERNANCE.md). Se houver dúvida sobre os termos ou a situação de uma contribuição, pergunte antes de enviá-la.
+Envie apenas material que tenha direito de contribuir e identifique material de terceiros e suas licenças. A licença e a governança do projeto são assuntos distintos. Consulte [LICENSE](LICENSE) e [GOVERNANCE.md](GOVERNANCE.md). Se houver dúvida sobre os termos ou a situação de uma contribuição, pergunte antes de enviá-la.
 
 ## Estágio atual do projeto
 
