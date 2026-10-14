@@ -14,7 +14,7 @@ O teste usa três clientes simulados: A publica mensagens, B e C recebem mensage
 
 ## Transporte binário Meshtastic entre três nós
 
-O script `scripts/check_meshtastic_mqtt.sh` simula o nó A publicando um fixture binário `ServiceEnvelope` num tópico com formato Meshtastic. Os nós B e C assinam o filtro de tópico e verificam que os bytes recebidos são idênticos aos publicados.
+O script `scripts/check_meshtastic_mqtt.sh` simula o nó A publicando um fixture binário `ServiceEnvelope` num tópico com formato Meshtastic. Os nós B e C assinam o filtro de tópico, confirmam suas assinaturas com o `SUBACK` do broker e verificam que os bytes recebidos são idênticos aos publicados.
 
 ```sh
 bash scripts/check_meshtastic_mqtt.sh
@@ -54,7 +54,7 @@ bash scripts/check_mqtt_acl.sh
 
 O teste verifica que B e C recebem mensagens no tópico público autorizado, B recebe mensagens no tópico restrito de A/B e C não consegue publicar nem receber nesse tópico.
 
-**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber os bytes cifrados, mas não ler o conteúdo. A simulação criptográfica real ainda não está implementada.
+**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. A simulação criptográfica real ainda não está implementada.
 
 ## Limitações conhecidas
 

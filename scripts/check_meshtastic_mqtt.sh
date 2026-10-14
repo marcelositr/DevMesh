@@ -8,6 +8,7 @@ RUN_ATTEMPT="${GITHUB_RUN_ATTEMPT:-0}"
 CONTAINER_NAME="devmesh-meshtastic-mqtt-${RUN_ID}-${RUN_ATTEMPT}"
 TEMP_DIR="$(mktemp -d)"
 BROKER_READY=false
+SUBSCRIBERS_READY=false
 TOPIC="msh/US/2/e/LongFast/!a1b2c3d4"
 TOPIC_FILTER="msh/US/2/e/LongFast/#"
 
@@ -28,7 +29,7 @@ fail() {
 
 trap cleanup EXIT
 
-# O fixture representa um ServiceEnvelope sintético com MeshPacket criptografado.
+# Fixture sintético: ServiceEnvelope com bytes no campo encrypted.
 tr -d '[:space:]' < "$ROOT_DIR/tests/fixtures/meshtastic-service-envelope.hex" \
     | xxd -r -p > "$TEMP_DIR/service-envelope.bin"
 [[ -s "$TEMP_DIR/service-envelope.bin" ]] || fail "Fixture binário vazio."
@@ -49,15 +50,30 @@ done
 
 OUTPUT_B="$TEMP_DIR/node-b.bin"
 OUTPUT_C="$TEMP_DIR/node-c.bin"
+ERROR_B="$TEMP_DIR/node-b.err"
+ERROR_C="$TEMP_DIR/node-c.err"
 
-# Os nós B e C assinam o filtro público LongFast.
-docker exec "$CONTAINER_NAME" mosquitto_sub -h 127.0.0.1 -t "$TOPIC_FILTER" \
-    -C 1 -N -W 8 > "$OUTPUT_B" 2> "$TEMP_DIR/node-b.err" &
+# O modo debug permite aguardar o SUBACK, em vez de depender de um sleep fixo.
+docker exec "$CONTAINER_NAME" mosquitto_sub -d -h 127.0.0.1 -t "$TOPIC_FILTER" \
+    -C 1 -N -W 8 > "$OUTPUT_B" 2> "$ERROR_B" &
 PID_B="$!"
-docker exec "$CONTAINER_NAME" mosquitto_sub -h 127.0.0.1 -t "$TOPIC_FILTER" \
-    -C 1 -N -W 8 > "$OUTPUT_C" 2> "$TEMP_DIR/node-c.err" &
+docker exec "$CONTAINER_NAME" mosquitto_sub -d -h 127.0.0.1 -t "$TOPIC_FILTER" \
+    -C 1 -N -W 8 > "$OUTPUT_C" 2> "$ERROR_C" &
 PID_C="$!"
-sleep 1
+
+for attempt in $(seq 1 40); do
+    if grep -qi 'received SUBACK' "$ERROR_B" 2>/dev/null \
+        && grep -qi 'received SUBACK' "$ERROR_C" 2>/dev/null; then
+        SUBSCRIBERS_READY=true
+        break
+    fi
+    if ! kill -0 "$PID_B" 2>/dev/null || ! kill -0 "$PID_C" 2>/dev/null; then
+        break
+    fi
+    sleep 0.25
+done
+[[ "$SUBSCRIBERS_READY" == true ]] \
+    || fail "Os nós B e C não confirmaram a assinatura MQTT dentro do prazo."
 
 docker exec -i "$CONTAINER_NAME" mosquitto_pub -h 127.0.0.1 \
     -t "$TOPIC" -s < "$TEMP_DIR/service-envelope.bin" \
@@ -70,6 +86,6 @@ cmp --silent "$TEMP_DIR/service-envelope.bin" "$OUTPUT_B" \
 cmp --silent "$TEMP_DIR/service-envelope.bin" "$OUTPUT_C" \
     || fail "Os bytes recebidos pelo nó C diferem dos publicados."
 
-printf 'OK: os nós B e C receberam o mesmo ServiceEnvelope binário em %s.\n' "$TOPIC"
+printf 'OK: os nós B e C confirmaram a assinatura e receberam o mesmo ServiceEnvelope em %s.\n' "$TOPIC"
 printf 'OK: o broker preservou exatamente os bytes publicados pelo nó A.\n'
-printf 'LIMITE: fixture sintético; este teste não valida ACL, decodificação Protobuf, criptografia real, firmware ou rádio LoRa.\n'
+printf 'LIMITE: fixture sintético; este teste não valida ACL, criptografia real, firmware ou rádio LoRa.\n'
