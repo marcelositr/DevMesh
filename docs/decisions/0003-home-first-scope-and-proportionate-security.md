@@ -17,7 +17,7 @@ O escopo inicial será uma instalação doméstica com Mosquitto, três nós sim
 
 A evolução da segurança seguirá estas etapas:
 
-1. **Protótipo e CI:** testar conectividade e roteamento MQTT com três clientes simulados num broker efêmero e isolado. A configuração anônima existente só pode ser usada nesse ambiente descartável de teste; ela não é uma configuração recomendada para implantação.
+1. **Protótipo e CI:** testar conectividade e roteamento MQTT com três clientes simulados num broker efêmero e isolado. Um teste separado verifica que o broker com autenticação recusa publicações anônimas e aceita clientes com credenciais temporárias. A configuração anônima só pode ser usada no teste descartável de conectividade, nunca como configuração de implantação.
 2. **Configuração doméstica:** não expor o broker diretamente à internet. Ao preparar uma configuração de uso real, habilitar autenticação para clientes de rede e manter credenciais fora do controle de versão.
 3. **Permissões por tópico:** implementar ACLs quando forem necessárias para separar clientes, limitar publicação/assinatura ou cumprir o modelo de confiança definido. Antes de disponibilizar o serviço a clientes não confiáveis, validar e aplicar as restrições necessárias.
 4. **Acesso por redes não confiáveis:** não oferecer acesso remoto direto como parte da primeira versão. Se esse cenário for adicionado, definir e testar a proteção do transporte, preferencialmente com TLS ou uma VPN adequadamente configurada, além das permissões de acesso necessárias.
@@ -25,6 +25,7 @@ A evolução da segurança seguirá estas etapas:
 ## Limites de segurança
 
 - Autenticação identifica o cliente; ACLs restringem o que ele pode publicar ou assinar. Uma não substitui a outra.
+- O teste de autenticação comprova apenas o comportamento básico do broker descartável com credenciais de teste. Não valida o armazenamento de segredos nem a configuração de uma instalação doméstica.
 - TLS protege o transporte entre os pontos da conexão, mas não transforma por si só o payload em conteúdo criptografado de ponta a ponta.
 - A criptografia de canais Meshtastic é uma camada separada. O DevMesh não deve prometer confidencialidade ou compatibilidade sem testes específicos do tipo de pacote e do encaminhamento MQTT.
 - A separação entre tópicos num teste de roteamento não comprova autorização por ACL.
@@ -39,7 +40,7 @@ Antes de declarar uma configuração pronta para uso real, revisar a configuraç
 ## Consequências
 
 - O protótipo continua pequeno e adequado a uma Raspberry Pi.
-- Os testes existentes permanecem úteis como linha de base, mas seu escopo será descrito corretamente.
+- Os testes existentes verificam conectividade, roteamento e autenticação básica em ambientes descartáveis, sem afirmar controles que não testam.
 - Segurança avançada não será implementada sem necessidade demonstrável; requisitos necessários para uma exposição futura não serão esquecidos.
 - A documentação deve distinguir sempre entre planejado, implementado e verificado.
 
