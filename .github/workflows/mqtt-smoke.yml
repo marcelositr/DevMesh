@@ -40,6 +40,7 @@ jobs:
           bash -n scripts/check_meshtastic_mqtt.sh
           bash -n scripts/check_meshtastic_protobuf.sh
           bash -n scripts/check_meshtastic_crypto_model.sh
+          bash -n scripts/check_meshtastic_downlink_transport.sh
           bash -n scripts/check_home_deployment.sh
 
       - name: Validate and exercise the home broker deployment
@@ -50,6 +51,9 @@ jobs:
 
       - name: Run Meshtastic binary payload check
         run: bash scripts/check_meshtastic_mqtt.sh
+
+      - name: Run Meshtastic MQTT downlink topic transport check
+        run: bash scripts/check_meshtastic_downlink_transport.sh
 
       - name: Validate fixture against official Meshtastic Protobuf schemas
         run: bash scripts/check_meshtastic_protobuf.sh
