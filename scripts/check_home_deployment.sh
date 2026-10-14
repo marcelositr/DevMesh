@@ -30,7 +30,18 @@ docker run --rm --user "$(id -u):$(id -g)" \
     --entrypoint mosquitto_passwd \
     --volume "$TEMP_DIR:/mosquitto/config" \
     "$IMAGE" -b -c /mosquitto/config/passwordfile devmesh "$PASSWORD"
+docker run --rm --user "$(id -u):$(id -g)" \
+    --entrypoint mosquitto_passwd \
+    --volume "$TEMP_DIR:/mosquitto/config" \
+    "$IMAGE" -b /mosquitto/config/passwordfile probe ci-probe-password
 chmod 644 "$TEMP_DIR/passwordfile"
+
+# Usuário observador exclusivo do teste para verificar separadamente as duas direções da ACL.
+cat >> "$TEMP_DIR/aclfile" <<'ACL'
+
+user probe
+topic readwrite outside-prefix/#
+ACL
 
 docker compose --project-name "$PROJECT_NAME" --file "$TEMP_DIR/compose.yaml" config --quiet
 docker compose --project-name "$PROJECT_NAME" --file "$TEMP_DIR/compose.yaml" up -d
@@ -89,13 +100,24 @@ set -e
     || fail "Uma senha incorreta permitiu receber uma mensagem protegida."
 printf 'OK: uma senha incorreta foi recusada.\n'
 
-node_pub -r -t outside-prefix/check -m must-not-be-visible >/dev/null 2>&1 || true
+broker_exec mosquitto_pub -h 127.0.0.1 -u probe -P ci-probe-password \
+    -r -t outside-prefix/read-check -m probe-readable
 set +e
-node_sub_once outside-prefix/check "$TEMP_DIR/acl-output.txt" "$TEMP_DIR/acl-error.txt"
-ACL_STATUS=$?
+node_sub_once outside-prefix/read-check "$TEMP_DIR/acl-read-output.txt" "$TEMP_DIR/acl-read-error.txt"
+ACL_READ_STATUS=$?
 set -e
-[[ ! -s "$TEMP_DIR/acl-output.txt" && "$ACL_STATUS" -ne 0 ]] \
-    || fail "O prefixo fora de msh/# ficou acessível ao cliente autorizado."
-printf 'OK: a ACL bloqueou leitura fora de msh/#.\n'
+[[ ! -s "$TEMP_DIR/acl-read-output.txt" && "$ACL_READ_STATUS" -ne 0 ]] \
+    || fail "O cliente devmesh leu um tópico fora do prefixo autorizado."
+
+node_pub -r -t outside-prefix/publish-check -m must-not-be-retained >/dev/null 2>&1 || true
+set +e
+broker_exec mosquitto_sub -h 127.0.0.1 -u probe -P ci-probe-password \
+    -t outside-prefix/publish-check -C 1 -W 3 \
+    >"$TEMP_DIR/acl-publish-output.txt" 2>"$TEMP_DIR/acl-publish-error.txt"
+ACL_PUBLISH_STATUS=$?
+set -e
+[[ ! -s "$TEMP_DIR/acl-publish-output.txt" && "$ACL_PUBLISH_STATUS" -ne 0 ]] \
+    || fail "A publicação do cliente devmesh foi retida fora do prefixo autorizado."
+printf 'OK: a ACL bloqueou leitura e publicação fora de msh/#.\n'
 printf 'PASSOU: configuração doméstica validada com Mosquitto real em contêiner descartável.\n'
 printf 'LIMITE: não valida TLS, payloads de rádio real nem prontidão para produção.\n'
