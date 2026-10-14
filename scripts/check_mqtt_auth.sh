@@ -111,7 +111,7 @@ docker exec "$CONTAINER_NAME" mosquitto_sub \
     -C 1 \
     -W 8 >"$OUTPUT_FILE" 2>"$ERROR_FILE" &
 SUBSCRIBER_PID="$!"
-wait_for_subscription "$SUBSCRIBER_PID" "$ERROR_FILE"
+wait_for_subscription "$SUBSCRIBER_PID" "$OUTPUT_FILE"
 
 PAYLOAD="authenticated-message-from-node-a"
 if ! docker exec "$CONTAINER_NAME" mosquitto_pub \
