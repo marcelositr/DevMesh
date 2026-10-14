@@ -27,5 +27,8 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Check shell syntax
+        run: bash -n scripts/check_mqtt_smoke.sh
+
       - name: Run isolated MQTT smoke check
         run: bash scripts/check_mqtt_smoke.sh
