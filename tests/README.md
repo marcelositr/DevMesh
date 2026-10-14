@@ -81,3 +81,10 @@ O teste verifica que B e C recebem mensagens no tópico público autorizado, B r
 ## Limitações conhecidas
 
 Os testes não comprovam interoperabilidade integral com hardware, criptografia de payload capturado de dispositivo real, confidencialidade ponta a ponta de todo o percurso, segurança de produção, alcance ou retransmissão LoRa. O teste direto valida AES-CTR no ambiente nativo para uma entrada sintética. Resultados ainda não executados não devem ser descritos como aprovados.
+
+
+## Integração do ciphertext do firmware com Protobuf e MQTT
+
+A workflow criptográfica também executa `scripts/check_firmware_crypto_protobuf_mqtt.sh` após a suíte oficial. O script recolhe o ciphertext do quinto caso produzido por `CryptoEngine::encryptPacket()`, constrói um `ServiceEnvelope` com o esquema oficial fixado, verifica a decodificação Protobuf e publica o envelope binário num Mosquitto descartável. Dois clientes recebem a mensagem e comparam o envelope recebido byte a byte com o publicado.
+
+Essa verificação liga a saída do código criptográfico do firmware (em teste nativo e com entradas sintéticas) à serialização Protobuf e ao transporte MQTT. Não é uma captura de rádio, não comprova interoperabilidade integral de um dispositivo e não testa ACL nem segurança geral do sistema. O broker anônimo e a mensagem retida existem somente no ambiente descartável do teste.

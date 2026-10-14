@@ -118,3 +118,11 @@ jobs:
             exit 1
           }
           printf 'OK: cinco ciphertexts do CryptoEngine coincidem com OpenSSL.\n'
+
+      - name: Install Protobuf compiler for integrated payload check
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y protobuf-compiler
+
+      - name: Validate firmware ciphertext through Protobuf and MQTT
+        run: bash scripts/check_firmware_crypto_protobuf_mqtt.sh "$RUNNER_TEMP/meshtastic-crypto-tests.log"
