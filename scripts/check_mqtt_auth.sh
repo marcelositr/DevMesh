@@ -9,6 +9,7 @@ CONTAINER_NAME="devmesh-mosquitto-auth-${RUN_ID}-${RUN_ATTEMPT}"
 TEMP_DIR="$(mktemp -d)"
 TEST_USERNAME="devmesh-test"
 TEST_PASSWORD="devmesh-test-password"
+INVALID_TEST_PASSWORD="invalid-test-password"
 BROKER_READY=false
 
 cleanup() {
@@ -70,6 +71,16 @@ if docker exec "$CONTAINER_NAME" mosquitto_pub \
     fail "O broker aceitou uma publicação anônima."
 fi
 printf 'OK: o broker recusou uma publicação sem credenciais.\n'
+
+if docker exec "$CONTAINER_NAME" mosquitto_pub \
+    -h 127.0.0.1 \
+    -u "$TEST_USERNAME" \
+    -P "$INVALID_TEST_PASSWORD" \
+    -t devmesh/test/auth/invalid-credentials \
+    -m must-be-rejected >/dev/null 2>&1; then
+    fail "O broker aceitou uma senha inválida."
+fi
+printf 'OK: o broker recusou credenciais inválidas.\n'
 
 OUTPUT_FILE="$TEMP_DIR/authenticated-message.txt"
 ERROR_FILE="$TEMP_DIR/subscriber.err"
