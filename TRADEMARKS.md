@@ -1,44 +1,44 @@
-# Name, Branding, and Trademarks
+# Nome, marca e identidade visual
 
-## Purpose
+## Objetivo
 
-This document explains the project's intended use of the DevMesh name and visual identity. It is a project policy, not a claim that every name or logo mentioned here is registered as a trademark.
+Este documento explica as regras pretendidas para o uso do nome DevMesh e de sua identidade visual. É uma política do projeto, não uma afirmação de que todos os nomes ou logotipos mencionados estejam registrados como marcas.
 
-## Project Identity
+## Identidade do projeto
 
-DevMesh is an independent community project. It is not an official Meshtastic project and is not endorsed by, affiliated with, or operated by the Meshtastic project unless the relevant parties explicitly state otherwise.
+O DevMesh é um projeto comunitário independente. Não é um projeto oficial do Meshtastic e não é endossado, afiliado ou operado pelo projeto Meshtastic, salvo se as partes envolvidas declararem explicitamente o contrário.
 
-Do not present DevMesh, its services, or its releases in a way that falsely suggests official endorsement, sponsorship, or affiliation with another project, organization, or product.
+Não apresente o DevMesh, seus serviços ou suas versões de modo a sugerir falsamente endosso, patrocínio ou afiliação oficial com outro projeto, organização ou produto.
 
-Names and marks belonging to other parties remain subject to their respective owners' rights and policies.
+Nomes e marcas de terceiros continuam sujeitos aos direitos e às políticas de seus respectivos titulares.
 
-## Use of the DevMesh Name
+## Uso do nome DevMesh
 
-You may use the DevMesh name to accurately refer to the project, discuss it, write reviews, link to the repository, or identify unmodified copies and forks, provided that your use is not misleading and does not imply endorsement.
+Você pode usar o nome DevMesh para se referir corretamente ao projeto, discuti-lo, publicar análises, apontar para o repositório ou identificar cópias e *forks* não modificados, desde que o uso não seja enganoso nem implique endosso.
 
-For a fork, derivative service, or independently operated deployment:
+Em um *fork*, serviço derivado ou instalação operada de forma independente:
 
-- Clearly identify the project or operator responsible for that fork or service.
-- Do not imply that it is the official DevMesh service or is endorsed by the DevMesh maintainers.
-- Do not use project branding in a way that confuses users about origin, responsibility, support, or security.
-- Preserve applicable copyright, license, and attribution notices.
+- Identifique claramente o projeto ou operador responsável por esse *fork* ou serviço.
+- Não sugira que se trata do serviço oficial DevMesh nem que os mantenedores do DevMesh o endossam.
+- Não use a identidade visual de forma que confunda as pessoas sobre a origem, a responsabilidade, o suporte ou a segurança.
+- Preserve os avisos de direitos autorais, licença e atribuição aplicáveis.
 
-The open-source license governs rights to the software code. It does not automatically grant permission to use project names, logos, or other branding as if they identify an official release.
+A licença de código aberto rege os direitos sobre o software. Ela não concede automaticamente permissão para usar nomes, logotipos ou outros elementos de identidade visual como se identificassem uma versão oficial.
 
-## Logos and Visual Assets
+## Logotipos e recursos visuais
 
-Unless a separate notice says otherwise, do not assume that a logo or distinctive visual asset is available for unrestricted reuse merely because the source code is open source.
+Salvo indicação específica em contrário, não presuma que um logotipo ou recurso visual distintivo pode ser reutilizado sem restrições só porque o código-fonte é aberto.
 
-Requests to use DevMesh branding in an official capacity, or in a way that could imply project endorsement, should be discussed with the project lead or a designated maintainer. No dedicated trademark-approval process is currently promised.
+Pedidos para usar a identidade visual do DevMesh em caráter oficial, ou de maneira que possa sugerir endosso do projeto, devem ser discutidos com a pessoa responsável pelo projeto ou com um mantenedor designado. Atualmente, não há um processo formal específico de aprovação de marcas garantido.
 
-## Forks and Community Projects
+## Forks e projetos comunitários
 
-Forks and independent community projects are welcome under the applicable software license. This policy is intended to prevent confusion about identity, not to prohibit criticism, interoperability, discussion, or lawful independent development.
+*Forks* e projetos comunitários independentes são bem-vindos sob a licença de software aplicável. Esta política busca evitar confusão de identidade, não proibir críticas, interoperabilidade, discussões ou desenvolvimento independente lícito.
 
-A fork may use its own name and branding to make its independent status clear. Do not remove legally required notices or misrepresent the origin of code.
+Um *fork* pode adotar seu próprio nome e identidade visual para deixar clara sua independência. Não remova avisos legalmente exigidos nem apresente de forma falsa a origem do código.
 
-## Changes and Questions
+## Alterações e dúvidas
 
-Questions about project identity or proposed official use of DevMesh branding should be raised through the project's published communication channels, if available. Do not assume a dedicated trademark contact exists until one is explicitly published.
+Dúvidas sobre a identidade do projeto ou propostas de uso oficial da marca DevMesh devem ser encaminhadas pelos canais de comunicação publicados pelo projeto, se houver. Não presuma que exista um contato específico para marcas até que ele seja anunciado explicitamente.
 
-This policy may be revised through the project's governance process. See [GOVERNANCE.md](GOVERNANCE.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [LICENSE](LICENSE).
+Esta política pode ser revisada conforme o processo de governança do projeto. Consulte [GOVERNANCE.md](GOVERNANCE.md), [CONTRIBUTING.md](CONTRIBUTING.md) e [LICENSE](LICENSE).
