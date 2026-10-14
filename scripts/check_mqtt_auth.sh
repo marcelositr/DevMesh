@@ -87,7 +87,7 @@ wait_for_subscription() {
     local debug_file="$2"
 
     for attempt in $(seq 1 40); do
-        if grep --quiet --ignore-case --fixed-strings 'SUBACK' "$debug_file"; then
+        if grep --quiet --ignore-case --fixed-strings 'Subscribed (mid:' "$debug_file"; then
             return 0
         fi
         if ! kill -0 "$subscriber_pid" 2>/dev/null; then
