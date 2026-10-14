@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-IMAGE="${MOSQUITTO_IMAGE:-eclipse-mosquitto:2.1.2}"
+IMAGE="${MOSQUITTO_IMAGE:-eclipse-mosquitto:2.1.2-alpine}"
 RUN_ID="${GITHUB_RUN_ID:-local}"
 RUN_ATTEMPT="${GITHUB_RUN_ATTEMPT:-0}"
 CONTAINER_NAME="devmesh-mosquitto-smoke-${RUN_ID}-${RUN_ATTEMPT}"
