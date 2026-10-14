@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 IMAGE="${MOSQUITTO_IMAGE:-eclipse-mosquitto:2.1.2-alpine}"
 RUN_ID="${GITHUB_RUN_ID:-local}"
 RUN_ATTEMPT="${GITHUB_RUN_ATTEMPT:-0}"
@@ -37,7 +38,7 @@ docker run --rm \
 docker run \
     --detach \
     --name "$CONTAINER_NAME" \
-    --volume "$PWD/tests/mosquitto/mosquitto-auth.conf:/mosquitto/config/mosquitto.conf:ro" \
+    --volume "$ROOT_DIR/tests/mosquitto/mosquitto-auth.conf:/mosquitto/config/mosquitto.conf:ro" \
     --volume "$TEMP_DIR/passwordfile:/mosquitto/config/passwordfile:ro" \
     "$IMAGE" >/dev/null
 
