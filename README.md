@@ -6,9 +6,19 @@ O DevMesh está em fase inicial de planejamento e validação. As escolhas técn
 
 O DevMesh não é um projeto oficial do Meshtastic e não deve sugerir afiliação ou endosso oficial.
 
+## Escopo inicial
+
+A primeira etapa tem como objetivo validar uma base simples para uso doméstico, inclusive numa Raspberry Pi. O cenário inicial usa o Mosquitto e três nós simulados, sem depender de hardware de rádio nem expor o broker à internet.
+
+O teste de CI atual verifica conectividade MQTT, entrega de mensagens e roteamento entre tópicos. Ele não comprova criptografia Meshtastic, autenticação MQTT, autorização por ACL, TLS ou funcionamento de rádio real.
+
+A configuração anônima usada no teste existe somente para um broker efêmero e isolado no CI. Ela não deve ser reutilizada como configuração de implantação. A configuração de uso real deve evitar exposição pública do broker e prever autenticação dos clientes de rede. ACLs e proteção do transporte serão aplicadas conforme o modelo de confiança e antes de qualquer acesso por redes não confiáveis. O acesso remoto não faz parte do escopo inicial.
+
+Consulte a [decisão sobre escopo doméstico e segurança proporcional](docs/decisions/0003-home-first-scope-and-proportionate-security.md) para os limites e os critérios de evolução.
+
 ## Documentação
 
-- [Índice da documentação técnica](docs/README.md): organização dos documentos, decisões e contexto de trabalho.
+- [Índice da documentação técnica](docs/README.md): organização dos documentos, pesquisas e decisões.
 - [Governança](GOVERNANCE.md): papéis, responsabilidades e decisões.
 - [Como contribuir](CONTRIBUTING.md): propostas, alterações e revisões.
 - [Código de Conduta](CODE_OF_CONDUCT.md): convivência na comunidade.
@@ -24,4 +34,4 @@ A documentação voltada às pessoas, os comentários explicativos no código e 
 
 ## Situação atual
 
-O projeto ainda não deve ser considerado pronto para produção. As decisões técnicas serão tomadas depois de pesquisa, testes reproduzíveis e registro dos resultados.
+O projeto ainda não deve ser considerado pronto para produção. As decisões técnicas serão tomadas depois de pesquisa, testes reproduzíveis e registro dos resultados. A aprovação de um teste isolado no CI não significa que todos os controles de segurança ou a integração com Meshtastic estejam implementados ou validados.
