@@ -40,6 +40,10 @@ jobs:
           bash -n scripts/check_meshtastic_mqtt.sh
           bash -n scripts/check_meshtastic_protobuf.sh
           bash -n scripts/check_meshtastic_crypto_model.sh
+          bash -n scripts/check_home_deployment.sh
+
+      - name: Validate and exercise the home broker deployment
+        run: bash scripts/check_home_deployment.sh
 
       - name: Run isolated MQTT smoke check
         run: bash scripts/check_mqtt_smoke.sh
