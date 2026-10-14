@@ -17,9 +17,9 @@ concurrency:
 
 jobs:
   mqtt-smoke:
-    name: MQTT connectivity and Meshtastic payload transport
+    name: MQTT connectivity and Meshtastic payload validation
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
 
     steps:
       - name: Check out source
@@ -27,17 +27,26 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install Protocol Buffers compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y protobuf-compiler
+
       - name: Check shell syntax
         run: |
           bash -n scripts/check_mqtt_smoke.sh
           bash -n scripts/check_mqtt_auth.sh
           bash -n scripts/check_meshtastic_mqtt.sh
+          bash -n scripts/check_meshtastic_protobuf.sh
 
       - name: Run isolated MQTT smoke check
         run: bash scripts/check_mqtt_smoke.sh
 
       - name: Run Meshtastic binary payload check
         run: bash scripts/check_meshtastic_mqtt.sh
+
+      - name: Validate fixture against official Meshtastic Protobuf schemas
+        run: bash scripts/check_meshtastic_protobuf.sh
 
       - name: Run isolated MQTT authentication check
         run: bash scripts/check_mqtt_auth.sh

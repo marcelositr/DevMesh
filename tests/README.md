@@ -28,9 +28,19 @@ O script `scripts/check_meshtastic_mqtt.sh` publica e recebe um fixture binário
 bash scripts/check_meshtastic_mqtt.sh
 ```
 
-O fixture em `tests/fixtures/meshtastic-service-envelope.hex` representa um envelope com um `MeshPacket` que contém bytes no campo `encrypted`. Os campos e números de campo seguem as definições oficiais `mqtt.proto` e `mesh.proto`. O teste converte os bytes hexadecimais para binário e compara exatamente o payload publicado com o recebido.
+O fixture em `tests/fixtures/meshtastic-service-envelope.hex` representa um envelope com um `MeshPacket` que contém bytes no campo `encrypted`. Esse teste verifica que o broker transporta o payload sem alterar os bytes, mas não decodifica Protobuf.
 
-**Limite:** esse teste verifica transporte binário sem alteração pelo broker, não decodificação Protobuf nem validação integral do protocolo. O fixture não contém uma mensagem cifrada por um dispositivo real e não comprova criptografia Meshtastic, interoperabilidade com firmware, downlink ou funcionamento de rádio LoRa.
+## Validação estrutural Protobuf com o esquema oficial
+
+O script `scripts/check_meshtastic_protobuf.sh` usa o compilador `protoc` e as definições oficiais do repositório `meshtastic/protobufs`, fixadas na versão `v2.8.0` e no commit `7b2464c9b8c1521f93852261e4123826e5b25e11`.
+
+```sh
+bash scripts/check_meshtastic_protobuf.sh
+```
+
+Requisitos: Git, `protoc` e `xxd`. O teste baixa a versão fixada das definições oficiais, decodifica o fixture como `meshtastic.ServiceEnvelope`, verifica os campos esperados e o recodifica para comparar os bytes resultantes com o original.
+
+**Limite:** o fixture é sintético, não uma captura de um dispositivo real. A validação confirma a estrutura Protobuf segundo a versão fixada do esquema, não criptografia real, compatibilidade integral com firmware, downlink ou funcionamento de rádio LoRa. O esquema é obtido durante o teste e não é incorporado ao código do DevMesh.
 
 ## Verificação básica de autenticação
 
@@ -50,7 +60,6 @@ O teste verifica que:
 
 Os testes atuais **não** comprovam:
 
-- decodificação Protobuf integral ou compatibilidade com firmware Meshtastic;
 - criptografia real dos canais Meshtastic ou confidencialidade ponta a ponta;
 - autorização por ACL;
 - comportamento de rádio LoRa, alcance ou retransmissão;
