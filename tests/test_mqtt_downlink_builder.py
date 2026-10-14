@@ -3,7 +3,7 @@ import struct
 import unittest
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from meshtastic.protobuf import mesh_pb2, mqtt_pb2
+from meshtastic.protobuf import mesh_pb2, mqtt_pb2, portnums_pb2
 
 from scripts.build_mqtt_downlink import (
     build_envelope,
@@ -43,7 +43,7 @@ class DownlinkBuilderTests(unittest.TestCase):
         plaintext = decryptor.update(packet.encrypted) + decryptor.finalize()
         data = mesh_pb2.Data()
         data.ParseFromString(plaintext)
-        self.assertEqual(data.portnum, mesh_pb2.PortNum.TEXT_MESSAGE_APP)
+        self.assertEqual(data.portnum, portnums_pb2.TEXT_MESSAGE_APP)
         self.assertEqual(data.payload, "Teste isolado".encode("utf-8"))
 
     def test_blocks_public_preset_channel(self):
