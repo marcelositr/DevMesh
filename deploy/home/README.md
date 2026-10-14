@@ -47,10 +47,10 @@ Os dados persistentes ficam em um volume Docker gerenciado pelo Compose. Faça u
 
 ```sh
 mkdir -p deploy/home/backups
-docker run --rm \\
-  -v home_mosquitto_data:/data:ro \\
-  -v "$PWD/deploy/home/backups:/backup" \\
-  alpine:3.22 \\
+docker run --rm \
+  -v home_mosquitto_data:/data:ro \
+  -v "$PWD/deploy/home/backups:/backup" \
+  alpine:3.22 \
   tar -czf /backup/mosquitto-data.tar.gz -C /data .
 ```
 
