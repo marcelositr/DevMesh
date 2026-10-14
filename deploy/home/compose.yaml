@@ -1,7 +1,6 @@
 services:
   mosquitto:
     image: eclipse-mosquitto:2.1.2-alpine
-    container_name: devmesh-mosquitto
     restart: unless-stopped
     ports:
       - "1883:1883"
@@ -9,7 +8,10 @@ services:
       - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
       - ./passwordfile:/mosquitto/config/passwordfile:ro
       - ./aclfile:/mosquitto/config/aclfile:ro
-      - ./data:/mosquitto/data
+      - mosquitto_data:/mosquitto/data
     read_only: true
     tmpfs:
       - /tmp
+
+volumes:
+  mosquitto_data:
