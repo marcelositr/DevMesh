@@ -13,7 +13,6 @@ Esta é uma configuração inicial para uma rede doméstica confiável, usando M
 Execute a partir da raiz do repositório:
 
 ```sh
-mkdir -p deploy/home/data
 docker run --rm -it \
   --user "$(id -u):$(id -g)" \
   --entrypoint mosquitto_passwd \
@@ -44,7 +43,18 @@ Para parar o serviço, mantendo os dados:
 docker compose -f deploy/home/compose.yaml down
 ```
 
-Os dados persistentes ficam em `deploy/home/data/`. Faça cópias de segurança desse diretório e do arquivo de senhas por um meio seguro. Não publique nem compartilhe o arquivo de senhas.
+Os dados persistentes ficam em um volume Docker gerenciado pelo Compose. Faça uma cópia de segurança do volume e do arquivo de senhas por um meio seguro. Para exportar os dados, crie uma pasta de backup local e execute a partir da raiz do repositório:
+
+```sh
+mkdir -p deploy/home/backups
+docker run --rm \\
+  -v home_mosquitto_data:/data:ro \\
+  -v "$PWD/deploy/home/backups:/backup" \\
+  alpine:3.22 \\
+  tar -czf /backup/mosquitto-data.tar.gz -C /data .
+```
+
+O nome padrão do volume é `home_mosquitto_data` quando os comandos Compose são executados a partir da raiz com este arquivo. Confirme o nome com `docker volume ls` se tiver definido outro nome de projeto. Mantenha os backups fora do Git e não publique nem compartilhe o arquivo de senhas.
 
 ## 3. Configurar os nós Meshtastic
 
