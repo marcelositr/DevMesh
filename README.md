@@ -2,13 +2,13 @@
 
 Infraestrutura comunitária e independente de comunicação por MQTT, com foco em redes de rádio compatíveis com Meshtastic, interoperabilidade e futuras integrações com serviços públicos brasileiros.
 
-O DevMesh está em fase inicial de planejamento e validação. As escolhas técnicas e os recursos ainda precisam ser avaliados por meio de pesquisa e testes. Este repositório não deve ser interpretado como evidência de funcionalidades que ainda não foram implementadas.
+O DevMesh está em fase inicial de implementação e validação. Algumas verificações e uma configuração doméstica inicial do Mosquitto já existem, mas o projeto ainda não está pronto para produção. Este repositório distingue recursos implementados, testados e ainda planejados.
 
 O DevMesh não é um projeto oficial do Meshtastic e não deve sugerir afiliação ou endosso oficial.
 
 ## Escopo inicial
 
-A primeira etapa valida uma base simples para uso doméstico, inclusive numa Raspberry Pi. O cenário inicial usa Mosquitto e três nós simulados, sem depender de hardware de rádio nem expor o broker à internet.
+A primeira etapa valida uma base simples para uso doméstico, inclusive numa Raspberry Pi. A configuração inicial em [deploy/home](deploy/home/README.md) usa Mosquitto com autenticação, ACL limitada ao prefixo `msh/#` e volume persistente. Os testes usam três nós simulados, sem depender de hardware de rádio nem expor o broker à internet.
 
 O CI verifica conectividade MQTT, roteamento por tópico, autenticação básica e ACLs num broker descartável. Também simula o nó A publicando um fixture binário Meshtastic sintético que os nós B e C recebem sem alteração. A validação estrutural usa `protoc` com as definições oficiais Meshtastic fixadas numa versão específica, decodifica o `ServiceEnvelope`, verifica campos esperados e confirma o ciclo de recodificação. Isso valida a estrutura do fixture e o transporte MQTT, não interoperabilidade integral com firmware ou rádio LoRa.
 
@@ -16,12 +16,13 @@ A workflow criptográfica compila a suíte oficial `test_crypto` do firmware fix
 
 **Criptografia Meshtastic e ACL MQTT são coisas diferentes.** O teste de ACL impede que o nó C acesse um tópico restrito no broker. O teste de transporte mostra que os assinantes recebem os mesmos bytes, sem validar por si só a autenticidade criptográfica desses bytes. AES-CTR não fornece autenticação; AES-CCM/AEAD pode detectar adulteração quando é realmente usado e validado pelo destinatário. A configuração do módulo MQTT e o modo criptográfico dos nós precisam ser verificados separadamente: a chave de canal, sozinha, não garante que o payload publicado no broker continue cifrado.
 
-A configuração anônima usada em alguns testes existe somente para brokers efêmeros de CI e não deve ser reutilizada numa instalação real. As credenciais do teste de autenticação são temporárias. A configuração doméstica deve evitar exposição pública do broker e prever autenticação para clientes de rede. ACLs e proteção do transporte serão aplicadas conforme o modelo de confiança e antes de qualquer acesso por redes não confiáveis. O acesso remoto não faz parte do escopo inicial.
+A configuração anônima usada em alguns testes existe somente para brokers efêmeros de CI e não deve ser reutilizada numa instalação real. As credenciais dos testes são temporárias. A configuração doméstica inicial exige autenticação e limita o acesso ao prefixo `msh/#`, mas usa MQTT sem TLS e uma conta compartilhada; destina-se apenas a uma rede doméstica confiável. Não exponha a porta diretamente à internet. Antes de permitir acesso por redes não confiáveis, será necessário configurar e testar proteção do transporte e permissões adequadas. O acesso remoto não faz parte do escopo inicial.
 
 Consulte a [decisão sobre escopo doméstico e segurança proporcional](docs/decisions/0003-home-first-scope-and-proportionate-security.md) para os limites e os critérios de evolução.
 
 ## Documentação
 
+- [Instalação doméstica do broker](deploy/home/README.md): configuração inicial, execução e limites de segurança.
 - [Índice da documentação técnica](docs/README.md): organização dos documentos, pesquisas e decisões.
 - [Como contribuir](CONTRIBUTING.md): propostas, alterações e revisões.
 - [Código de Conduta](CODE_OF_CONDUCT.md): convivência com a comunidade.
