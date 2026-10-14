@@ -16,17 +16,23 @@ class DownlinkBuilderTests(unittest.TestCase):
     def setUp(self):
         self.key = b"devmesh-test-key"
         self.key_b64 = base64.b64encode(self.key).decode("ascii")
+        self.local_id = 0xA35AA590
+
+    def build(self, **overrides):
+        values = {
+            "text": "Teste isolado",
+            "channel_name": "ITUVERAVA",
+            "psk_base64": self.key_b64,
+            "sender_id": 0x7F4A91C2,
+            "local_node_id": self.local_id,
+            "gateway_id": "!deadbeef",
+            "packet_id": 0x10203040,
+        }
+        values.update(overrides)
+        return build_envelope(**values)
 
     def test_builds_valid_envelope_and_decryptable_text_packet(self):
-        topic, payload = build_envelope(
-            text="Teste isolado",
-            channel_name="ITUVERAVA",
-            psk_base64=self.key_b64,
-            sender_id=0x7F4A91C2,
-            gateway_id="!deadbeef",
-            packet_id=0x10203040,
-        )
-
+        topic, payload = self.build()
         envelope = mqtt_pb2.ServiceEnvelope()
         envelope.ParseFromString(payload)
         self.assertEqual(topic, "msh/2/e/ITUVERAVA/!deadbeef")
@@ -48,14 +54,7 @@ class DownlinkBuilderTests(unittest.TestCase):
 
     def test_blocks_public_preset_channel(self):
         with self.assertRaisesRegex(ValueError, "Canal público"):
-            build_envelope(
-                text="Não transmitir",
-                channel_name="LongFast",
-                psk_base64=self.key_b64,
-                sender_id=0x7F4A91C2,
-                gateway_id="!deadbeef",
-                packet_id=0x10203040,
-            )
+            self.build(channel_name="LongFast")
 
     def test_expands_default_psk_short_code(self):
         expanded = effective_psk("AQ==")
@@ -68,14 +67,15 @@ class DownlinkBuilderTests(unittest.TestCase):
 
     def test_rejects_invalid_gateway_id(self):
         with self.assertRaisesRegex(ValueError, "Gateway ID"):
-            build_envelope(
-                text="Teste",
-                channel_name="ITUVERAVA",
-                psk_base64=self.key_b64,
-                sender_id=0x7F4A91C2,
-                gateway_id="radio-real",
-                packet_id=0x10203040,
-            )
+            self.build(gateway_id="radio-real")
+
+    def test_rejects_sender_id_matching_local_radio(self):
+        with self.assertRaisesRegex(ValueError, "não pode ser o ID do rádio local"):
+            self.build(sender_id=self.local_id)
+
+    def test_rejects_gateway_id_matching_local_radio(self):
+        with self.assertRaisesRegex(ValueError, "gateway ID não pode ser o ID do rádio local"):
+            self.build(gateway_id="!a35aa590")
 
 
 if __name__ == "__main__":
