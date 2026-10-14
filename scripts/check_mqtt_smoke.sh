@@ -91,8 +91,8 @@ assert_public_delivery() {
     node_b_pid="$SUBSCRIBER_PID"
     subscribe_once node-c "$topic" "$node_c_output"
     node_c_pid="$SUBSCRIBER_PID"
-    wait_for_subscription "$node_b_pid" "$TEMP_DIR/node-b.err"
-    wait_for_subscription "$node_c_pid" "$TEMP_DIR/node-c.err"
+    wait_for_subscription "$node_b_pid" "$node_b_output"
+    wait_for_subscription "$node_c_pid" "$node_c_output"
 
     docker exec "$CONTAINER_NAME" mosquitto_pub \
         -h 127.0.0.1 \
@@ -122,8 +122,8 @@ assert_topic_routing() {
     node_b_pid="$SUBSCRIBER_PID"
     subscribe_once node-c-other-topic devmesh/test/private/b "$node_c_output"
     node_c_pid="$SUBSCRIBER_PID"
-    wait_for_subscription "$node_b_pid" "$TEMP_DIR/node-b-private.err"
-    wait_for_subscription "$node_c_pid" "$TEMP_DIR/node-c-other-topic.err"
+    wait_for_subscription "$node_b_pid" "$node_b_output"
+    wait_for_subscription "$node_c_pid" "$node_c_output"
 
     docker exec "$CONTAINER_NAME" mosquitto_pub \
         -h 127.0.0.1 \
