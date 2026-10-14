@@ -60,7 +60,7 @@ Siga o [Código de Conduta](CODE_OF_CONDUCT.md).
 
 ## Licença e atribuição
 
-A contribuição deverá ser distribuída sob os termos de licença aplicáveis ao projeto, respeitando os direitos que você possui sobre o material enviado. O arquivo [LICENSE](LICENSE) identifica a licença pretendida como **GNU AGPL versão 3 ou posterior**, mas atualmente contém um aviso resumido, não o texto integral da licença. A incorporação e conferência do texto completo ainda são uma pendência documental importante; o aviso não substitui o texto oficial.
+A contribuição deverá ser distribuída sob os termos de licença aplicáveis ao projeto, respeitando os direitos que você possui sobre o material enviado. O arquivo [LICENSE](LICENSE) contém o texto integral da **GNU Affero General Public License, versão 3**, e identifica a opção de licenciamento da versão atual como **versão 3 ou posterior**. A licença não substitui a governança do projeto, e a governança não altera os termos da licença.
 
 Envie apenas material que tenha direito de contribuir e identifique material de terceiros e suas licenças. A licença e a governança do projeto são assuntos distintos. Consulte [LICENSE](LICENSE) e [GOVERNANCE.md](GOVERNANCE.md). Se houver dúvida sobre os termos ou a situação de uma contribuição, pergunte antes de enviá-la.
 
