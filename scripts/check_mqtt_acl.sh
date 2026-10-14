@@ -114,29 +114,35 @@ grep --fixed-strings --line-regexp --quiet "private-message-from-node-a" "$PRIVA
 printf 'OK: nó B recebeu a mensagem privada autorizada do nó A.\n'
 
 UNAUTHORIZED_PUBLISH_OUTPUT="$TEMP_DIR/unauthorized-publish-node-b.txt"
+# Publicar como retained permite verificar a ACL sem depender da corrida de inicialização.
+broker_exec mosquitto_pub -h 127.0.0.1 -u node-c \
+    -P node-c-test-password -i node-c -r \
+    -t devmesh/private/a -m "must-be-rejected"
+
+set +e
 node_sub_once node-b devmesh/private/a "$UNAUTHORIZED_PUBLISH_OUTPUT" "$TEMP_DIR/unauthorized-publish-node-b.err" &
 UNAUTHORIZED_PUBLISH_PID="$!"
-sleep 1
-node_pub node-c devmesh/private/a "must-be-rejected"
-set +e
 wait "$UNAUTHORIZED_PUBLISH_PID"
 UNAUTHORIZED_PUBLISH_STATUS=$?
 set -e
-[[ ! -s "$UNAUTHORIZED_PUBLISH_OUTPUT" ]] || fail "O broker entregou ao nó B uma publicação não autorizada do nó C."
-[[ "$UNAUTHORIZED_PUBLISH_STATUS" -ne 0 ]] || fail "A assinatura de verificação recebeu inesperadamente a publicação não autorizada."
-printf 'OK: a publicação do nó C não chegou ao nó B no tópico privado.\n'
+[[ ! -s "$UNAUTHORIZED_PUBLISH_OUTPUT" ]] || fail "O broker reteve e entregou ao nó B uma publicação não autorizada do nó C."
+[[ "$UNAUTHORIZED_PUBLISH_STATUS" -ne 0 ]] || fail "A assinatura de verificação recebeu inesperadamente uma publicação não autorizada."
+printf 'OK: a publicação retida do nó C foi bloqueada pela ACL.\n'
+
+# A mensagem retida autorizada torna determinística a verificação da assinatura negada.
+broker_exec mosquitto_pub -h 127.0.0.1 -u node-a \
+    -P node-a-test-password -i node-a -r \
+    -t devmesh/private/a -m "private-message-not-for-node-c"
 
 set +e
 node_sub_once node-c devmesh/private/a "$DENIED_OUTPUT" "$TEMP_DIR/denied-node-c.err" &
 DENIED_PID="$!"
-sleep 1
-node_pub node-a devmesh/private/a "private-message-not-for-node-c"
 wait "$DENIED_PID"
 DENIED_STATUS=$?
 set -e
 
 [[ ! -s "$DENIED_OUTPUT" ]] || fail "O nó C recebeu conteúdo do tópico privado apesar da ACL."
 [[ "$DENIED_STATUS" -ne 0 ]] || fail "A assinatura do nó C no tópico privado terminou como sucesso inesperado."
-printf 'OK: o nó C não recebeu mensagens do tópico privado e a assinatura não foi autorizada.\n'
+printf 'OK: a assinatura do nó C no tópico privado foi bloqueada pela ACL.\n'
 printf 'PASSOU: ACLs MQTT verificadas com três clientes e broker descartável.\n'
 printf 'LIMITE: este teste não valida TLS, criptografia Meshtastic nem configuração de produção.\n'
