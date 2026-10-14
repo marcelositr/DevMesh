@@ -34,9 +34,9 @@ docker run \
 
 for attempt in $(seq 1 20); do
     if docker exec "$CONTAINER_NAME" mosquitto_pub \
-        --host 127.0.0.1 \
-        --topic devmesh/test/healthcheck \
-        --message ready >/dev/null 2>&1; then
+        -h 127.0.0.1 \
+        -t devmesh/test/healthcheck \
+        -m ready >/dev/null 2>&1; then
         BROKER_READY=true
         break
     fi
@@ -53,11 +53,11 @@ subscribe_once() {
     local output_file="$3"
 
     docker exec "$CONTAINER_NAME" mosquitto_sub \
-        --host 127.0.0.1 \
-        --id "$node_name" \
-        --topic "$topic" \
-        --count 1 \
-        --timeout 8 >"$output_file" 2>"$TEMP_DIR/${node_name}.err" &
+        -h 127.0.0.1 \
+        -i "$node_name" \
+        -t "$topic" \
+        -C 1 \
+        -W 8 >"$output_file" 2>"$TEMP_DIR/${node_name}.err" &
     SUBSCRIBER_PID="$!"
 }
 
@@ -76,10 +76,10 @@ assert_public_delivery() {
     sleep 1
 
     docker exec "$CONTAINER_NAME" mosquitto_pub \
-        --host 127.0.0.1 \
-        --id node-a \
-        --topic "$topic" \
-        --message "$payload"
+        -h 127.0.0.1 \
+        -i node-a \
+        -t "$topic" \
+        -m "$payload"
 
     wait "$node_b_pid" || fail "O nó B não recebeu a mensagem pública."
     wait "$node_c_pid" || fail "O nó C não recebeu a mensagem pública."
@@ -106,10 +106,10 @@ assert_topic_routing() {
     sleep 1
 
     docker exec "$CONTAINER_NAME" mosquitto_pub \
-        --host 127.0.0.1 \
-        --id node-a-private \
-        --topic devmesh/test/private/a \
-        --message "$payload"
+        -h 127.0.0.1 \
+        -i node-a-private \
+        -t devmesh/test/private/a \
+        -m "$payload"
 
     wait "$node_b_pid" || fail "O nó B não recebeu a mensagem do tópico A."
     if wait "$node_c_pid"; then
