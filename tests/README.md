@@ -14,11 +14,13 @@ O teste usa três clientes simulados: A publica mensagens, B e C recebem mensage
 
 ## Transporte binário Meshtastic entre três nós
 
-O script `scripts/check_meshtastic_mqtt.sh` simula o nó A publicando um fixture binário `ServiceEnvelope` num tópico com formato Meshtastic. Os nós B e C assinam o filtro de tópico, confirmam suas assinaturas com o `SUBACK` do broker e verificam que os bytes recebidos são idênticos aos publicados.
+O script `scripts/check_meshtastic_mqtt.sh` simula o nó A publicando um fixture binário `ServiceEnvelope` como mensagem retida num broker descartável. Os nós B e C assinam o filtro de tópico e recebem a mensagem retida, mesmo que iniciem depois da publicação. Em seguida, verificam que os bytes recebidos são idênticos aos publicados.
 
 ```sh
 bash scripts/check_meshtastic_mqtt.sh
 ```
+
+A retenção é usada somente para remover a corrida de inicialização entre publicação e assinatura dentro deste teste. Não representa a configuração de retenção recomendada para mensagens Meshtastic em produção.
 
 O fixture `tests/fixtures/meshtastic-service-envelope.hex` é sintético e contém um `MeshPacket` com bytes no campo `encrypted`. O teste comprova entrega e preservação de bytes, mas **não** comprova que esses bytes resultem de criptografia real nem que o nó C não consiga decifrá-los. Ele não valida ACL nem decodifica Protobuf.
 
