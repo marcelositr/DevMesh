@@ -68,7 +68,7 @@ bash scripts/check_mqtt_acl.sh
 
 O teste verifica que B e C recebem mensagens no tópico público autorizado, B recebe mensagens no tópico restrito de A/B e C não consegue publicar nem receber nesse tópico.
 
-**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. A simulação criptográfica real ainda não está implementada.
+**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. O modelo AES-CTR independente está implementado, mas a execução do código criptográfico do firmware Meshtastic e a validação contra um vetor gerado pelo firmware ainda não estão implementadas.
 
 ## Limitações conhecidas
 
