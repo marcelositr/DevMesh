@@ -82,10 +82,28 @@ if docker exec "$CONTAINER_NAME" mosquitto_pub \
 fi
 printf 'OK: o broker recusou credenciais inválidas.\n'
 
+wait_for_subscription() {
+    local subscriber_pid="$1"
+    local debug_file="$2"
+
+    for attempt in $(seq 1 40); do
+        if grep --quiet --extended-regexp 'received SUBACK|Subscribed \(mid:' "$debug_file"; then
+            return 0
+        fi
+        if ! kill -0 "$subscriber_pid" 2>/dev/null; then
+            fail "O assinante terminou antes de confirmar a assinatura MQTT."
+        fi
+        sleep 0.1
+    done
+
+    fail "O assinante não recebeu confirmação SUBACK dentro do prazo."
+}
+
 OUTPUT_FILE="$TEMP_DIR/authenticated-message.txt"
 ERROR_FILE="$TEMP_DIR/subscriber.err"
 
 docker exec "$CONTAINER_NAME" mosquitto_sub \
+    -d \
     -h 127.0.0.1 \
     -u "$TEST_USERNAME" \
     -P "$TEST_PASSWORD" \
@@ -93,7 +111,7 @@ docker exec "$CONTAINER_NAME" mosquitto_sub \
     -C 1 \
     -W 8 >"$OUTPUT_FILE" 2>"$ERROR_FILE" &
 SUBSCRIBER_PID="$!"
-sleep 1
+wait_for_subscription "$SUBSCRIBER_PID" "$ERROR_FILE"
 
 PAYLOAD="authenticated-message-from-node-a"
 if ! docker exec "$CONTAINER_NAME" mosquitto_pub \
