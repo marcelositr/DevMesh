@@ -65,12 +65,29 @@ node_pub() {
         -P "$username-test-password" -i "$username" -t "$topic" -m "$payload"
 }
 
+wait_for_subscription() {
+    local subscriber_pid="$1"
+    local debug_file="$2"
+
+    for attempt in $(seq 1 40); do
+        if grep --quiet --extended-regexp 'received SUBACK|Subscribed \(mid:' "$debug_file"; then
+            return 0
+        fi
+        if ! kill -0 "$subscriber_pid" 2>/dev/null; then
+            fail "O assinante terminou antes de confirmar a assinatura MQTT."
+        fi
+        sleep 0.1
+    done
+
+    fail "O assinante não recebeu confirmação SUBACK dentro do prazo."
+}
+
 node_sub_once() {
     local username="$1"
     local topic="$2"
     local output_file="$3"
     local error_file="$4"
-    broker_exec mosquitto_sub -h 127.0.0.1 -u "$username" \
+    broker_exec mosquitto_sub -d -h 127.0.0.1 -u "$username" \
         -P "$username-test-password" -i "$username-subscriber" \
         -t "$topic" -C 1 -W 6 >"$output_file" 2>"$error_file"
 }
@@ -93,7 +110,8 @@ node_sub_once node-b devmesh/public/check "$PUBLIC_OUTPUT" "$TEMP_DIR/public-nod
 PUBLIC_B_PID="$!"
 node_sub_once node-c devmesh/public/check "$PUBLIC_NODE_C_OUTPUT" "$TEMP_DIR/public-node-c.err" &
 PUBLIC_C_PID="$!"
-sleep 1
+wait_for_subscription "$PUBLIC_B_PID" "$TEMP_DIR/public-node-b.err"
+wait_for_subscription "$PUBLIC_C_PID" "$TEMP_DIR/public-node-c.err"
 node_pub node-a devmesh/public/check "public-message-from-node-a"
 
 wait "$PUBLIC_B_PID" || fail "O nó B não recebeu a mensagem pública permitida."
@@ -106,7 +124,7 @@ printf 'OK: nós B e C receberam a mensagem do tópico público autorizado.\n'
 
 node_sub_once node-b devmesh/private/a "$PRIVATE_OUTPUT" "$TEMP_DIR/private-node-b.err" &
 PRIVATE_B_PID="$!"
-sleep 1
+wait_for_subscription "$PRIVATE_B_PID" "$TEMP_DIR/private-node-b.err"
 node_pub node-a devmesh/private/a "private-message-from-node-a"
 wait "$PRIVATE_B_PID" || fail "O nó B não recebeu a mensagem privada autorizada."
 grep --fixed-strings --line-regexp --quiet "private-message-from-node-a" "$PRIVATE_OUTPUT" \
@@ -116,7 +134,7 @@ printf 'OK: nó B recebeu a mensagem privada autorizada do nó A.\n'
 UNAUTHORIZED_PUBLISH_OUTPUT="$TEMP_DIR/unauthorized-publish-node-b.txt"
 node_sub_once node-b devmesh/private/a "$UNAUTHORIZED_PUBLISH_OUTPUT" "$TEMP_DIR/unauthorized-publish-node-b.err" &
 UNAUTHORIZED_PUBLISH_PID="$!"
-sleep 1
+wait_for_subscription "$UNAUTHORIZED_PUBLISH_PID" "$TEMP_DIR/unauthorized-publish-node-b.err"
 node_pub node-c devmesh/private/a "must-be-rejected"
 set +e
 wait "$UNAUTHORIZED_PUBLISH_PID"
@@ -129,7 +147,7 @@ printf 'OK: a publicação do nó C não chegou ao nó B no tópico privado.\n'
 set +e
 node_sub_once node-c devmesh/private/a "$DENIED_OUTPUT" "$TEMP_DIR/denied-node-c.err" &
 DENIED_PID="$!"
-sleep 1
+wait_for_subscription "$DENIED_PID" "$TEMP_DIR/denied-node-c.err"
 node_pub node-a devmesh/private/a "private-message-not-for-node-c"
 wait "$DENIED_PID"
 DENIED_STATUS=$?
