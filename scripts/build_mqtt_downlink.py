@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import base64
 import getpass
+import os
 import re
 import struct
 import sys
@@ -77,6 +78,7 @@ def build_envelope(
     channel_name: str,
     psk_base64: str,
     sender_id: int,
+    local_node_id: int,
     gateway_id: str,
     packet_id: int,
     hop_limit: int = 3,
@@ -87,12 +89,18 @@ def build_envelope(
         raise ValueError(
             "Canal público/preset bloqueado por segurança; use um canal privado de teste."
         )
+    if not 1 <= local_node_id <= 0xFFFFFFFF:
+        raise ValueError("O ID local deve ser um inteiro de 32 bits diferente de zero.")
     if not 1 <= sender_id <= 0xFFFFFFFF:
         raise ValueError("O ID de origem deve ser um inteiro de 32 bits diferente de zero.")
+    if sender_id == local_node_id:
+        raise ValueError("O ID de origem não pode ser o ID do rádio local.")
     if not 1 <= packet_id <= 0xFFFFFFFF:
         raise ValueError("O ID do pacote deve estar entre 1 e 2^32-1.")
     if not re.fullmatch(r"![0-9a-fA-F]{8}", gateway_id):
         raise ValueError("Gateway ID deve ter o formato ! seguido de 8 dígitos hexadecimais.")
+    if gateway_id.lower() == f"!{local_node_id:08x}":
+        raise ValueError("O gateway ID não pode ser o ID do rádio local.")
     if not 1 <= hop_limit <= 7:
         raise ValueError("hop_limit deve estar entre 1 e 7.")
     if not text or len(text.encode("utf-8")) > 180:
@@ -124,6 +132,7 @@ def build_envelope(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--channel", required=True, help="Nome exato do canal privado no rádio.")
+    parser.add_argument("--local-node-id", required=True, type=lambda s: int(s, 0), help="ID do rádio local, decimal ou 0xHEX.")
     parser.add_argument("--sender-id", required=True, type=lambda s: int(s, 0), help="ID sintético, decimal ou 0xHEX.")
     parser.add_argument("--gateway-id", required=True, help="Gateway sintético, por exemplo !a1b2c3d4.")
     parser.add_argument("--packet-id", required=True, type=lambda s: int(s, 0), help="ID de pacote novo, decimal ou 0xHEX.")
@@ -131,7 +140,7 @@ def main() -> int:
     parser.add_argument("--output", required=True, type=Path, help="Arquivo local para o envelope binário.")
     args = parser.parse_args()
 
-    encoded_key = __import__("os").environ.get("DEVMESH_CHANNEL_PSK_B64")
+    encoded_key = os.environ.get("DEVMESH_CHANNEL_PSK_B64")
     if not encoded_key:
         encoded_key = getpass.getpass("PSK Base64 do canal privado (entrada oculta): ").strip()
 
@@ -141,6 +150,7 @@ def main() -> int:
             channel_name=args.channel,
             psk_base64=encoded_key,
             sender_id=args.sender_id,
+            local_node_id=args.local_node_id,
             gateway_id=args.gateway_id,
             packet_id=args.packet_id,
         )
@@ -153,7 +163,7 @@ def main() -> int:
     print(f"Envelope Protobuf cifrado criado: {args.output} ({len(payload)} bytes)")
     print(f"Tópico MQTT de destino: {topic}")
     print("Nenhuma conexão MQTT ou transmissão LoRa foi iniciada.")
-    print("Confirme que sender-id e gateway-id não pertencem ao seu rádio nem a nós reais.")
+    print("Use apenas canal privado de teste; confirme que o ID sintético não pertence a outro nó.")
     return 0
 
 
