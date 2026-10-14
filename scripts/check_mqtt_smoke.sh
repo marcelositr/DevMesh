@@ -3,7 +3,6 @@ set -Eeuo pipefail
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 IMAGE="${MOSQUITTO_IMAGE:-eclipse-mosquitto:2.1.2}"
-PORT="${DEVMESH_TEST_PORT:-18883}"
 RUN_ID="${GITHUB_RUN_ID:-local}"
 RUN_ATTEMPT="${GITHUB_RUN_ATTEMPT:-0}"
 CONTAINER_NAME="devmesh-mosquitto-smoke-${RUN_ID}-${RUN_ATTEMPT}"
@@ -30,7 +29,6 @@ trap cleanup EXIT
 docker run \
     --detach \
     --name "$CONTAINER_NAME" \
-    --publish "127.0.0.1:${PORT}:1883" \
     --volume "$ROOT_DIR/tests/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro" \
     "$IMAGE" >/dev/null
 
@@ -60,7 +58,7 @@ subscribe_once() {
         --topic "$topic" \
         --count 1 \
         --timeout 8 >"$output_file" 2>"$TEMP_DIR/${node_name}.err" &
-    printf '%s\n' "$!"
+    SUBSCRIBER_PID="$!"
 }
 
 assert_public_delivery() {
@@ -71,8 +69,10 @@ assert_public_delivery() {
     local node_b_pid
     local node_c_pid
 
-    node_b_pid="$(subscribe_once node-b "$topic" "$node_b_output")"
-    node_c_pid="$(subscribe_once node-c "$topic" "$node_c_output")"
+    subscribe_once node-b "$topic" "$node_b_output"
+    node_b_pid="$SUBSCRIBER_PID"
+    subscribe_once node-c "$topic" "$node_c_output"
+    node_c_pid="$SUBSCRIBER_PID"
     sleep 1
 
     docker exec "$CONTAINER_NAME" mosquitto_pub \
@@ -99,8 +99,10 @@ assert_topic_routing() {
     local node_b_pid
     local node_c_pid
 
-    node_b_pid="$(subscribe_once node-b-private devmesh/test/private/a "$node_b_output")"
-    node_c_pid="$(subscribe_once node-c-other-topic devmesh/test/private/b "$node_c_output")"
+    subscribe_once node-b-private devmesh/test/private/a "$node_b_output"
+    node_b_pid="$SUBSCRIBER_PID"
+    subscribe_once node-c-other-topic devmesh/test/private/b "$node_c_output"
+    node_c_pid="$SUBSCRIBER_PID"
     sleep 1
 
     docker exec "$CONTAINER_NAME" mosquitto_pub \
@@ -113,6 +115,8 @@ assert_topic_routing() {
     if wait "$node_c_pid"; then
         fail "O nó C recebeu inesperadamente uma mensagem de outro tópico."
     fi
+    grep --ignore-case --quiet "timed out" "$TEMP_DIR/node-c-other-topic.err" \
+        || fail "O assinante do nó C terminou por um motivo diferente do timeout esperado."
 
     grep --fixed-strings --line-regexp --quiet "$payload" "$node_b_output" \
         || fail "A mensagem do tópico A não corresponde ao conteúdo enviado."
