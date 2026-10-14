@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 
 TEST_FUNCTION_ANCHOR = "void test_AES_CCM_partial_block_bounds(void)"
-TEST_REGISTRATION_ANCHOR = "    RUN_TEST(test_AES_CTR);\\n"
+TEST_REGISTRATION_ANCHOR = "    RUN_TEST(test_AES_CTR);\n"
 
 INTEROP_TEST = r"""
 void test_DevMesh_AES_CTR_channel_interop(void)
