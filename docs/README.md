@@ -7,6 +7,7 @@ Esta pasta reúne a documentação técnica, os registros de decisões e os proc
 - [Continuidade e sucessão](CONTINUITY.md): continuidade das responsabilidades, recuperação de acesso e transição de liderança.
 - [Registros de decisões](decisions/README.md): como localizar decisões e registrar novas decisões técnicas ou de governança.
 - [Pesquisas técnicas](research/): levantamentos com fontes, hipóteses e questões ainda não validadas.
+- [Levantamento de equipamento Meshtastic](research/0002-meshtastic-device-inventory-and-traffic-survey.md): plano para inventariar hardware, firmware, interfaces e tráfego real antes da implementação.
 - [Contexto para ferramentas de IA](ai/README.md): orientações para retomar o trabalho sem confundir decisões aprovadas com hipóteses.
 
 ## Princípios de documentação
