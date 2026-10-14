@@ -10,7 +10,7 @@ O DevMesh não é um projeto oficial do Meshtastic e não deve sugerir afiliaç�
 
 A primeira etapa tem como objetivo validar uma base simples para uso doméstico, inclusive numa Raspberry Pi. O cenário inicial usa o Mosquitto e três nós simulados, sem depender de hardware de rádio nem expor o broker à internet.
 
-O CI verifica conectividade MQTT, entrega de mensagens e roteamento entre tópicos. Também testa autenticação básica num broker descartável: publicação anônima deve ser recusada e clientes com credenciais de teste devem conseguir trocar mensagens. Esses testes não comprovam autorização por ACL, TLS, criptografia Meshtastic ou funcionamento de rádio real.
+O CI verifica conectividade MQTT, entrega de mensagens e roteamento entre tópicos. Também testa autenticação básica num broker descartável: publicações anônimas e senhas inválidas devem ser recusadas, enquanto clientes com credenciais de teste válidas conseguem trocar mensagens. Esses testes não comprovam autorização por ACL, TLS, criptografia Meshtastic ou funcionamento de rádio real.
 
 A configuração anônima usada no teste de conectividade existe somente para um broker efêmero e isolado no CI. Ela não deve ser reutilizada como configuração de implantação. As credenciais do teste de autenticação são temporárias e geradas durante a execução. A configuração de uso real deve evitar exposição pública do broker e prever autenticação dos clientes de rede. ACLs e proteção do transporte serão aplicadas conforme o modelo de confiança e antes de qualquer acesso por redes não confiáveis. O acesso remoto não faz parte do escopo inicial.
 
