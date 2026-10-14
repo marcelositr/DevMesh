@@ -52,9 +52,9 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 ## Plano
 
 ### Fase A: CI sem hardware
-- [ ] Fixar Protobufs oficiais por tag e commit imutável.
+- [x] Fixar Protobufs oficiais por tag e commit imutável no script de teste inicial.
 - [x] Criar fixtures sintéticos iniciais para Position, Telemetry de dispositivo/ambiente/qualidade do ar, User, NeighborInfo, Waypoint e MapReport, usando Protobufs v2.8.0 fixado por commit.
-- [x] Verificar decode/encode para esses fixtures e rejeição de uma mensagem truncada.
+- [ ] Executar no CI a verificação decode/encode desses fixtures e a rejeição de uma mensagem truncada; o teste foi implementado, mas ainda não há resultado confirmado.
 - [ ] Testar preservação de campos desconhecidos e tipos de payload desconhecidos; isso ainda não está coberto pelo script inicial.
 - [ ] Verificar payload vazio, privacidade dos logs e matriz de versões adicionais.
 - [ ] Garantir que os logs de teste não exponham conteúdo sensível.
