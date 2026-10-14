@@ -18,8 +18,8 @@ O escopo inicial será uma instalação doméstica com Mosquitto, três nós sim
 A evolução seguirá estas etapas:
 
 1. **Protótipo e CI:** testar conectividade e roteamento MQTT, transporte binário de um fixture sintético, um modelo independente AES-CTR, autenticação básica e ACLs por tópico num broker efêmero. O fixture é uma amostra estática, não um pacote capturado de um dispositivo real. A validação estrutural usa as definições oficiais Protobuf do Meshtastic numa versão fixada, mas não valida criptografia real nem interoperabilidade integral com firmware.
-2. **Configuração doméstica:** não expor o broker diretamente à internet. Ao preparar uma configuração de uso real, habilitar autenticação para clientes de rede e manter credenciais fora do controle de versão.
-3. **Permissões por tópico:** aplicar regras de ACL adequadas ao modelo de confiança para separar clientes e limitar publicação/assinatura. O teste atual cobre somente o cenário mínimo de três nós; regras de uma instalação real devem ser definidas para os clientes e tópicos efetivamente usados.
+2. **Configuração doméstica:** a configuração inicial em `deploy/home/` não expõe a porta via roteador por si só, exige autenticação, mantém persistência num volume Docker e ignora o arquivo local de senhas no Git. Ela não usa TLS e deve ficar numa rede doméstica confiável.
+3. **Permissões por tópico:** a ACL inicial limita a conta compartilhada ao prefixo `msh/#`. Isso reduz o escopo de tópicos, mas não separa clientes entre si. Antes de oferecer acesso a outras pessoas, definir e testar contas individuais e regras de ACL para os tópicos efetivamente usados.
 4. **Acesso por redes não confiáveis:** não oferecer acesso remoto direto como parte da primeira versão. Se esse cenário for adicionado, definir e testar a proteção do transporte, preferencialmente com TLS ou uma VPN adequadamente configurada, além das permissões de acesso necessárias.
 
 ## Limites de segurança e compatibilidade
@@ -51,4 +51,4 @@ Antes de declarar uma configuração pronta para uso real, revisar a configuraç
 
 ## Revisão
 
-Revisar esta decisão quando o projeto introduzir uma configuração de implantação real, acesso remoto, clientes não confiáveis ou integrações que alterem o modelo de segurança.
+Revisar esta decisão quando a configuração doméstica evoluir para contas individuais, TLS, acesso remoto, clientes não confiáveis ou integrações que alterem o modelo de segurança.
