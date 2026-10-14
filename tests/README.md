@@ -1,5 +1,17 @@
 # Testes iniciais do DevMesh
 
+## Verificação da configuração doméstica
+
+O script `scripts/check_home_deployment.sh` valida a configuração versionada em `deploy/home/` usando um broker Mosquitto descartável e um arquivo de senhas sintético. Ele verifica inicialização, entrega autenticada, rejeição de acesso anônimo e de senha incorreta, além de impedir leitura e publicação fora do prefixo MQTT `msh/#`. O teste adiciona uma conta observadora somente à cópia temporária da ACL para verificar as duas direções; os arquivos do repositório não são alterados.
+
+```sh
+bash scripts/check_home_deployment.sh
+```
+
+Requisitos: Docker Engine, Docker Compose, Python 3 e acesso à imagem `eclipse-mosquitto:2.1.2-alpine`. O teste remove os contêineres e o volume temporário ao terminar.
+
+**Limites:** o teste valida a configuração do broker e as permissões MQTT num contêiner local. Não valida TLS, integração com dispositivos físicos, payloads capturados de rádio nem prontidão para produção.
+
 ## Verificação básica do broker MQTT
 
 O script `scripts/check_mqtt_smoke.sh` inicia um broker Mosquitto descartável usando `tests/mosquitto/mosquitto.conf`.
