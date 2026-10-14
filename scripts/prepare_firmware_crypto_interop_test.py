@@ -1,36 +1,64 @@
 #!/usr/bin/env python3
-"""Add a temporary interoperability assertion to the pinned upstream crypto test."""
+"""Add temporary AES-CTR interoperability cases to the pinned upstream test."""
 
 from pathlib import Path
 import sys
 
 TEST_FUNCTION_ANCHOR = "void test_AES_CCM_partial_block_bounds(void)"
-TEST_REGISTRATION_ANCHOR = "    RUN_TEST(test_AES_CTR);\n"
+TEST_REGISTRATION_ANCHOR = "    RUN_TEST(test_AES_CTR);\\n"
 
-INTEROP_TEST = """
+INTEROP_TEST = r"""
 void test_DevMesh_AES_CTR_channel_interop(void)
 {
-    CryptoEngine localCrypto;
-    CryptoKey key = {};
-    key.length = 16;
-    HexToBytes(key.bytes, "00112233445566778899aabbccddeeff");
-    localCrypto.setKey(key);
+    struct InteropCase {
+        const char *plaintext;
+        uint32_t fromNode;
+        uint32_t packetId;
+    };
 
-    uint8_t payload[] = "DevMesh private";
-    localCrypto.encryptPacket(0x23456789, 0x12345678, sizeof(payload) - 1, payload);
+    const InteropCase cases[] = {
+        {"A", 0x23456789, 0x12345678},
+        {"DevMesh private", 0x23456789, 0x12345679},
+        {"0123456789ABCDEF", 0x10203040, 0x0a0b0c0d},
+        {"payload-17-bytes!", 0xdeadbeef, 0x01020304},
+        {"Longer synthetic Meshtastic payload for boundary testing.",
+         0x12345678, 0x87654321},
+    };
 
-    printf("DEVMESH_CHANNEL_CTR_HEX=");
-    for (size_t i = 0; i < sizeof(payload) - 1; i++) {
-        printf("%02x", payload[i]);
+    for (size_t caseIndex = 0; caseIndex < sizeof(cases) / sizeof(cases[0]); caseIndex++) {
+        CryptoEngine localCrypto;
+        CryptoKey key = {};
+        key.length = 16;
+        HexToBytes(key.bytes, "00112233445566778899aabbccddeeff");
+        localCrypto.setKey(key);
+
+        uint8_t payload[128] = {};
+        const size_t payloadLength = strlen(cases[caseIndex].plaintext);
+        TEST_ASSERT_LESS_OR_EQUAL(sizeof(payload), payloadLength + 1);
+        memcpy(payload, cases[caseIndex].plaintext, payloadLength);
+        localCrypto.encryptPacket(
+            cases[caseIndex].fromNode,
+            cases[caseIndex].packetId,
+            payloadLength,
+            payload
+        );
+
+        printf("DEVMESH_CHANNEL_CTR_%u_HEX=", (unsigned int)(caseIndex + 1));
+        for (size_t byteIndex = 0; byteIndex < payloadLength; byteIndex++) {
+            printf("%02x", payload[byteIndex]);
+        }
+        printf("\\n");
     }
-    printf("\\n");
 }
 """
 
 
 def main() -> int:
     if len(sys.argv) != 2:
-        print("Uso: prepare_firmware_crypto_interop_test.py CAMINHO/test_main.cpp", file=sys.stderr)
+        print(
+            "Uso: prepare_firmware_crypto_interop_test.py CAMINHO/test_main.cpp",
+            file=sys.stderr,
+        )
         return 2
 
     test_file = Path(sys.argv[1])
@@ -49,14 +77,19 @@ def main() -> int:
         print("O teste temporário já está presente; recusando duplicação.", file=sys.stderr)
         return 1
 
-    source = source.replace(TEST_FUNCTION_ANCHOR, INTEROP_TEST + "\n" + TEST_FUNCTION_ANCHOR, 1)
+    source = source.replace(
+        TEST_FUNCTION_ANCHOR,
+        INTEROP_TEST + "\\n" + TEST_FUNCTION_ANCHOR,
+        1,
+    )
     source = source.replace(
         TEST_REGISTRATION_ANCHOR,
-        TEST_REGISTRATION_ANCHOR + "    RUN_TEST(test_DevMesh_AES_CTR_channel_interop);\n",
+        TEST_REGISTRATION_ANCHOR
+        + "    RUN_TEST(test_DevMesh_AES_CTR_channel_interop);\\n",
         1,
     )
     test_file.write_text(source, encoding="utf-8")
-    print("Teste temporário de interoperabilidade AES-CTR preparado.")
+    print("Cinco casos temporários de interoperabilidade AES-CTR preparados.")
     return 0
 
 
