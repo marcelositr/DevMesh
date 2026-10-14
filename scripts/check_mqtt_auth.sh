@@ -30,6 +30,7 @@ trap cleanup EXIT
 
 # Gere uma credencial descartável usando a ferramenta da própria imagem.
 docker run --rm \
+    --user "$(id -u):$(id -g)" \
     --volume "$TEMP_DIR:/tmp/auth" \
     --entrypoint mosquitto_passwd \
     "$IMAGE" \
