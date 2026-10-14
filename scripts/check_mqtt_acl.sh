@@ -113,10 +113,18 @@ grep --fixed-strings --line-regexp --quiet "private-message-from-node-a" "$PRIVA
     || fail "O conteúdo privado recebido pelo nó B não corresponde ao enviado."
 printf 'OK: nó B recebeu a mensagem privada autorizada do nó A.\n'
 
-if node_pub node-c devmesh/private/a "must-be-rejected" >"$TEMP_DIR/denied-publish.txt" 2>&1; then
-    fail "O broker aceitou publicação do nó C no tópico privado de A/B."
-fi
-printf 'OK: o broker recusou publicação do nó C no tópico privado.\n'
+UNAUTHORIZED_PUBLISH_OUTPUT="$TEMP_DIR/unauthorized-publish-node-b.txt"
+node_sub_once node-b devmesh/private/a "$UNAUTHORIZED_PUBLISH_OUTPUT" "$TEMP_DIR/unauthorized-publish-node-b.err" &
+UNAUTHORIZED_PUBLISH_PID="$!"
+sleep 1
+node_pub node-c devmesh/private/a "must-be-rejected"
+set +e
+wait "$UNAUTHORIZED_PUBLISH_PID"
+UNAUTHORIZED_PUBLISH_STATUS=$?
+set -e
+[[ ! -s "$UNAUTHORIZED_PUBLISH_OUTPUT" ]] || fail "O broker entregou ao nó B uma publicação não autorizada do nó C."
+[[ "$UNAUTHORIZED_PUBLISH_STATUS" -ne 0 ]] || fail "A assinatura de verificação recebeu inesperadamente a publicação não autorizada."
+printf 'OK: a publicação do nó C não chegou ao nó B no tópico privado.\n'
 
 set +e
 node_sub_once node-c devmesh/private/a "$DENIED_OUTPUT" "$TEMP_DIR/denied-node-c.err" &
