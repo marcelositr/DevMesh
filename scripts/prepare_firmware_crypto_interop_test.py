@@ -4,8 +4,9 @@
 from pathlib import Path
 import sys
 
+NEWLINE = chr(10)
 TEST_FUNCTION_ANCHOR = "void test_AES_CCM_partial_block_bounds(void)"
-TEST_REGISTRATION_ANCHOR = "    RUN_TEST(test_AES_CTR);\n"
+TEST_REGISTRATION_ANCHOR = "    RUN_TEST(test_AES_CTR);" + NEWLINE
 
 INTEROP_TEST = r"""
 void test_DevMesh_AES_CTR_channel_interop(void)
@@ -47,7 +48,7 @@ void test_DevMesh_AES_CTR_channel_interop(void)
         for (size_t byteIndex = 0; byteIndex < payloadLength; byteIndex++) {
             printf("%02x", payload[byteIndex]);
         }
-        printf("\\n");
+        putchar(10);
     }
 }
 """
@@ -79,13 +80,14 @@ def main() -> int:
 
     source = source.replace(
         TEST_FUNCTION_ANCHOR,
-        INTEROP_TEST + "\\n" + TEST_FUNCTION_ANCHOR,
+        INTEROP_TEST + NEWLINE + TEST_FUNCTION_ANCHOR,
         1,
     )
     source = source.replace(
         TEST_REGISTRATION_ANCHOR,
         TEST_REGISTRATION_ANCHOR
-        + "    RUN_TEST(test_DevMesh_AES_CTR_channel_interop);\\n",
+        + "    RUN_TEST(test_DevMesh_AES_CTR_channel_interop);"
+        + NEWLINE,
         1,
     )
     test_file.write_text(source, encoding="utf-8")
