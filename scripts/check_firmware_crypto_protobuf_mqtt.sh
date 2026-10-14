@@ -60,6 +60,11 @@ PY
 grep -Fq 'channel_id: "LongFast"' "$TEMP_DIR/decoded.txt" || fail "O envelope decodificado perdeu o channel_id."
 grep -Fq 'gateway_id: "!a1b2c3d4"' "$TEMP_DIR/decoded.txt" || fail "O envelope decodificado perdeu o gateway_id."
 grep -Fq 'encrypted:' "$TEMP_DIR/decoded.txt" || fail "O envelope decodificado perdeu o campo encrypted."
+(
+    cd "$TEMP_DIR/protobufs"
+    protoc -I . --encode=meshtastic.ServiceEnvelope meshtastic/mqtt.proto < "$TEMP_DIR/decoded.txt" > "$TEMP_DIR/reencoded-envelope.bin"
+)
+cmp --silent "$TEMP_DIR/service-envelope.bin" "$TEMP_DIR/reencoded-envelope.bin" || fail "O ciclo Protobuf decode/encode alterou os bytes do envelope."
 TOPIC="msh/US/2/e/LongFast/!a1b2c3d4"
 TOPIC_FILTER="msh/US/2/e/LongFast/#"
 docker run --detach --name "$CONTAINER_NAME" --volume "$ROOT_DIR/tests/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro" "$IMAGE" >/dev/null
