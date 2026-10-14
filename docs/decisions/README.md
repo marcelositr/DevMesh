@@ -5,6 +5,7 @@ Esta pasta registra decisões importantes do DevMesh e seus fundamentos. O objet
 ## Decisões registradas
 
 - [0001: modelo inicial de governança](0001-initial-governance-model.md): estabelece a governança inicial conduzida pela pessoa responsável pelo projeto, com participação comunitária gradual e regras para mudanças relevantes.
+- [0002: adoção do Eclipse Mosquitto](0002-adoption-of-eclipse-mosquitto.md): seleciona o Mosquitto como broker MQTT da arquitetura inicial, sem afirmar que já foi implantado ou testado.
 
 ## Como registrar uma decisão
 
