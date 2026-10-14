@@ -48,6 +48,12 @@ O nonce do modelo segue a disposição de canal documentada e conferida no códi
 
 O modelo publica o ciphertext no broker descartável. B e C recebem os mesmos bytes; B recupera o texto com a chave correta e C, usando outra chave, não recupera o texto original.
 
+## Suíte criptográfica oficial do firmware
+
+A workflow `.github/workflows/meshtastic-firmware-crypto.yml` faz checkout do código oficial Meshtastic num commit fixo (`8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c`) e executa `pio test -e native -f test_crypto -vv`. A execução [#1](https://github.com/marcelositr/DevMesh/actions/runs/38586528090) terminou com sucesso: 28 casos de teste passaram em aproximadamente cinco minutos.
+
+Esse resultado comprova que a suíte `test_crypto` do firmware fixado passou no ambiente nativo do CI. Não significa que o DevMesh incorpora ou chama `CryptoEngine.cpp`, nem que um payload produzido por um rádio real já foi decifrado de ponta a ponta pelo modelo. A comparação de interoperabilidade entre a implementação do firmware e o modelo independente continua pendente.
+
 **Limites:** os vetores de referência conferem o primitivo AES-CTR do OpenSSL com vetores também usados pelo teste do firmware. Isso **não** executa `CryptoEngine.cpp`, não é um vetor de mensagem gerado por um dispositivo e não prova interoperabilidade integral. A conferência do nonce testa a codificação esperada, não toda a lógica interna do firmware. AES-CTR não autentica o conteúdo, e uma saída diferente com chave errada não equivale a uma garantia criptográfica geral. O teste também não cobre mensagens diretas PKI/AES-CCM, assinatura ou integridade.
 
 ## Verificação básica de autenticação
@@ -70,8 +76,8 @@ bash scripts/check_mqtt_acl.sh
 
 O teste verifica que B e C recebem mensagens no tópico público autorizado, B recebe mensagens no tópico restrito de A/B e C não consegue publicar nem receber nesse tópico.
 
-**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. O modelo AES-CTR independente e a conferência de vetores estão implementados, mas a execução do código criptográfico do firmware Meshtastic e a validação de um payload de canal gerado pelo firmware ainda não estão implementadas.
+**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. O modelo AES-CTR independente e a conferência de vetores estão implementados. A suíte de testes criptográficos do firmware oficial também é executada separadamente no CI, mas ainda falta comparar o modelo com um payload de canal produzido pelo próprio firmware.
 
 ## Limitações conhecidas
 
-Os testes não comprovam criptografia real dos canais Meshtastic, confidencialidade ponta a ponta, segurança de produção, alcance ou retransmissão LoRa, nem interoperabilidade integral com firmware ou hardware. Resultados ainda não executados não devem ser descritos como aprovados.
+Os testes não comprovam interoperabilidade integral com firmware ou hardware, criptografia de um payload capturado de dispositivo real, confidencialidade ponta a ponta, segurança de produção, alcance ou retransmissão LoRa. A suíte upstream aprovada valida apenas os casos criptográficos selecionados do commit fixado. Resultados ainda não executados não devem ser descritos como aprovados.
