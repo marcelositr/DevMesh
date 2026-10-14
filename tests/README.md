@@ -38,15 +38,17 @@ Requisitos: Git, `protoc` e `xxd`. O teste baixa a versão fixada, decodifica o 
 
 ## Modelo de criptografia AES-CTR de canal
 
-O script `scripts/check_meshtastic_crypto_model.sh` cria texto de teste, cifra com OpenSSL AES-128-CTR usando uma chave e um nonce sintéticos, publica os bytes cifrados num broker descartável e verifica que B e C recebem o mesmo ciphertext. B recupera o texto com a chave correta; C usa uma chave diferente e não recupera o texto original.
+O script `scripts/check_meshtastic_crypto_model.sh` verifica dois vetores AES-CTR de referência usados pelo teste criptográfico do firmware Meshtastic, confere a disposição de bytes do nonce e executa o modelo com OpenSSL num broker descartável. Os vetores são definidos no teste oficial `test/test_crypto/test_main.cpp` do firmware [v2.8.1.8e6a88d, commit `8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c`](https://github.com/meshtastic/firmware/blob/8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c/test/test_crypto/test_main.cpp), com base nos vetores RFC 3686.
 
 ```sh
 bash scripts/check_meshtastic_crypto_model.sh
 ```
 
-O nonce segue a disposição documentada para tráfego de canal Meshtastic: `packet_id` little-endian de 64 bits, `from_node` little-endian de 32 bits e contador de bloco little-endian de 32 bits. O teste usa apenas um bloco curto e não inclui segredos reais.
+O nonce do modelo segue a disposição de canal documentada e conferida no código fixado de `CryptoEngine.cpp`: `packet_id` little-endian de 64 bits, `from_node` little-endian de 32 bits e contador de bloco de 32 bits. O teste usa chaves e texto sintéticos, sem segredos reais.
 
-**Limites:** é um modelo independente da operação AES-CTR, não uma execução do `CryptoEngine.cpp` nem uma captura de dispositivo. Não comprova interoperabilidade integral com firmware. AES-CTR não autentica o conteúdo, e uma saída diferente com chave errada não equivale a uma garantia criptográfica geral. O teste também não cobre mensagens diretas PKI/AES-CCM, assinatura ou integridade.
+O modelo publica o ciphertext no broker descartável. B e C recebem os mesmos bytes; B recupera o texto com a chave correta e C, usando outra chave, não recupera o texto original.
+
+**Limites:** os vetores de referência conferem o primitivo AES-CTR do OpenSSL com vetores também usados pelo teste do firmware. Isso **não** executa `CryptoEngine.cpp`, não é um vetor de mensagem gerado por um dispositivo e não prova interoperabilidade integral. A conferência do nonce testa a codificação esperada, não toda a lógica interna do firmware. AES-CTR não autentica o conteúdo, e uma saída diferente com chave errada não equivale a uma garantia criptográfica geral. O teste também não cobre mensagens diretas PKI/AES-CCM, assinatura ou integridade.
 
 ## Verificação básica de autenticação
 
@@ -68,7 +70,7 @@ bash scripts/check_mqtt_acl.sh
 
 O teste verifica que B e C recebem mensagens no tópico público autorizado, B recebe mensagens no tópico restrito de A/B e C não consegue publicar nem receber nesse tópico.
 
-**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. O modelo AES-CTR independente está implementado, mas a execução do código criptográfico do firmware Meshtastic e a validação contra um vetor gerado pelo firmware ainda não estão implementadas.
+**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. O modelo AES-CTR independente e a conferência de vetores estão implementados, mas a execução do código criptográfico do firmware Meshtastic e a validação de um payload de canal gerado pelo firmware ainda não estão implementadas.
 
 ## Limitações conhecidas
 

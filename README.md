@@ -10,9 +10,11 @@ O DevMesh não é um projeto oficial do Meshtastic e não deve sugerir afiliaç�
 
 A primeira etapa valida uma base simples para uso doméstico, inclusive numa Raspberry Pi. O cenário inicial usa Mosquitto e três nós simulados, sem depender de hardware de rádio nem expor o broker à internet.
 
-O CI verifica conectividade MQTT, roteamento por tópico, autenticação básica e ACLs num broker descartável. Também simula o nó A publicando um fixture binário Meshtastic sintético que os nós B e C recebem sem alteração. A validação estrutural usa `protoc` com as definições oficiais Meshtastic fixadas numa versão específica, decodifica o `ServiceEnvelope`, verifica campos esperados e confirma o ciclo de recodificação. Isso valida a estrutura do fixture e o transporte MQTT, não interoperabilidade integral com firmware ou rádio LoRa. Um teste separado usa OpenSSL para modelar AES-CTR com a disposição de nonce documentada pelo firmware: dois nós recebem os mesmos bytes, a chave correta recupera o texto e uma chave diferente não o recupera. Esse modelo não executa o código do firmware e não é uma prova de compatibilidade integral.
+O CI verifica conectividade MQTT, roteamento por tópico, autenticação básica e ACLs num broker descartável. Também simula o nó A publicando um fixture binário Meshtastic sintético que os nós B e C recebem sem alteração. A validação estrutural usa `protoc` com as definições oficiais Meshtastic fixadas numa versão específica, decodifica o `ServiceEnvelope`, verifica campos esperados e confirma o ciclo de recodificação. Isso valida a estrutura do fixture e o transporte MQTT, não interoperabilidade integral com firmware ou rádio LoRa.
 
-**Criptografia Meshtastic e ACL MQTT são coisas diferentes.** O teste de ACL impede que o nó C acesse um tópico restrito no broker. O teste binário mostra que dois assinantes recebem os mesmos bytes. O teste de modelo AES-CTR exercita a diferença entre a chave correta e uma chave diferente, mas não executa o código do firmware nem prova interoperabilidade integral com um dispositivo. Também é necessário verificar a opção de criptografia do módulo MQTT: a chave de canal, sozinha, não garante que o payload publicado no broker continue cifrado.
+Um teste separado usa OpenSSL para modelar AES-CTR. Ele confere vetores de referência também usados no teste criptográfico do firmware Meshtastic v2.8.1.8e6a88d, confere a codificação do nonce de canal e verifica o comportamento com uma chave correta e outra diferente. Essa verificação compara o modelo com referências do código oficial, mas não executa o firmware nem prova interoperabilidade integral com um dispositivo.
+
+**Criptografia Meshtastic e ACL MQTT são coisas diferentes.** O teste de ACL impede que o nó C acesse um tópico restrito no broker. O teste binário mostra que dois assinantes recebem os mesmos bytes. O modelo AES-CTR exercita a diferença entre a chave correta e uma chave diferente, mas não executa o código do firmware nem prova interoperabilidade integral com um dispositivo. Também é necessário verificar a opção de criptografia do módulo MQTT: a chave de canal, sozinha, não garante que o payload publicado no broker continue cifrado.
 
 A configuração anônima usada em alguns testes existe somente para brokers efêmeros de CI e não deve ser reutilizada numa instalação real. As credenciais do teste de autenticação são temporárias. A configuração doméstica deve evitar exposição pública do broker e prever autenticação para clientes de rede. ACLs e proteção do transporte serão aplicadas conforme o modelo de confiança e antes de qualquer acesso por redes não confiáveis. O acesso remoto não faz parte do escopo inicial.
 
@@ -22,7 +24,7 @@ Consulte a [decisão sobre escopo doméstico e segurança proporcional](docs/dec
 
 - [Índice da documentação técnica](docs/README.md): organização dos documentos, pesquisas e decisões.
 - [Como contribuir](CONTRIBUTING.md): propostas, alterações e revisões.
-- [Código de Conduta](CODE_OF_CONDUCT.md): convivência na comunidade.
+- [Código de Conduta](CODE_OF_CONDUCT.md): convivência com a comunidade.
 - [Política de Segurança](SECURITY.md): comunicação e tratamento de vulnerabilidades.
 - [Nome e identidade visual](TRADEMARKS.md): uso da marca e prevenção de confusão.
 - [Continuidade e sucessão](docs/CONTINUITY.md): responsabilidades, acesso e sucessão.
