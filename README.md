@@ -8,6 +8,7 @@ O DevMesh não é um projeto oficial do Meshtastic e não deve sugerir afiliaç�
 
 ## Documentação
 
+- [Índice da documentação técnica](docs/README.md): organização dos documentos, decisões e contexto de trabalho.
 - [Governança](GOVERNANCE.md): papéis, responsabilidades e decisões.
 - [Como contribuir](CONTRIBUTING.md): propostas, alterações e revisões.
 - [Código de Conduta](CODE_OF_CONDUCT.md): convivência na comunidade.
