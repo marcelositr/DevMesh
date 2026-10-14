@@ -52,9 +52,9 @@ O modelo publica o ciphertext no broker descartável. B e C recebem os mesmos by
 
 A workflow `.github/workflows/meshtastic-firmware-crypto.yml` faz checkout do código oficial Meshtastic num commit fixo (`8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c`) e executa `pio test -e native -f test_crypto -vv`. A execução [#1](https://github.com/marcelositr/DevMesh/actions/runs/38586528090) terminou com sucesso: 28 casos de teste passaram em aproximadamente cinco minutos.
 
-Esse resultado comprova que a suíte `test_crypto` do firmware fixado passou no ambiente nativo do CI. Não significa que o DevMesh incorpora ou chama `CryptoEngine.cpp`, nem que um payload produzido por um rádio real já foi decifrado de ponta a ponta pelo modelo. A comparação de interoperabilidade entre a implementação do firmware e o modelo independente continua pendente.
+A execução seguinte, [#2](https://github.com/marcelositr/DevMesh/actions/runs/38588041550), prepara um caso temporário dentro do teste upstream, chama `CryptoEngine::encryptPacket()` com uma chave de 16 bytes, uma mensagem e identificadores sintéticos, e compara o resultado com OpenSSL usando o nonce correspondente. A suíte `test_crypto` e a comparação byte a byte passaram. O teste não altera o repositório upstream: a edição ocorre somente no checkout descartável do CI. O firmware não é incorporado ao produto DevMesh.
 
-**Limites:** os vetores de referência conferem o primitivo AES-CTR do OpenSSL com vetores também usados pelo teste do firmware. Isso **não** executa `CryptoEngine.cpp`, não é um vetor de mensagem gerado por um dispositivo e não prova interoperabilidade integral. A conferência do nonce testa a codificação esperada, não toda a lógica interna do firmware. AES-CTR não autentica o conteúdo, e uma saída diferente com chave errada não equivale a uma garantia criptográfica geral. O teste também não cobre mensagens diretas PKI/AES-CCM, assinatura ou integridade.
+**Limites:** a comparação direta confirma que `CryptoEngine::encryptPacket()` e OpenSSL produzem o mesmo ciphertext AES-CTR para os parâmetros sintéticos do teste. Isso ainda não valida um payload capturado de um dispositivo real, a integração MQTT ponta a ponta, LoRa, mensagens diretas PKI/AES-CCM, assinaturas ou a segurança geral do sistema. AES-CTR não autentica o conteúdo.
 
 ## Verificação básica de autenticação
 
@@ -76,8 +76,8 @@ bash scripts/check_mqtt_acl.sh
 
 O teste verifica que B e C recebem mensagens no tópico público autorizado, B recebe mensagens no tópico restrito de A/B e C não consegue publicar nem receber nesse tópico.
 
-**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. O modelo AES-CTR independente e a conferência de vetores estão implementados. A suíte de testes criptográficos do firmware oficial também é executada separadamente no CI, mas ainda falta comparar o modelo com um payload de canal produzido pelo próprio firmware.
+**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. O CI agora compara diretamente o AES-CTR do `CryptoEngine` com OpenSSL para uma mensagem sintética. A validação de payload real e da integração MQTT continua pendente.
 
 ## Limitações conhecidas
 
-Os testes não comprovam interoperabilidade integral com firmware ou hardware, criptografia de um payload capturado de dispositivo real, confidencialidade ponta a ponta, segurança de produção, alcance ou retransmissão LoRa. A suíte upstream aprovada valida apenas os casos criptográficos selecionados do commit fixado. Resultados ainda não executados não devem ser descritos como aprovados.
+Os testes não comprovam interoperabilidade integral com hardware, criptografia de payload capturado de dispositivo real, confidencialidade ponta a ponta de todo o percurso, segurança de produção, alcance ou retransmissão LoRa. O teste direto valida AES-CTR no ambiente nativo para uma entrada sintética. Resultados ainda não executados não devem ser descritos como aprovados.
