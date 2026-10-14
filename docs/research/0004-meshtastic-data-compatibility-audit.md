@@ -53,8 +53,10 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 
 ### Fase A: CI sem hardware
 - [ ] Fixar Protobufs oficiais por tag e commit imutável.
-- [ ] Criar fixtures sintéticos para Position, DeviceMetrics, EnvironmentMetrics, User/NodeInfo, NeighborInfo, Waypoint, MapReport e tipos desconhecidos, conforme o esquema fixado.
-- [ ] Verificar decode/encode do envelope, campos opcionais, payload vazio, tipo desconhecido e mensagem malformada.
+- [x] Criar fixtures sintéticos iniciais para Position, Telemetry de dispositivo/ambiente/qualidade do ar, User, NeighborInfo, Waypoint e MapReport, usando Protobufs v2.8.0 fixado por commit.
+- [x] Verificar decode/encode para esses fixtures e rejeição de uma mensagem truncada.
+- [ ] Testar preservação de campos desconhecidos e tipos de payload desconhecidos; isso ainda não está coberto pelo script inicial.
+- [ ] Verificar payload vazio, privacidade dos logs e matriz de versões adicionais.
 - [ ] Garantir que os logs de teste não exponham conteúdo sensível.
 - [ ] Manter baseline estável e executar testes adicionais contra o esquema mais novo sem promover automaticamente a versão nova a baseline.
 
@@ -69,6 +71,10 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 - [ ] Usar canal privado e mensagens de baixa frequência.
 - [ ] Verificar separadamente MQTT, aceitação pelo firmware e recepção LoRa por segundo nó, se disponível.
 - [ ] Testar posição/telemetria com dados controlados sem divulgar localização real.
+
+## Implementação inicial de CI
+
+O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. O workflow MQTT smoke executa o script. Essa etapa valida estrutura e round-trip dos tipos cobertos, não decodifica tráfego real nem prova que todos os campos são enviados pelo firmware. O resultado do CI do commit mais recente ainda precisa ser confirmado.
 
 ## Critério de aceitação
 
