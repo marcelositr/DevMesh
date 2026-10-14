@@ -1,0 +1,65 @@
+name: Meshtastic firmware crypto reference
+
+on:
+  push:
+    branches:
+      - "test/**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firmware-crypto-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  upstream-crypto-tests:
+    name: Run pinned upstream crypto test suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out DevMesh
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+
+      - name: Check out pinned Meshtastic firmware source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: meshtastic/firmware
+          ref: 8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c
+          path: firmware
+          persist-credentials: false
+
+      - name: Install native test system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            build-essential \
+            libbluetooth-dev \
+            libgpiod-dev \
+            libyaml-cpp-dev \
+            libjsoncpp-dev \
+            openssl \
+            libssl-dev \
+            libulfius-dev \
+            liborcania-dev \
+            libusb-1.0-0-dev \
+            libi2c-dev \
+            libuv1-dev \
+            libcurl4-gnutls-dev
+
+      - name: Install pinned PlatformIO CLI
+        run: python -m pip install platformio==6.1.18
+
+      - name: Run upstream crypto unit tests
+        working-directory: firmware
+        run: pio test -e native -f test_crypto -vv
