@@ -110,8 +110,8 @@ node_sub_once node-b devmesh/public/check "$PUBLIC_OUTPUT" "$TEMP_DIR/public-nod
 PUBLIC_B_PID="$!"
 node_sub_once node-c devmesh/public/check "$PUBLIC_NODE_C_OUTPUT" "$TEMP_DIR/public-node-c.err" &
 PUBLIC_C_PID="$!"
-wait_for_subscription "$PUBLIC_B_PID" "$TEMP_DIR/public-node-b.err"
-wait_for_subscription "$PUBLIC_C_PID" "$TEMP_DIR/public-node-c.err"
+wait_for_subscription "$PUBLIC_B_PID" "$PUBLIC_OUTPUT"
+wait_for_subscription "$PUBLIC_C_PID" "$PUBLIC_NODE_C_OUTPUT"
 node_pub node-a devmesh/public/check "public-message-from-node-a"
 
 wait "$PUBLIC_B_PID" || fail "O nó B não recebeu a mensagem pública permitida."
@@ -124,7 +124,7 @@ printf 'OK: nós B e C receberam a mensagem do tópico público autorizado.\n'
 
 node_sub_once node-b devmesh/private/a "$PRIVATE_OUTPUT" "$TEMP_DIR/private-node-b.err" &
 PRIVATE_B_PID="$!"
-wait_for_subscription "$PRIVATE_B_PID" "$TEMP_DIR/private-node-b.err"
+wait_for_subscription "$PRIVATE_B_PID" "$PRIVATE_OUTPUT"
 node_pub node-a devmesh/private/a "private-message-from-node-a"
 wait "$PRIVATE_B_PID" || fail "O nó B não recebeu a mensagem privada autorizada."
 grep --fixed-strings --line-regexp --quiet "private-message-from-node-a" "$PRIVATE_OUTPUT" \
@@ -134,26 +134,30 @@ printf 'OK: nó B recebeu a mensagem privada autorizada do nó A.\n'
 UNAUTHORIZED_PUBLISH_OUTPUT="$TEMP_DIR/unauthorized-publish-node-b.txt"
 node_sub_once node-b devmesh/private/a "$UNAUTHORIZED_PUBLISH_OUTPUT" "$TEMP_DIR/unauthorized-publish-node-b.err" &
 UNAUTHORIZED_PUBLISH_PID="$!"
-wait_for_subscription "$UNAUTHORIZED_PUBLISH_PID" "$TEMP_DIR/unauthorized-publish-node-b.err"
+wait_for_subscription "$UNAUTHORIZED_PUBLISH_PID" "$UNAUTHORIZED_PUBLISH_OUTPUT"
 node_pub node-c devmesh/private/a "must-be-rejected"
 set +e
 wait "$UNAUTHORIZED_PUBLISH_PID"
 UNAUTHORIZED_PUBLISH_STATUS=$?
 set -e
-[[ ! -s "$UNAUTHORIZED_PUBLISH_OUTPUT" ]] || fail "O broker entregou ao nó B uma publicação não autorizada do nó C."
+if grep --fixed-strings --line-regexp --quiet "must-be-rejected" "$UNAUTHORIZED_PUBLISH_OUTPUT"; then
+    fail "O broker entregou ao nó B uma publicação não autorizada do nó C."
+fi
 [[ "$UNAUTHORIZED_PUBLISH_STATUS" -ne 0 ]] || fail "A assinatura de verificação recebeu inesperadamente a publicação não autorizada."
 printf 'OK: a publicação do nó C não chegou ao nó B no tópico privado.\n'
 
 set +e
 node_sub_once node-c devmesh/private/a "$DENIED_OUTPUT" "$TEMP_DIR/denied-node-c.err" &
 DENIED_PID="$!"
-wait_for_subscription "$DENIED_PID" "$TEMP_DIR/denied-node-c.err"
+wait_for_subscription "$DENIED_PID" "$DENIED_OUTPUT"
 node_pub node-a devmesh/private/a "private-message-not-for-node-c"
 wait "$DENIED_PID"
 DENIED_STATUS=$?
 set -e
 
-[[ ! -s "$DENIED_OUTPUT" ]] || fail "O nó C recebeu conteúdo do tópico privado apesar da ACL."
+if grep --fixed-strings --line-regexp --quiet "private-message-not-for-node-c" "$DENIED_OUTPUT"; then
+    fail "O nó C recebeu conteúdo do tópico privado apesar da ACL."
+fi
 [[ "$DENIED_STATUS" -ne 0 ]] || fail "A assinatura do nó C no tópico privado terminou como sucesso inesperado."
 printf 'OK: o nó C não recebeu mensagens do tópico privado e a assinatura não foi autorizada.\n'
 printf 'PASSOU: ACLs MQTT verificadas com três clientes e broker descartável.\n'
