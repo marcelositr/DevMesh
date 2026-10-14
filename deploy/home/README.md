@@ -73,7 +73,7 @@ Habilite uplink/downlink somente nos canais que você realmente pretende encamin
 
 ## Limites de segurança
 
-- Esta configuração é apenas para uma rede doméstica confiável. MQTT na porta 1883 não usa TLS; credenciais e tráfego podem ser observados por alguém capaz de monitorar a rede local. Para redes não confiáveis, configure TLS ou use uma VPN adequadamente configurada antes de permitir o acesso.
+- Esta configuração é apenas para uma rede doméstica confiável. MQTT na porta 1883 não usa TLS; credenciais e tráfego podem ser observados por alguém capaz de monitorar a rede local. Para redes não confiáveis, não habilite acesso apenas por ativar TLS: no [commit do firmware fixado para os testes](https://github.com/meshtastic/firmware/blob/8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c/src/mqtt/MQTT.cpp), o cliente chama `mqttClientTLS.setInsecure()`, desativando a validação normal do certificado do servidor. Prefira uma VPN adequadamente configurada até que a validação de certificados esteja confirmada na versão real usada.
 - **Não** encaminhe a porta 1883 no roteador para a internet. Acesso remoto não faz parte desta instalação inicial.
 - A conta compartilhada `devmesh` pode ler e publicar em todos os tópicos `msh/#`. Ela não separa nós entre si. A ACL limita o prefixo, não substitui a criptografia dos pacotes nem cria privacidade entre os clientes autorizados.
 - A opção Meshtastic **Encryption enabled** precisa estar ativa para encaminhar pacotes cifrados. A chave de canal sozinha não garante que o payload publicado no MQTT permaneça cifrado. Mensagens JSON são um caminho separado e não cifrado.
