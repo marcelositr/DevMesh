@@ -1,72 +1,74 @@
-# Project Continuity and Succession
+# Continuidade e sucessão do projeto
 
-## Purpose
+## Objetivo
 
-This document describes how DevMesh can continue operating if the project lead or a maintainer becomes unavailable, loses access, or steps down. It complements [GOVERNANCE.md](../GOVERNANCE.md); it does not replace GitHub's account recovery procedures or grant access to any account.
+Este documento descreve como o DevMesh pode continuar funcionando se a pessoa responsável pelo projeto ou um mantenedor ficar indisponível, perder acesso ou deixar a função. Ele complementa [GOVERNANCE.md](../GOVERNANCE.md); não substitui os procedimentos de recuperação de conta do GitHub nem concede acesso a qualquer conta.
 
-## Principles
+## Princípios
 
-Continuity decisions should protect the project and its community while preserving transparency, security, and the applicable software license.
+As decisões de continuidade devem proteger o projeto e a comunidade, preservando transparência, segurança e os termos da licença aplicável.
 
-- Do not make any person the sole holder of essential project knowledge or operational instructions where this can reasonably be avoided.
-- Never store passwords, recovery codes, access tokens, private keys, or other credentials in this repository.
-- Grant access only to people who need it, using the least privilege available.
-- Record significant transfers of responsibility without publishing confidential security details or personal information.
-- Do not assume that GitHub or another service can restore access to an account.
+- Sempre que razoavelmente possível, não concentre todo o conhecimento essencial ou todas as instruções operacionais em uma única pessoa.
+- Nunca armazene senhas, códigos de recuperação, tokens de acesso, chaves privadas ou outras credenciais neste repositório.
+- Conceda acesso apenas a quem precisa dele, com o menor nível de permissão disponível.
+- Registre transferências relevantes de responsabilidade sem publicar detalhes confidenciais de segurança ou informações pessoais.
+- Não presuma que o GitHub ou outro serviço conseguirá recuperar o acesso a uma conta.
 
-## Planned Responsibilities
+## Responsabilidades planejadas
 
-The project lead initially coordinates project direction, governance, and access administration. As maintainers are appointed, responsibilities should be divided and documented, including who can maintain code, manage releases, handle security reports, and administer essential services.
+Inicialmente, a pessoa responsável pelo projeto coordena a direção, a governança e a administração dos acessos. Conforme forem nomeados mantenedores, as responsabilidades devem ser divididas e documentadas, incluindo quem pode manter o código, publicar versões, tratar relatos de segurança e administrar serviços essenciais.
 
-The project should maintain an up-to-date, non-sensitive record of:
-- Roles and the responsibilities assigned to them.
-- Essential services and their operational owners.
-- Where authoritative operational instructions are maintained.
-- Which responsibilities still depend on one person and need a continuity plan.
+O projeto deve manter um registro atualizado e não sensível de:
 
-Do not publish private contact details or sensitive infrastructure information without a clear need and permission.
+- Papéis e responsabilidades atribuídos.
+- Serviços essenciais e seus responsáveis operacionais.
+- Localização das instruções operacionais oficiais.
+- Responsabilidades que ainda dependem de uma única pessoa e precisam de um plano de continuidade.
 
-## Temporary Unavailability
+Não publique contatos privados nem informações sensíveis sobre a infraestrutura sem necessidade clara e autorização.
 
-If the project lead is temporarily unavailable, maintainers should continue routine, reversible work within their assigned responsibilities. They should defer major governance changes, transfers of ownership, and other irreversible decisions unless urgent action is necessary to prevent significant harm.
+## Indisponibilidade temporária
 
-For urgent security or service incidents, the available maintainers may take proportionate protective action within their existing access and authority. They should document the action and rationale when doing so is safe.
+Se a pessoa responsável pelo projeto estiver temporariamente indisponível, os mantenedores podem continuar tarefas rotineiras e reversíveis dentro de suas responsabilidades. Devem adiar grandes mudanças de governança, transferências de titularidade e outras decisões irreversíveis, exceto quando uma ação urgente for necessária para evitar dano significativo.
 
-## Resignation or Permanent Unavailability
+Em incidentes urgentes de segurança ou de serviço, os mantenedores disponíveis podem tomar medidas proporcionais de proteção dentro dos acessos e da autoridade que já possuem. Quando for seguro, devem documentar a ação e sua justificativa.
 
-If the project lead steps down or is permanently unable to serve:
+## Saída ou indisponibilidade permanente
 
-1. Determine which maintainers are available and willing to assume responsibilities.
-2. Review the current governance rules and any recorded succession arrangements.
-3. Select an interim project lead from willing, trusted maintainers through a documented decision.
-4. Communicate the change publicly when it is appropriate and safe to do so.
-5. Review repository, service, release, and security-report responsibilities, transferring access through the relevant platforms' supported mechanisms.
-6. Record the decision and any unresolved risks without exposing credentials or sensitive personal information.
+Se a pessoa responsável pelo projeto deixar a função ou ficar permanentemente indisponível:
 
-If no suitable maintainer is available, the project should state that its leadership is unresolved rather than implying that a successor has been appointed. Routine activity may be paused until responsible leadership can be established.
+1. Identifique quais mantenedores estão disponíveis e dispostos a assumir responsabilidades.
+2. Consulte as regras de governança vigentes e os procedimentos de sucessão já registrados.
+3. Escolha uma liderança interina entre mantenedores de confiança que aceitem a função, por meio de uma decisão documentada.
+4. Comunique a mudança publicamente quando for apropriado e seguro.
+5. Revise as responsabilidades pelo repositório, serviços, versões e relatos de segurança; transfira os acessos usando os mecanismos oficiais das plataformas envolvidas.
+6. Registre a decisão e os riscos ainda não resolvidos, sem expor credenciais ou informações pessoais sensíveis.
 
-Permanent changes to governance or the long-term leadership model must follow [GOVERNANCE.md](../GOVERNANCE.md), including its enhanced process for protected governance changes.
+Se não houver um mantenedor adequado disponível, o projeto deve declarar que a liderança está indefinida, em vez de sugerir que alguém foi nomeado sucessor. As atividades rotineiras podem ser pausadas até que seja possível estabelecer uma liderança responsável.
 
-## Account and Service Recovery
+Mudanças permanentes na governança ou no modelo de liderança devem seguir [GOVERNANCE.md](../GOVERNANCE.md), incluindo o processo reforçado para alterações protegidas.
 
-Recovery must use each provider's official account recovery and access-management mechanisms. Do not attempt to bypass access controls or take over another person's account.
+## Recuperação de contas e serviços
 
-Where supported, the project should:
-- Maintain more than one appropriately authorized administrator for critical shared resources.
-- Use individual accounts rather than shared personal credentials.
-- Enable available account security protections.
-- Keep recovery instructions in an access-controlled location outside this public repository.
-- Periodically verify that designated maintainers can perform necessary administrative tasks.
-- Remove or revise access promptly when a person's role ends, while preserving legitimate project continuity.
+A recuperação deve usar os mecanismos oficiais de recuperação de conta e gerenciamento de acesso de cada provedor. Não tente contornar controles de acesso nem assumir a conta de outra pessoa.
 
-The repository itself must not contain recovery codes, secrets, private keys, personal identity documents, or instructions that would expose an account or service to compromise.
+Quando houver suporte, o projeto deve:
 
-## Disagreements and Safeguards
+- Manter mais de uma pessoa devidamente autorizada como administradora de recursos compartilhados críticos.
+- Usar contas individuais, em vez de compartilhar credenciais pessoais.
+- Ativar as proteções de segurança disponíveis nas contas.
+- Guardar instruções de recuperação em local com acesso controlado, fora deste repositório público.
+- Verificar periodicamente se os mantenedores designados conseguem executar tarefas administrativas necessárias.
+- Remover ou ajustar acessos prontamente quando alguém deixar sua função, preservando a continuidade legítima do projeto.
 
-A succession decision should be documented and handled under the project's governance process. Anyone with a direct conflict of interest should disclose it and, where practical, avoid being the sole decision-maker.
+O repositório não deve conter códigos de recuperação, segredos, chaves privadas, documentos pessoais de identidade ou instruções que exponham contas e serviços a comprometimento.
 
-No continuity document can guarantee access to a personal account, hosting provider, domain, or external service. The project should reduce single-person dependencies over time and be transparent about limitations it has not yet resolved.
+## Divergências e salvaguardas
 
-## Review
+Uma decisão de sucessão deve ser documentada e seguir o processo de governança. Pessoas com conflito de interesse direto devem declará-lo e, quando viável, evitar atuar como única pessoa decisora.
 
-Review this document when maintainers are appointed, critical services are introduced, access arrangements change, or a succession event occurs. See also [GOVERNANCE.md](../GOVERNANCE.md), [SECURITY.md](../SECURITY.md), and [CONTRIBUTING.md](../CONTRIBUTING.md).
+Nenhum documento de continuidade pode garantir acesso a uma conta pessoal, provedor de hospedagem, domínio ou serviço externo. O projeto deve reduzir dependências de uma única pessoa ao longo do tempo e ser transparente sobre as limitações ainda não resolvidas.
+
+## Revisão
+
+Revise este documento quando forem nomeados mantenedores, serviços críticos forem introduzidos, os acessos mudarem ou ocorrer uma sucessão. Consulte também [GOVERNANCE.md](../GOVERNANCE.md), [SECURITY.md](../SECURITY.md) e [CONTRIBUTING.md](../CONTRIBUTING.md).
