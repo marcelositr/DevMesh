@@ -125,6 +125,25 @@ if cmp --silent "$TEMP_DIR/plaintext.bin" "$TEMP_DIR/node-C.plaintext"; then
     fail "O nó C recuperou o texto original usando uma chave diferente."
 fi
 
+# AES-CTR não autentica: alterar um bit do ciphertext altera o bit correspondente do plaintext.
+python3 - "$TEMP_DIR/ciphertext.bin" "$TEMP_DIR/tampered-ciphertext.bin" <<'PY'
+from pathlib import Path
+import sys
+ciphertext = bytearray(Path(sys.argv[1]).read_bytes())
+ciphertext[0] ^= 0x01
+Path(sys.argv[2]).write_bytes(ciphertext)
+PY
+openssl enc -d -aes-128-ctr -K "$KEY_B" -iv "$NONCE" -in "$TEMP_DIR/tampered-ciphertext.bin" -out "$TEMP_DIR/tampered-plaintext.bin" || fail "Falha ao demonstrar AES-CTR com ciphertext alterado."
+python3 - "$TEMP_DIR/plaintext.bin" "$TEMP_DIR/tampered-plaintext.bin" <<'PY'
+from pathlib import Path
+import sys
+original = Path(sys.argv[1]).read_bytes()
+tampered = Path(sys.argv[2]).read_bytes()
+expected = bytes([original[0] ^ 0x01]) + original[1:]
+if tampered != expected:
+    raise SystemExit("FALHA: a alteração do ciphertext não correspondeu à alteração de bit esperada.")
+PY
+
 printf 'OK: vetores AES-128/AES-256 de referência conferidos.\n'
 printf 'OK: nonce de canal coincide com a disposição de bytes esperada.\n'
 printf 'OK: B e C receberam os mesmos bytes cifrados pelo MQTT.\n'
