@@ -36,7 +36,7 @@ A evolução seguirá estas etapas:
 
 ## Critérios para ampliar o escopo
 
-Próximo passo de protocolo: ampliar a comparação com casos AES-CTR adicionais e avaliar separadamente AES-CCM/AEAD quando a opção de canal correspondente fizer parte do escopo. Depois, validar um payload de firmware através do envelope Protobuf e do transporte MQTT. Para testes com hardware, documentar a origem do pacote e a configuração do canal. Se for necessário incorporar ou derivar código upstream, avaliar antes a licença GPL-3.0 e as consequências para a distribuição do DevMesh.
+A interoperabilidade sintética já cobre cinco casos AES-CTR do firmware, a suíte upstream de criptografia e o percurso de ciphertext pelo envelope Protobuf e pelo transporte MQTT. A cobertura futura deve priorizar a verificação documental e, quando necessário, testes específicos do modo de criptografia e do comportamento do módulo MQTT do Meshtastic, sem confundir resultados sintéticos com pacotes reais. Se forem introduzidos testes com hardware, documentar a origem do pacote e a configuração do canal. Se for necessário incorporar ou derivar código upstream no produto, avaliar antes a licença GPL-3.0 e as consequências para a distribuição do DevMesh.
 
 Adicionar autenticação avançada, regras de ACL mais detalhadas, TLS, acesso remoto ou serviços auxiliares somente quando houver um cenário de uso claro. Cada ampliação deve explicar o risco ou a necessidade que atende e incluir testes proporcionais.
 
