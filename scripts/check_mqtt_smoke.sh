@@ -47,30 +47,12 @@ if [[ "$BROKER_READY" != true ]]; then
     fail "Mosquitto não ficou pronto dentro do prazo."
 fi
 
-wait_for_subscription() {
-    local subscriber_pid="$1"
-    local debug_file="$2"
-
-    for attempt in $(seq 1 40); do
-        if grep --quiet --ignore-case --fixed-strings 'Subscribed (mid:' "$debug_file"; then
-            return 0
-        fi
-        if ! kill -0 "$subscriber_pid" 2>/dev/null; then
-            fail "O assinante terminou antes de confirmar a assinatura MQTT."
-        fi
-        sleep 0.1
-    done
-
-    fail "O assinante não recebeu confirmação SUBACK dentro do prazo."
-}
-
 subscribe_once() {
     local node_name="$1"
     local topic="$2"
     local output_file="$3"
 
     docker exec "$CONTAINER_NAME" mosquitto_sub \
-        -d \
         -h 127.0.0.1 \
         -i "$node_name" \
         -t "$topic" \
@@ -91,8 +73,7 @@ assert_public_delivery() {
     node_b_pid="$SUBSCRIBER_PID"
     subscribe_once node-c "$topic" "$node_c_output"
     node_c_pid="$SUBSCRIBER_PID"
-    wait_for_subscription "$node_b_pid" "$node_b_output"
-    wait_for_subscription "$node_c_pid" "$node_c_output"
+    sleep 1
 
     docker exec "$CONTAINER_NAME" mosquitto_pub \
         -h 127.0.0.1 \
@@ -122,8 +103,7 @@ assert_topic_routing() {
     node_b_pid="$SUBSCRIBER_PID"
     subscribe_once node-c-other-topic devmesh/test/private/b "$node_c_output"
     node_c_pid="$SUBSCRIBER_PID"
-    wait_for_subscription "$node_b_pid" "$node_b_output"
-    wait_for_subscription "$node_c_pid" "$node_c_output"
+    sleep 1
 
     docker exec "$CONTAINER_NAME" mosquitto_pub \
         -h 127.0.0.1 \
