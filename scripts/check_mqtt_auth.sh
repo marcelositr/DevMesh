@@ -35,6 +35,9 @@ docker run --rm \
     "$IMAGE" \
     -b -c /tmp/auth/passwordfile "$TEST_USERNAME" "$TEST_PASSWORD"
 
+# O broker executa sem privilégios de root; o arquivo temporário precisa ser legível.
+chmod 644 "$TEMP_DIR/passwordfile"
+
 docker run \
     --detach \
     --name "$CONTAINER_NAME" \
