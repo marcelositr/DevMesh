@@ -39,7 +39,7 @@ jobs:
           path: firmware
           persist-credentials: false
 
-      - name: Prepare temporary channel AES-CTR interoperability test
+      - name: Prepare temporary channel AES-CTR interoperability tests
         run: python scripts/prepare_firmware_crypto_interop_test.py firmware/test/test_crypto/test_main.cpp
 
       - name: Install native test system dependencies
@@ -63,7 +63,7 @@ jobs:
       - name: Install pinned PlatformIO CLI
         run: python -m pip install platformio==6.1.18
 
-      - name: Run upstream crypto tests and compare channel AES-CTR output
+      - name: Run upstream crypto tests and compare AES-CTR vectors
         working-directory: firmware
         shell: bash
         run: |
@@ -71,24 +71,50 @@ jobs:
           log_file="$RUNNER_TEMP/meshtastic-crypto-tests.log"
           pio test -e native -f test_crypto -vv 2>&1 | tee "$log_file"
 
-          actual="$(grep -Eo 'DEVMESH_CHANNEL_CTR_HEX=[0-9a-f]+' "$log_file" | tail -n 1 | cut -d= -f2 || true)"
-          [[ "$actual" =~ ^[0-9a-f]+$ ]] || {
-            printf 'FALHA: o teste do firmware não emitiu o ciphertext de referência.\n' >&2
-            exit 1
-          }
-
           key="00112233445566778899aabbccddeeff"
-          nonce="78563412000000008967452300000000"
           input_file="$RUNNER_TEMP/devmesh-crypto-plaintext.bin"
           output_file="$RUNNER_TEMP/devmesh-openssl-ciphertext.bin"
-          printf 'DevMesh private' > "$input_file"
-          openssl enc -aes-128-ctr -K "$key" -iv "$nonce" \
-            -in "$input_file" -out "$output_file"
-          expected="$(od -An -v -tx1 "$output_file" | tr -d ' \n')"
+          checked=0
 
-          [[ "$actual" == "$expected" ]] || {
-            printf 'FALHA: o ciphertext do CryptoEngine difere do modelo OpenSSL.\n' >&2
-            printf 'Firmware: %s\nOpenSSL:  %s\n' "$actual" "$expected" >&2
+          while IFS='|' read -r case_id from_node packet_id plaintext; do
+            [[ -n "$case_id" ]] || continue
+            actual="$(grep -Eo "DEVMESH_CHANNEL_CTR_${case_id}_HEX=[0-9a-f]+" "$log_file" | tail -n 1 | cut -d= -f2 || true)"
+            [[ "$actual" =~ ^[0-9a-f]+$ ]] || {
+              printf 'FALHA: o firmware não emitiu ciphertext para o caso %s.\n' "$case_id" >&2
+              exit 1
+            }
+
+            nonce="$(python3 - "$packet_id" "$from_node" <<'PY'
+          import struct
+          import sys
+
+          packet_id = int(sys.argv[1])
+          from_node = int(sys.argv[2])
+          print(struct.pack("<QII", packet_id, from_node, 0).hex())
+          PY
+          )"
+            printf '%s' "$plaintext" > "$input_file"
+            openssl enc -aes-128-ctr -K "$key" -iv "$nonce" \
+              -in "$input_file" -out "$output_file"
+            expected="$(od -An -v -tx1 "$output_file" | tr -d '[:space:]')"
+
+            [[ "$actual" == "$expected" ]] || {
+              printf 'FALHA: ciphertext divergente no caso %s.\n' "$case_id" >&2
+              printf 'Firmware: %s\nOpenSSL:  %s\n' "$actual" "$expected" >&2
+              exit 1
+            }
+            printf 'OK: caso AES-CTR %s comparado byte a byte.\n' "$case_id"
+            checked=$((checked + 1))
+          done <<'CASES'
+          1|591751049|305419896|A
+          2|591751049|305419897|DevMesh private
+          3|270544960|168496141|0123456789ABCDEF
+          4|3735928559|16909060|payload-17-bytes!
+          5|305419896|2271560481|Longer synthetic Meshtastic payload for boundary testing.
+          CASES
+
+          [[ "$checked" -eq 5 ]] || {
+            printf 'FALHA: esperados 5 casos AES-CTR, executados %s.\n' "$checked" >&2
             exit 1
           }
-          printf 'OK: CryptoEngine do firmware e modelo OpenSSL produziram o mesmo ciphertext AES-CTR.\n'
+          printf 'OK: cinco ciphertexts do CryptoEngine coincidem com OpenSSL.\n'
