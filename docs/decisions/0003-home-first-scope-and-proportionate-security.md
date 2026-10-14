@@ -17,19 +17,19 @@ O escopo inicial será uma instalação doméstica com Mosquitto, três nós sim
 
 A evolução seguirá estas etapas:
 
-1. **Protótipo e CI:** testar conectividade e roteamento MQTT, transporte binário de um fixture sintético e autenticação básica num broker efêmero. O fixture é uma amostra estática, não um pacote capturado de um dispositivo real. A validação estrutural usa as definições oficiais Protobuf do Meshtastic numa versão fixada, mas não valida criptografia real nem interoperabilidade integral com firmware.
+1. **Protótipo e CI:** testar conectividade e roteamento MQTT, transporte binário de um fixture sintético, autenticação básica e ACLs por tópico num broker efêmero. O fixture é uma amostra estática, não um pacote capturado de um dispositivo real. A validação estrutural usa as definições oficiais Protobuf do Meshtastic numa versão fixada, mas não valida criptografia real nem interoperabilidade integral com firmware.
 2. **Configuração doméstica:** não expor o broker diretamente à internet. Ao preparar uma configuração de uso real, habilitar autenticação para clientes de rede e manter credenciais fora do controle de versão.
-3. **Permissões por tópico:** implementar ACLs quando forem necessárias para separar clientes, limitar publicação/assinatura ou cumprir o modelo de confiança definido. Antes de disponibilizar o serviço a clientes não confiáveis, validar e aplicar as restrições necessárias.
+3. **Permissões por tópico:** aplicar regras de ACL adequadas ao modelo de confiança para separar clientes e limitar publicação/assinatura. O teste atual cobre somente o cenário mínimo de três nós; regras de uma instalação real devem ser definidas para os clientes e tópicos efetivamente usados.
 4. **Acesso por redes não confiáveis:** não oferecer acesso remoto direto como parte da primeira versão. Se esse cenário for adicionado, definir e testar a proteção do transporte, preferencialmente com TLS ou uma VPN adequadamente configurada, além das permissões de acesso necessárias.
 
 ## Limites de segurança e compatibilidade
 
 - Autenticação identifica o cliente; ACLs restringem o que ele pode publicar ou assinar. Uma não substitui a outra.
 - O teste de autenticação comprova apenas o comportamento básico do broker descartável com credenciais de teste. Não valida o armazenamento de segredos nem a configuração de uma instalação doméstica.
+- O teste de ACL verifica permissões de publicação e assinatura no cenário simulado de tópicos públicos e privados. Não certifica uma política de ACL de produção nem cobre todas as convenções de tópicos do Meshtastic.
 - O teste MQTT binário verifica que o broker transporta bytes sem alterá-los no tópico escolhido. O teste Protobuf valida o fixture sintético contra as definições oficiais fixadas e confirma a recodificação dos mesmos bytes. Nenhum dos testes comprova que firmware Meshtastic aceite o fixture nem que o payload tenha sido cifrado por um dispositivo real.
 - TLS protege o transporte entre os pontos da conexão, mas não transforma por si só o payload em conteúdo criptografado de ponta a ponta.
 - A criptografia de canais Meshtastic é uma camada separada. O DevMesh não deve prometer confidencialidade ou compatibilidade sem testes específicos do tipo de pacote e do encaminhamento MQTT.
-- A separação entre tópicos num teste de roteamento não comprova autorização por ACL.
 - Testes com nós simulados validam o comportamento do software e do broker, não o alcance, a qualidade do sinal ou o comportamento físico de um enlace LoRa.
 
 ## Critérios para ampliar o escopo
@@ -41,7 +41,7 @@ Antes de declarar uma configuração pronta para uso real, revisar a configuraç
 ## Consequências
 
 - O protótipo continua pequeno e adequado a uma Raspberry Pi.
-- Os testes existentes verificam conectividade, roteamento, transporte binário de um fixture, validação estrutural Protobuf e autenticação básica em ambientes descartáveis, sem afirmar controles que não testam.
+- Os testes verificam conectividade, roteamento, transporte binário de um fixture, validação estrutural Protobuf, autenticação básica e ACLs em ambientes descartáveis, sem afirmar controles que não testam.
 - Segurança avançada não será implementada sem necessidade demonstrável; requisitos necessários para uma exposição futura não serão esquecidos.
 - A documentação deve distinguir sempre entre planejado, implementado e verificado.
 

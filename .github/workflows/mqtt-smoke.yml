@@ -36,6 +36,7 @@ jobs:
         run: |
           bash -n scripts/check_mqtt_smoke.sh
           bash -n scripts/check_mqtt_auth.sh
+          bash -n scripts/check_mqtt_acl.sh
           bash -n scripts/check_meshtastic_mqtt.sh
           bash -n scripts/check_meshtastic_protobuf.sh
 
@@ -50,3 +51,6 @@ jobs:
 
       - name: Run isolated MQTT authentication check
         run: bash scripts/check_mqtt_auth.sh
+
+      - name: Run isolated MQTT ACL check
+        run: bash scripts/check_mqtt_acl.sh
