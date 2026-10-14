@@ -1,14 +1,20 @@
 # Documentação do DevMesh
 
-Esta pasta reúne a documentação técnica, os registros de decisões e os procedimentos de continuidade do DevMesh.
+Esta pasta reúne a documentação técnica, as pesquisas, os registros de decisões e os procedimentos de continuidade do DevMesh.
 
 ## Documentos
 
 - [Continuidade e sucessão](CONTINUITY.md): continuidade das responsabilidades, recuperação de acesso e transição de liderança.
-- [Registros de decisões](decisions/README.md): como localizar decisões e registrar novas decisões técnicas ou de governança.
-- [Pesquisas técnicas](research/): levantamentos com fontes, hipóteses e questões ainda não validadas.
-- [Levantamento de equipamento Meshtastic](research/0002-meshtastic-device-inventory-and-traffic-survey.md): plano para inventariar hardware, firmware, interfaces e tráfego real antes da implementação.
+- [Registros de decisões](decisions/README.md): decisões aprovadas, seus fundamentos e como registrar revisões.
+- [Comparação inicial de brokers MQTT](research/0001-mqtt-broker-initial-comparison.md): pesquisa documental e requisitos técnicos, com distinção entre prioridades iniciais e verificações futuras.
+- [Levantamento de equipamento Meshtastic](research/0002-meshtastic-device-inventory-and-traffic-survey.md): inventário de hardware, firmware, interfaces e observações de tráfego ainda incompletas.
 - [Contexto para ferramentas de IA](ai/README.md): orientações para retomar o trabalho sem confundir decisões aprovadas com hipóteses.
+
+## Escopo e estado das informações
+
+A primeira etapa prioriza uma instalação doméstica simples, com Mosquitto e três nós simulados. O acesso remoto pela internet e integrações adicionais estão fora do escopo inicial. Os controles de segurança serão aplicados conforme o risco e o modelo de confiança, sem confundir a configuração isolada de testes com uma configuração de implantação.
+
+A [decisão sobre escopo doméstico e segurança proporcional](decisions/0003-home-first-scope-and-proportionate-security.md) registra esse acordo e define quando o projeto deve ampliar os controles.
 
 ## Princípios de documentação
 
