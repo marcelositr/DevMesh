@@ -35,8 +35,12 @@ tr -d '[:space:]' < "$ROOT_DIR/tests/fixtures/meshtastic-service-envelope.hex" \
     | xxd -r -p > "$TEMP_DIR/service-envelope.bin"
 [[ -s "$TEMP_DIR/service-envelope.bin" ]] || fail "Fixture binário vazio."
 
+# Habilita logs somente no broker descartável para sincronizar com a inscrição real do assinante.
+sed 's/^log_type error$/log_type all/' "$ROOT_DIR/tests/mosquitto/mosquitto.conf" \
+    > "$TEMP_DIR/mosquitto.conf"
+
 docker run --detach --name "$CONTAINER_NAME" \
-    --volume "$ROOT_DIR/tests/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro" \
+    --volume "$TEMP_DIR/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro" \
     "$IMAGE" >/dev/null
 
 for attempt in $(seq 1 20); do
@@ -54,7 +58,16 @@ OUTPUT="$TEMP_DIR/radio-received.bin"
 docker exec "$CONTAINER_NAME" mosquitto_sub -h 127.0.0.1 \
     -t "$RADIO_FILTER" -C 1 -N -W 8 > "$OUTPUT" 2>"$TEMP_DIR/subscriber.err" &
 SUBSCRIBER_PID="$!"
-sleep 0.5
+
+SUBSCRIBED=false
+for attempt in $(seq 1 20); do
+    if docker logs "$CONTAINER_NAME" 2>&1 | grep -Fq "$RADIO_FILTER"; then
+        SUBSCRIBED=true
+        break
+    fi
+    sleep 0.1
+done
+[[ "$SUBSCRIBED" == true ]] || fail "O assinante não registrou o filtro MQTT esperado."
 
 # O fixture é sintético: testa apenas o caminho MQTT e a correspondência de tópico.
 docker exec -i "$CONTAINER_NAME" mosquitto_pub -h 127.0.0.1 \
