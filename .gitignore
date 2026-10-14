@@ -1,0 +1,10 @@
+# Segredos e dados locais do broker doméstico
+/deploy/home/passwordfile
+/deploy/home/data/
+
+# Certificados e chaves privadas locais
+*.key
+*.pem
+.env
+.env.*
+!.env.example
