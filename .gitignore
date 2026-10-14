@@ -2,9 +2,7 @@
 /deploy/home/passwordfile
 /deploy/home/data/
 
-# Certificados e chaves privadas locais
-*.key
-*.pem
+# Variáveis de ambiente locais
 .env
 .env.*
 !.env.example
