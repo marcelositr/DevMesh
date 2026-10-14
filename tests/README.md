@@ -52,11 +52,11 @@ O modelo publica o ciphertext no broker descartável. B e C recebem os mesmos by
 
 A workflow `.github/workflows/meshtastic-firmware-crypto.yml` faz checkout do código oficial Meshtastic num commit fixo (`8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c`) e executa `pio test -e native -f test_crypto -vv`. A execução [#1](https://github.com/marcelositr/DevMesh/actions/runs/38586528090) terminou com sucesso: 28 casos de teste passaram em aproximadamente cinco minutos.
 
-A execução seguinte, [#2](https://github.com/marcelositr/DevMesh/actions/runs/38588041550), prepara um caso temporário dentro do teste upstream, chama `CryptoEngine::encryptPacket()` com uma chave de 16 bytes, uma mensagem e identificadores sintéticos, e compara o resultado com OpenSSL usando o nonce correspondente. A suíte `test_crypto` e a comparação byte a byte passaram. O teste não altera o repositório upstream: a edição ocorre somente no checkout descartável do CI. O firmware não é incorporado ao produto DevMesh.
+A workflow atual prepara casos temporários dentro do teste upstream e chama `CryptoEngine::encryptPacket()` com chaves, nonces, mensagens e identificadores sintéticos. Cinco casos comparam o ciphertext byte a byte com OpenSSL AES-128-CTR. A edição ocorre somente no checkout descartável do CI; o repositório upstream não é alterado e o firmware não é incorporado ao produto DevMesh. O resultado mais recente está disponível na [workflow criptográfica](https://github.com/marcelositr/DevMesh/actions/runs/38622597752).
 
 A mesma suíte upstream também executa os testes `test_AES_CCM_AEAD_rejects_tampering`, `test_AES_CCM_AEAD_tamper_sweep`, `test_AES_CCM_AEAD_rejects_wrong_psk`, `test_AES_CCM_AEAD_binds_nonce_inputs` e `test_AES_CCM_AEAD_binds_destination`. Eles verificam que alterações no ciphertext ou na tag, PSK incorreta, identificadores de nonce diferentes e destino alterado são rejeitados no nível de `CryptoEngine`. O teste `test_AES_CCM_rfc3610` ainda compara vetores conhecidos de AES-CCM com resultados esperados. Isso é evidência de testes unitários do código oficial fixado, não uma prova de que o DevMesh habilita ou negocia AEAD: os nós Meshtastic precisam estar configurados de forma compatível, e o teste MQTT atual apenas transporta os bytes recebidos.
 
-**Limites:** a comparação direta confirma que `CryptoEngine::encryptPacket()` e OpenSSL produzem o mesmo ciphertext AES-CTR para os parâmetros sintéticos do teste. Isso ainda não valida um payload capturado de um dispositivo real, a integração MQTT ponta a ponta, LoRa, mensagens diretas PKI/AES-CCM, assinaturas ou a segurança geral do sistema. AES-CTR não autentica o conteúdo.
+**Limites:** a comparação direta confirma que `CryptoEngine::encryptPacket()` e OpenSSL produzem o mesmo ciphertext AES-CTR nos cinco casos sintéticos cobertos. O teste integrado também verifica o percurso desse ciphertext por `ServiceEnvelope` Protobuf e MQTT, com dois assinantes recebendo bytes idênticos. Isso não valida payloads capturados de dispositivos reais, enlaces LoRa, mensagens diretas PKI/AES-CCM, assinaturas ou a segurança geral do sistema. AES-CTR não autentica o conteúdo.
 
 ## Verificação básica de autenticação
 
@@ -78,7 +78,7 @@ bash scripts/check_mqtt_acl.sh
 
 O teste verifica que B e C recebem mensagens no tópico público autorizado, B recebe mensagens no tópico restrito de A/B e C não consegue publicar nem receber nesse tópico.
 
-**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. O CI agora compara diretamente o AES-CTR do `CryptoEngine` com OpenSSL para uma mensagem sintética. A validação de payload real e da integração MQTT continua pendente.
+**Importante:** esse isolamento é imposto pela ACL do broker MQTT. Não é o mesmo que criptografia de canal Meshtastic. Num canal cifrado real, um nó sem a chave pode receber e retransmitir bytes cifrados, mas não ler o conteúdo. O CI compara o AES-CTR do `CryptoEngine` com OpenSSL em cinco casos sintéticos e integra um ciphertext sintético ao percurso Protobuf/MQTT. A validação com payload capturado de dispositivo real e a integração com hardware continuam pendentes.
 
 ## Limitações conhecidas
 
