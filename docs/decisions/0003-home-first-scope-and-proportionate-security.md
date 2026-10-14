@@ -17,7 +17,7 @@ O escopo inicial será uma instalação doméstica com Mosquitto, três nós sim
 
 A evolução da segurança seguirá estas etapas:
 
-1. **Protótipo e CI:** testar conectividade e roteamento MQTT com três clientes simulados num broker efêmero e isolado. Um teste separado verifica que o broker com autenticação recusa publicações anônimas e aceita clientes com credenciais temporárias. A configuração anônima só pode ser usada no teste descartável de conectividade, nunca como configuração de implantação.
+1. **Protótipo e CI:** testar conectividade e roteamento MQTT com três clientes simulados num broker efêmero e isolado. Um teste separado verifica que o broker com autenticação recusa publicações anônimas e credenciais inválidas, e aceita clientes com credenciais temporárias válidas. A configuração anônima só pode ser usada no teste descartável de conectividade, nunca como configuração de implantação.
 2. **Configuração doméstica:** não expor o broker diretamente à internet. Ao preparar uma configuração de uso real, habilitar autenticação para clientes de rede e manter credenciais fora do controle de versão.
 3. **Permissões por tópico:** implementar ACLs quando forem necessárias para separar clientes, limitar publicação/assinatura ou cumprir o modelo de confiança definido. Antes de disponibilizar o serviço a clientes não confiáveis, validar e aplicar as restrições necessárias.
 4. **Acesso por redes não confiáveis:** não oferecer acesso remoto direto como parte da primeira versão. Se esse cenário for adicionado, definir e testar a proteção do transporte, preferencialmente com TLS ou uma VPN adequadamente configurada, além das permissões de acesso necessárias.
