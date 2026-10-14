@@ -15,9 +15,11 @@ Execute a partir da raiz do repositório:
 ```sh
 mkdir -p deploy/home/data
 docker run --rm -it \
+  --user "$(id -u):$(id -g)" \
+  --entrypoint mosquitto_passwd \
   -v "$PWD/deploy/home:/mosquitto/config" \
   eclipse-mosquitto:2.1.2-alpine \
-  mosquitto_passwd -c /mosquitto/config/passwordfile devmesh
+  -c /mosquitto/config/passwordfile devmesh
 chmod 644 deploy/home/passwordfile
 ```
 
