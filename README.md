@@ -8,11 +8,11 @@ O DevMesh não é um projeto oficial do Meshtastic e não deve sugerir afiliaç�
 
 ## Escopo inicial
 
-A primeira etapa tem como objetivo validar uma base simples para uso doméstico, inclusive numa Raspberry Pi. O cenário inicial usa o Mosquitto e três nós simulados, sem depender de hardware de rádio nem expor o broker à internet.
+A primeira etapa valida uma base simples para uso doméstico, inclusive numa Raspberry Pi. O cenário inicial usa Mosquitto e três nós simulados, sem depender de hardware de rádio nem expor o broker à internet.
 
-O CI verifica conectividade MQTT, entrega de mensagens, roteamento entre tópicos e autenticação básica num broker descartável. Também verifica o transporte binário de um fixture Meshtastic sintético. A validação estrutural usa `protoc` com as definições oficiais Meshtastic fixadas numa versão específica, decodifica o `ServiceEnvelope`, verifica os campos esperados e confirma o ciclo de recodificação. Isso valida a estrutura do fixture, não criptografia real, interoperabilidade integral com firmware ou rádio LoRa.
+O CI verifica conectividade MQTT, roteamento por tópico, autenticação básica e ACLs num broker descartável. Também simula o nó A publicando um fixture binário Meshtastic sintético que os nós B e C recebem sem alteração. A validação estrutural usa `protoc` com as definições oficiais Meshtastic fixadas numa versão específica, decodifica o `ServiceEnvelope`, verifica campos esperados e confirma o ciclo de recodificação. Isso valida a estrutura do fixture e o transporte MQTT, não criptografia real, interoperabilidade integral com firmware ou rádio LoRa.
 
-A configuração anônima usada nos testes existe somente para brokers efêmeros de CI e não deve ser reutilizada numa instalação real. As credenciais do teste de autenticação são temporárias. A configuração doméstica deve evitar exposição pública do broker e prever autenticação para clientes de rede. ACLs e proteção do transporte serão aplicadas conforme o modelo de confiança e antes de qualquer acesso por redes não confiáveis. O acesso remoto não faz parte do escopo inicial.
+A configuração anônima usada em alguns testes existe somente para brokers efêmeros de CI e não deve ser reutilizada numa instalação real. As credenciais do teste de autenticação são temporárias. A configuração doméstica deve evitar exposição pública do broker e prever autenticação para clientes de rede. ACLs e proteção do transporte serão aplicadas conforme o modelo de confiança e antes de qualquer acesso por redes não confiáveis. O acesso remoto não faz parte do escopo inicial.
 
 Consulte a [decisão sobre escopo doméstico e segurança proporcional](docs/decisions/0003-home-first-scope-and-proportionate-security.md) para os limites e os critérios de evolução.
 

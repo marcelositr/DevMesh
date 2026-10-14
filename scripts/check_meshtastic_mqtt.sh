@@ -9,6 +9,7 @@ CONTAINER_NAME="devmesh-meshtastic-mqtt-${RUN_ID}-${RUN_ATTEMPT}"
 TEMP_DIR="$(mktemp -d)"
 BROKER_READY=false
 TOPIC="msh/US/2/e/LongFast/!a1b2c3d4"
+TOPIC_FILTER="msh/US/2/e/LongFast/#"
 
 cleanup() {
     if docker container inspect "$CONTAINER_NAME" >/dev/null 2>&1; then
@@ -27,61 +28,48 @@ fail() {
 
 trap cleanup EXIT
 
-# O fixture hexadecimal representa um ServiceEnvelope com um MeshPacket criptografado.
-# Os bytes são derivados das definições oficiais; este teste não decodifica Protobuf.
+# O fixture representa um ServiceEnvelope sintético com MeshPacket criptografado.
 tr -d '[:space:]' < "$ROOT_DIR/tests/fixtures/meshtastic-service-envelope.hex" \
     | xxd -r -p > "$TEMP_DIR/service-envelope.bin"
+[[ -s "$TEMP_DIR/service-envelope.bin" ]] || fail "Fixture binário vazio."
 
-if [[ ! -s "$TEMP_DIR/service-envelope.bin" ]]; then
-    fail "O fixture binário do ServiceEnvelope está vazio."
-fi
-
-docker run \
-    --detach \
-    --name "$CONTAINER_NAME" \
+docker run --detach --name "$CONTAINER_NAME" \
     --volume "$ROOT_DIR/tests/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro" \
     "$IMAGE" >/dev/null
 
 for attempt in $(seq 1 20); do
-    if docker exec "$CONTAINER_NAME" mosquitto_pub \
-        -h 127.0.0.1 \
-        -t devmesh/test/healthcheck \
-        -m ready >/dev/null 2>&1; then
+    if docker exec "$CONTAINER_NAME" mosquitto_pub -h 127.0.0.1 \
+        -t devmesh/test/healthcheck -m ready >/dev/null 2>&1; then
         BROKER_READY=true
         break
     fi
     sleep 0.5
 done
+[[ "$BROKER_READY" == true ]] || fail "Mosquitto não ficou pronto dentro do prazo."
 
-if [[ "$BROKER_READY" != true ]]; then
-    fail "Mosquitto não ficou pronto dentro do prazo."
-fi
+OUTPUT_B="$TEMP_DIR/node-b.bin"
+OUTPUT_C="$TEMP_DIR/node-c.bin"
 
-OUTPUT_FILE="$TEMP_DIR/received-envelope.bin"
-ERROR_FILE="$TEMP_DIR/subscriber.err"
-
-docker exec "$CONTAINER_NAME" mosquitto_sub \
-    -h 127.0.0.1 \
-    -t "$TOPIC" \
-    -C 1 \
-    -N \
-    -W 8 > "$OUTPUT_FILE" 2> "$ERROR_FILE" &
-SUBSCRIBER_PID="$!"
+# Os nós B e C assinam o filtro público LongFast.
+docker exec "$CONTAINER_NAME" mosquitto_sub -h 127.0.0.1 -t "$TOPIC_FILTER" \
+    -C 1 -N -W 8 > "$OUTPUT_B" 2> "$TEMP_DIR/node-b.err" &
+PID_B="$!"
+docker exec "$CONTAINER_NAME" mosquitto_sub -h 127.0.0.1 -t "$TOPIC_FILTER" \
+    -C 1 -N -W 8 > "$OUTPUT_C" 2> "$TEMP_DIR/node-c.err" &
+PID_C="$!"
 sleep 1
 
-docker exec -i "$CONTAINER_NAME" mosquitto_pub \
-    -h 127.0.0.1 \
-    -t "$TOPIC" \
-    -s < "$TEMP_DIR/service-envelope.bin" \
-    || fail "Não foi possível publicar o payload binário no tópico Meshtastic."
+docker exec -i "$CONTAINER_NAME" mosquitto_pub -h 127.0.0.1 \
+    -t "$TOPIC" -s < "$TEMP_DIR/service-envelope.bin" \
+    || fail "Falha ao publicar o fixture binário."
 
-wait "$SUBSCRIBER_PID" \
-    || fail "O assinante não recebeu o payload binário dentro do prazo."
+wait "$PID_B" || fail "O nó B não recebeu o envelope no prazo."
+wait "$PID_C" || fail "O nó C não recebeu o envelope no prazo."
+cmp --silent "$TEMP_DIR/service-envelope.bin" "$OUTPUT_B" \
+    || fail "Os bytes recebidos pelo nó B diferem dos publicados."
+cmp --silent "$TEMP_DIR/service-envelope.bin" "$OUTPUT_C" \
+    || fail "Os bytes recebidos pelo nó C diferem dos publicados."
 
-if ! cmp --silent "$TEMP_DIR/service-envelope.bin" "$OUTPUT_FILE"; then
-    fail "Os bytes recebidos diferem dos bytes publicados."
-fi
-
-printf 'OK: o broker preservou os bytes do fixture ServiceEnvelope no tópico %s.\n' "$TOPIC"
-printf 'PASSOU: encaminhamento MQTT binário validado para um fixture compatível com o formato Meshtastic.\n'
-printf 'LIMITE: não valida decodificação Protobuf, firmware, criptografia real, downlink ou rádio LoRa.\n'
+printf 'OK: os nós B e C receberam o mesmo ServiceEnvelope binário em %s.\n' "$TOPIC"
+printf 'OK: o broker preservou exatamente os bytes publicados pelo nó A.\n'
+printf 'LIMITE: fixture sintético; este teste não valida ACL, decodificação Protobuf, criptografia real, firmware ou rádio LoRa.\n'
