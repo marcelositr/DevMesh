@@ -20,11 +20,21 @@ O teste cria três clientes MQTT simulados:
 
 O broker de teste permite acesso anônimo de propósito, fica restrito ao ambiente descartável e não deve ser usado em produção.
 
+## Transporte binário de um fixture Meshtastic
+
+O script `scripts/check_meshtastic_mqtt.sh` publica e recebe um fixture binário no formato de um `ServiceEnvelope`, usando o padrão de tópico MQTT documentado pelo Meshtastic.
+
+```sh
+bash scripts/check_meshtastic_mqtt.sh
+```
+
+O fixture em `tests/fixtures/meshtastic-service-envelope.hex` representa um envelope com um `MeshPacket` que contém bytes no campo `encrypted`. Os campos e números de campo seguem as definições oficiais `mqtt.proto` e `mesh.proto`. O teste converte os bytes hexadecimais para binário e compara exatamente o payload publicado com o recebido.
+
+**Limite:** esse teste verifica transporte binário sem alteração pelo broker, não decodificação Protobuf nem validação integral do protocolo. O fixture não contém uma mensagem cifrada por um dispositivo real e não comprova criptografia Meshtastic, interoperabilidade com firmware, downlink ou funcionamento de rádio LoRa.
+
 ## Verificação básica de autenticação
 
 O script `scripts/check_mqtt_auth.sh` inicia um broker descartável com autenticação obrigatória e credenciais temporárias geradas durante a execução.
-
-Execute na raiz do repositório:
 
 ```sh
 bash scripts/check_mqtt_auth.sh
@@ -40,9 +50,9 @@ O teste verifica que:
 
 Os testes atuais **não** comprovam:
 
-- criptografia de canais Meshtastic ou confidencialidade do payload;
+- decodificação Protobuf integral ou compatibilidade com firmware Meshtastic;
+- criptografia real dos canais Meshtastic ou confidencialidade ponta a ponta;
 - autorização por ACL;
-- compatibilidade com Protobufs ou com o protocolo Meshtastic;
 - comportamento de rádio LoRa, alcance ou retransmissão;
 - segurança de uma configuração de produção.
 

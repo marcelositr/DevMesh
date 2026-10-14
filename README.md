@@ -10,16 +10,15 @@ O DevMesh não é um projeto oficial do Meshtastic e não deve sugerir afiliaç�
 
 A primeira etapa tem como objetivo validar uma base simples para uso doméstico, inclusive numa Raspberry Pi. O cenário inicial usa o Mosquitto e três nós simulados, sem depender de hardware de rádio nem expor o broker à internet.
 
-O CI verifica conectividade MQTT, entrega de mensagens e roteamento entre tópicos. Também testa autenticação básica num broker descartável: publicações anônimas e senhas inválidas devem ser recusadas, enquanto clientes com credenciais de teste válidas conseguem trocar mensagens. Esses testes não comprovam autorização por ACL, TLS, criptografia Meshtastic ou funcionamento de rádio real.
+O CI verifica conectividade MQTT, entrega de mensagens, roteamento entre tópicos e autenticação básica num broker descartável. Também verifica se o Mosquitto preserva os bytes de um fixture binário que segue a estrutura de um `ServiceEnvelope` Meshtastic num tópico MQTT compatível com o padrão documentado. Esse último teste valida transporte binário, não decodificação Protobuf, interoperabilidade integral com firmware, criptografia real ou rádio LoRa.
 
-A configuração anônima usada no teste de conectividade existe somente para um broker efêmero e isolado no CI. Ela não deve ser reutilizada como configuração de implantação. As credenciais do teste de autenticação são temporárias e geradas durante a execução. A configuração de uso real deve evitar exposição pública do broker e prever autenticação dos clientes de rede. ACLs e proteção do transporte serão aplicadas conforme o modelo de confiança e antes de qualquer acesso por redes não confiáveis. O acesso remoto não faz parte do escopo inicial.
+A configuração anônima usada nos testes existe somente para brokers efêmeros de CI e não deve ser reutilizada numa instalação real. As credenciais do teste de autenticação são temporárias. A configuração doméstica deve evitar exposição pública do broker e prever autenticação para clientes de rede. ACLs e proteção do transporte serão aplicadas conforme o modelo de confiança e antes de qualquer acesso por redes não confiáveis. O acesso remoto não faz parte do escopo inicial.
 
 Consulte a [decisão sobre escopo doméstico e segurança proporcional](docs/decisions/0003-home-first-scope-and-proportionate-security.md) para os limites e os critérios de evolução.
 
 ## Documentação
 
 - [Índice da documentação técnica](docs/README.md): organização dos documentos, pesquisas e decisões.
-- [Governança](GOVERNANCE.md): papéis, responsabilidades e decisões.
 - [Como contribuir](CONTRIBUTING.md): propostas, alterações e revisões.
 - [Código de Conduta](CODE_OF_CONDUCT.md): convivência na comunidade.
 - [Política de Segurança](SECURITY.md): comunicação e tratamento de vulnerabilidades.

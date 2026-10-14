@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   mqtt-smoke:
-    name: Mosquitto connectivity and topic routing
+    name: MQTT connectivity and Meshtastic payload transport
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -31,9 +31,13 @@ jobs:
         run: |
           bash -n scripts/check_mqtt_smoke.sh
           bash -n scripts/check_mqtt_auth.sh
+          bash -n scripts/check_meshtastic_mqtt.sh
 
       - name: Run isolated MQTT smoke check
         run: bash scripts/check_mqtt_smoke.sh
+
+      - name: Run Meshtastic binary payload check
+        run: bash scripts/check_meshtastic_mqtt.sh
 
       - name: Run isolated MQTT authentication check
         run: bash scripts/check_mqtt_auth.sh
