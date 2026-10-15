@@ -62,8 +62,10 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 - [x] Confirmar no CI a matriz de versões estáveis; o smoke check MQTT concluiu com sucesso em 2026-10-15. O teste é de esquemas Protobuf, não de compatibilidade integral entre versões de firmware.
 - [x] Identificar que a branch oficial `develop` está atrasada em relação à v2.8.0 e não usá-la como revisão futura.
 - [x] Acrescentar o snapshot da branch oficial `master`, fixado no commit `28f4f5f5c31c0323bfb86d890a1acaff15d1c4c6` (2026-10-12), como faixa experimental separada.
-- [ ] Confirmar no CI a matriz ampliada com o snapshot `master`.
-- [ ] Revisar diferenças semânticas relevantes entre v2.8.0 e `master` antes de qualquer decisão de baseline.
+- [ ] Confirmar no CI a matriz ampliada com o snapshot `master`, após corrigir os diretórios de inclusão do compilador Protobuf.
+- [x] Revisar diferenças semânticas relevantes entre v2.8.0 e `master`; as limitações e riscos conhecidos estão registrados abaixo.
+- [x] Investigar a falha da matriz experimental no CI de 2026-10-15: as duas versões estáveis passaram, mas a compilação de `master` não encontrou `google/protobuf/descriptor.proto`.
+- [x] Corrigir o script para incluir diretórios padrão do sistema que contenham os arquivos `.proto` do Protobuf, sem ignorar erros de compilação nem enfraquecer os fixtures.
 
 
 ### Comparação de campos entre Protobufs v2.7.26 e v2.8.0
@@ -77,6 +79,14 @@ A comparação dos campos declarados em `mesh.proto`, `telemetry.proto` e `mqtt.
 - As mensagens `DeviceMetrics`, `PowerMetrics`, `LocalStats`, `HealthMetrics`, `HostMetrics` e o contêiner `Telemetry` não mostraram diferenças de campos nesta comparação.
 
 Implicação para o DevMesh: encaminhar envelopes sem reserializar continua sendo a opção mais segura para preservar campos que a versão local desconhece. Se no futuro houver decodificação analítica, campos novos devem ser opcionais e a unidade de cada métrica precisa ser explícita. Esta comparação cobre apenas os tipos listados nas duas revisões estáveis e no snapshot experimental fixados, não todos os esquemas nem todas as versões de firmware. A revisão `develop` foi adicionada como faixa experimental separada; passar seus fixtures comuns não a torna uma versão estável nem substitui uma comparação de semântica dos campos.
+
+### Incidente de CI: includes do Protobuf no snapshot experimental
+
+Em 2026-10-15, a execução `38791804483` passou pelas etapas anteriores, incluindo a validação de esquemas estáveis v2.7.26 e v2.8.0. A etapa da matriz falhou somente ao compilar o snapshot experimental `master`: `protoc` não encontrou `google/protobuf/descriptor.proto`, seguido por erros em cascata nos imports e tipos de configuração. A evidência aponta para uma falha na resolução de dependências de compilação, não para uma incompatibilidade demonstrada dos fixtures com o esquema experimental.
+
+**Correção aplicada:** `scripts/check_meshtastic_schema_matrix.sh` agora detecta `descriptor.proto` nos diretórios padrão `/usr/include` e `/usr/local/include` e adiciona o diretório encontrado aos argumentos de inclusão de todas as invocações `protoc`. Se nenhum diretório contiver o arquivo, o script termina com uma mensagem direta. A matriz continua fixada em commits completos, exige encode/decode/round-trip e falha normalmente diante de erros reais. Nenhuma versão experimental foi reclassificada como estável.
+
+**Critério de conclusão:** esta correção só será considerada validada quando uma nova execução do CI concluir a matriz para as três revisões. Até lá, a alteração foi aplicada, mas o resultado permanece pendente de CI.
 
 ### Diferenças relevantes entre v2.8.0 e o snapshot experimental master
 
