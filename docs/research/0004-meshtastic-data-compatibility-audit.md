@@ -79,8 +79,9 @@ Implicação para o DevMesh: encaminhar envelopes sem reserializar continua send
 - [x] Criar `scripts/audit_mqtt_capture.py`, uma ferramenta de observação limitada por tempo e quantidade, com assinatura MQTT somente leitura.
 - [x] Garantir que o resumo não exponha tópicos completos, IDs de nós, nomes de canais, credenciais, coordenadas ou bytes de payload; não grava payloads nem publica mensagens.
 - [x] Adicionar testes sintéticos para envelopes cifrados, metadados ausentes e famílias de tópicos opacas.
-- [ ] Executar a ferramenta no broker autorizado e registrar apenas o resumo sanitizado; ainda não houve captura real nesta etapa.
-- [ ] Comparar famílias esperadas com tipos realmente vistos e marcar ausência como inconclusiva.
+- [x] Executar a ferramenta no broker autorizado e registrar apenas o resumo sanitizado (captura real em 2026-10-15).
+- [x] Confirmar que a captura identifica envelopes MQTT cifrados sem expor payload ou identificadores; a janela observada teve 11 envelopes e 774 bytes agregados.
+- [ ] Comparar famílias de dados esperadas com tipos realmente identificáveis; como os envelopes estavam cifrados, a captura não identifica se eram texto, posição, telemetria ou outros tipos.
 - [ ] Confirmar que o encaminhamento preserva bytes e não aumenta tráfego inesperadamente.
 
 ### Fase C: hardware
@@ -91,7 +92,7 @@ Implicação para o DevMesh: encaminhar envelopes sem reserializar continua send
 
 ## Ferramenta de observação somente leitura
 
-O script `scripts/audit_mqtt_capture.py` assina um filtro MQTT por até 300 segundos e para após até 10.000 mensagens (padrões: 30 segundos e 500 mensagens). O padrão é `msh/#`; ele pode ser limitado com `--topic`. Credenciais, quando necessárias, são lidas das variáveis `DEVMESH_MQTT_USERNAME` e `DEVMESH_MQTT_PASSWORD`, nunca de argumentos. O resumo inclui somente contagens agregadas, categorias de tópicos, estado de conexão e volume total de bytes. Não publica, não grava payloads e não exibe tópicos completos ou metadados pessoais. O teste de CI usa fixtures sintéticos; a captura real no broker autorizado continua pendente e deve ser feita localmente. Uma observação sem mensagens é inconclusiva, não prova ausência de tráfego.
+O script `scripts/audit_mqtt_capture.py` assina um filtro MQTT por até 300 segundos e para após até 10.000 mensagens (padrões: 30 segundos e 500 mensagens). O padrão é `msh/#`; ele pode ser limitado com `--topic`. Credenciais, quando necessárias, são lidas das variáveis `DEVMESH_MQTT_USERNAME` e `DEVMESH_MQTT_PASSWORD`, nunca de argumentos. O resumo inclui somente contagens agregadas, categorias de tópicos, estado de conexão e volume total de bytes. Não publica, não grava payloads e não exibe tópicos completos ou metadados pessoais. O teste de CI usa fixtures sintéticos. Em 2026-10-15, uma captura real autorizada de 60 segundos no broker doméstico conectou e teve a assinatura aceita; recebeu 11 envelopes cifrados (774 bytes agregados), sem salvar payloads nem publicar mensagens. Isso confirma que havia tráfego MQTT durante a janela, mas não revela as famílias internas dos payloads cifrados. Uma observação sem mensagens é inconclusiva, não prova ausência de tráfego.
 
 ## Implementação inicial de CI
 
