@@ -127,7 +127,7 @@ class DownlinkBuilderTests(unittest.TestCase):
             self.build(gateway_id="!a35aa590")
 
 
-    def test_cli_does_not_log_channel_key_or_message_text(self):
+    def test_cli_reads_sensitive_message_from_stdin(self):
         secret_text = "private synthetic payload must stay local"
         with tempfile.TemporaryDirectory() as directory:
             output_path = Path(directory) / "envelope.bin"
@@ -142,11 +142,12 @@ class DownlinkBuilderTests(unittest.TestCase):
                     "--sender-id", "2135587861",
                     "--gateway-id", "!deadbeef",
                     "--packet-id", "270544960",
-                    "--text", secret_text,
+                    "--text-stdin",
                     "--output", str(output_path),
                 ],
                 cwd=Path(__file__).resolve().parents[1],
                 env=env,
+                input=secret_text + "\\n",
                 capture_output=True,
                 text=True,
                 check=False,
@@ -156,6 +157,16 @@ class DownlinkBuilderTests(unittest.TestCase):
             combined_output = result.stdout + result.stderr
             self.assertNotIn(self.key_b64, combined_output)
             self.assertNotIn(secret_text, combined_output)
+
+            envelope = mqtt_pb2.ServiceEnvelope()
+            envelope.ParseFromString(output_path.read_bytes())
+            packet = envelope.packet
+            nonce = struct.pack("<QII", packet.id, getattr(packet, "from"), 0)
+            decryptor = Cipher(algorithms.AES(self.key), modes.CTR(nonce)).decryptor()
+            plaintext = decryptor.update(packet.encrypted) + decryptor.finalize()
+            data = mesh_pb2.Data()
+            data.ParseFromString(plaintext)
+            self.assertEqual(data.payload.decode("utf-8"), secret_text)
 
     def test_cli_does_not_overwrite_existing_output(self):
         with tempfile.TemporaryDirectory() as directory:
