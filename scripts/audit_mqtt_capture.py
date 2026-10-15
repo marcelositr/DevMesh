@@ -100,7 +100,7 @@ def main() -> int:
 
     client = mqtt.Client(
         callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-        client_id="devmesh-readonly-audit",
+        client_id="",
         protocol=mqtt.MQTTv311,
     )
     if username:
