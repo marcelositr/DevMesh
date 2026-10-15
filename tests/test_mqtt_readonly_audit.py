@@ -3,7 +3,7 @@ import sys
 import unittest
 from unittest.mock import patch
 
-from scripts.audit_mqtt_capture import classify_message, valid_topic_filter
+from scripts.audit_mqtt_capture import classify_message, main, valid_topic_filter
 from meshtastic.protobuf import mqtt_pb2, portnums_pb2
 
 
@@ -139,16 +139,15 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
             with self.subTest(arguments=arguments):
                 with patch.object(sys, "argv", ["audit_mqtt_capture.py", *arguments]):
                     with self.assertRaises(SystemExit):
-                        from scripts.audit_mqtt_capture import main
-
                         main()
 
     def test_cli_rejects_unpaired_mqtt_credentials(self):
-        from scripts.audit_mqtt_capture import main
-
+        credentials = {
+            "DEVMESH_MQTT_USERNAME": "synthetic-user",
+            "DEVMESH_MQTT_PASSWORD": "",
+        }
         with patch.object(sys, "argv", ["audit_mqtt_capture.py"]):
-            with patch.dict(os.environ, {"DEVMESH_MQTT_USERNAME": "synthetic-user",
-                                         "DEVMESH_MQTT_PASSWORD": ""}):
+            with patch.dict(os.environ, credentials):
                 with self.assertRaisesRegex(SystemExit, "configure usuário e senha juntos"):
                     main()
 
