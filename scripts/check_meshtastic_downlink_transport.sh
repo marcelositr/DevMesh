@@ -37,7 +37,7 @@ tr -d '[:space:]' < "$ROOT_DIR/tests/fixtures/meshtastic-service-envelope.hex" \
 
 # Acrescenta um campo desconhecido (field 100, varint 42) ao envelope. O transporte
 # deve tratar o payload como bytes opacos e preservar esse campo futuro sem decodificá-lo.
-printf '\\xa0\\x06\\x2a' >> "$TEMP_DIR/service-envelope.bin"
+printf '\xa0\x06\x2a' >> "$TEMP_DIR/service-envelope.bin"
 
 # Habilita logs somente no broker descartável para sincronizar com a inscrição real do assinante.
 sed 's/^log_type error$/log_type all/' "$ROOT_DIR/tests/mosquitto/mosquitto.conf" \
