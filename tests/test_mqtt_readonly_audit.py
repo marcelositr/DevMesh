@@ -47,6 +47,18 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
             ("encrypted_topic", "decoded_telemetry_app"),
         )
 
+    def test_classifies_unknown_future_portnum_without_exposing_value(self):
+        envelope = mqtt_pb2.ServiceEnvelope()
+        envelope.channel_id = "PRIVATE_SYNTHETIC"
+        envelope.gateway_id = "!deadbeef"
+        envelope.packet.decoded.portnum = 65535
+        envelope.packet.decoded.payload = b"synthetic-future-payload"
+
+        self.assertEqual(
+            classify_message("msh/2/e/PRIVATE_SYNTHETIC/!deadbeef", envelope.SerializeToString()),
+            ("encrypted_topic", "decoded_unknown_portnum"),
+        )
+
     def test_classifies_map_report_position_without_exposing_coordinates(self):
         envelope = mqtt_pb2.ServiceEnvelope()
         envelope.channel_id = "PRIVATE_SYNTHETIC"
