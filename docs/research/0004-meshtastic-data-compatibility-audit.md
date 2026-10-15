@@ -60,9 +60,10 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 - [x] Confirmar no CI os testes acima; o smoke check MQTT concluiu com sucesso em 2026-10-15.
 - [x] Implementar matriz de compatibilidade de esquemas Protobuf para v2.7.26 e v2.8.0, com SHAs completos fixados e fixtures comuns de Position, Telemetry, User e MapReport.
 - [x] Confirmar no CI a matriz de versões estáveis; o smoke check MQTT concluiu com sucesso em 2026-10-15. O teste é de esquemas Protobuf, não de compatibilidade integral entre versões de firmware.
-- [x] Acrescentar a revisão de desenvolvimento `develop` fixada no commit `ba16bfc731ab7e23f6be5a8e73358b1973e73822` como faixa experimental separada, sem promovê-la a baseline estável.
-- [ ] Confirmar no CI a matriz ampliada com a revisão experimental de `develop`.
-- [ ] Revisar diferenças semânticas relevantes da revisão experimental antes de qualquer decisão de baseline.
+- [x] Acrescentar o snapshot histórico `develop-snapshot-2026-07-01`, fixado no commit `ba16bfc731ab7e23f6be5a8e73358b1973e73822`, apenas como referência histórica separada.
+- [x] Comparar a ancestralidade do snapshot com a baseline estável: ele é ancestral de v2.8.0, portanto não representa uma revisão de desenvolvimento posterior à baseline.
+- [ ] Identificar e fixar um commit de `develop` realmente posterior à baseline v2.8.0 antes de chamar a matriz de experimental futura.
+- [ ] Revisar diferenças semânticas relevantes desse commit futuro antes de qualquer decisão de baseline.
 
 
 ### Comparação de campos entre Protobufs v2.7.26 e v2.8.0
@@ -104,7 +105,7 @@ O script `scripts/audit_mqtt_capture.py` assina um filtro MQTT por até 300 segu
 
 ## Implementação inicial de CI
 
-O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. O script `scripts/check_meshtastic_schema_matrix.sh` compara os tipos comuns Position, Telemetry, User e MapReport entre os esquemas v2.7.26 e v2.8.0, também com commits fixados. Também cobre payload vazio, omissão do booleano `false` padrão em MapReport e rejeição de mensagem truncada. O teste MQTT de downlink acrescenta um campo desconhecido sintético e confirma que o broker preserva todos os bytes sem tentar interpretar o envelope. Testes de CLI verificam que a chave não seja exibida nos logs e que o texto sensível possa ser fornecido por stdin, sem colocá-lo nos argumentos do processo. Essas verificações precisam passar no CI antes de serem consideradas validadas; são testes sintéticos e não decodificam tráfego real nem provam que todos os campos são enviados pelo firmware.
+O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. O script `scripts/check_meshtastic_schema_matrix.sh` compara os tipos comuns Position, Telemetry, User e MapReport entre os esquemas v2.7.26 e v2.8.0, também com commits fixados, e inclui um snapshot histórico de 2026-07-01 que antecede a baseline v2.8.0. Esse snapshot não deve ser descrito como desenvolvimento posterior. Também cobre payload vazio, omissão do booleano `false` padrão em MapReport e rejeição de mensagem truncada. O teste MQTT de downlink acrescenta um campo desconhecido sintético e confirma que o broker preserva todos os bytes sem tentar interpretar o envelope. Testes de CLI verificam que a chave não seja exibida nos logs e que o texto sensível possa ser fornecido por stdin, sem colocá-lo nos argumentos do processo. Essas verificações precisam passar no CI antes de serem consideradas validadas; são testes sintéticos e não decodificam tráfego real nem provam que todos os campos são enviados pelo firmware.
 
 ## Resultado CI confirmado
 
