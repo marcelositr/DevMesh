@@ -83,8 +83,14 @@ def build_envelope(
     packet_id: int,
     hop_limit: int = 3,
 ) -> tuple[str, bytes]:
-    if not channel_name or "/" in channel_name:
-        raise ValueError("Nome de canal inválido.")
+    if (
+        not channel_name
+        or "/" in channel_name
+        or "+" in channel_name
+        or "#" in channel_name
+        or any(ord(char) < 32 or ord(char) == 127 for char in channel_name)
+    ):
+        raise ValueError("Nome de canal inválido para um tópico MQTT.")
     if channel_name in PUBLIC_PRESET_CHANNELS:
         raise ValueError(
             "Canal público/preset bloqueado por segurança; use um canal privado de teste."
@@ -158,8 +164,20 @@ def main() -> int:
         print(f"FALHA: {exc}", file=sys.stderr)
         return 2
 
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_bytes(payload)
+    try:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        with args.output.open("xb") as output_file:
+            output_file.write(payload)
+    except FileExistsError:
+        print(
+            f"FALHA: o arquivo de saída já existe e não foi sobrescrito: {args.output}",
+            file=sys.stderr,
+        )
+        return 2
+    except OSError as exc:
+        print(f"FALHA: não foi possível gravar o envelope: {exc}", file=sys.stderr)
+        return 2
+
     print(f"Envelope Protobuf cifrado criado: {args.output} ({len(payload)} bytes)")
     print(f"Tópico MQTT de destino: {topic}")
     print("Nenhuma conexão MQTT ou transmissão LoRa foi iniciada.")
