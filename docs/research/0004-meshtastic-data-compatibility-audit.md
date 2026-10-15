@@ -60,10 +60,10 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 - [x] Confirmar no CI os testes acima; o smoke check MQTT concluiu com sucesso em 2026-10-15.
 - [x] Implementar matriz de compatibilidade de esquemas Protobuf para v2.7.26 e v2.8.0, com SHAs completos fixados e fixtures comuns de Position, Telemetry, User e MapReport.
 - [x] Confirmar no CI a matriz de versões estáveis; o smoke check MQTT concluiu com sucesso em 2026-10-15. O teste é de esquemas Protobuf, não de compatibilidade integral entre versões de firmware.
-- [x] Acrescentar o snapshot histórico `develop-snapshot-2026-07-01`, fixado no commit `ba16bfc731ab7e23f6be5a8e73358b1973e73822`, apenas como referência histórica separada.
-- [x] Comparar a ancestralidade do snapshot com a baseline estável: ele é ancestral de v2.8.0, portanto não representa uma revisão de desenvolvimento posterior à baseline.
-- [ ] Identificar e fixar um commit de `develop` realmente posterior à baseline v2.8.0 antes de chamar a matriz de experimental futura.
-- [ ] Revisar diferenças semânticas relevantes desse commit futuro antes de qualquer decisão de baseline.
+- [x] Identificar que a branch oficial `develop` está atrasada em relação à v2.8.0 e não usá-la como revisão futura.
+- [x] Acrescentar o snapshot da branch oficial `master`, fixado no commit `28f4f5f5c31c0323bfb86d890a1acaff15d1c4c6` (2026-10-12), como faixa experimental separada.
+- [ ] Confirmar no CI a matriz ampliada com o snapshot `master`.
+- [ ] Revisar diferenças semânticas relevantes entre v2.8.0 e `master` antes de qualquer decisão de baseline.
 
 
 ### Comparação de campos entre Protobufs v2.7.26 e v2.8.0
@@ -76,7 +76,7 @@ A comparação dos campos declarados em `mesh.proto`, `telemetry.proto` e `mqtt.
 - `AirQualityMetrics`: v2.8.0 acrescenta `pm_status_flags` no campo 26.
 - As mensagens `DeviceMetrics`, `PowerMetrics`, `LocalStats`, `HealthMetrics`, `HostMetrics` e o contêiner `Telemetry` não mostraram diferenças de campos nesta comparação.
 
-Implicação para o DevMesh: encaminhar envelopes sem reserializar continua sendo a opção mais segura para preservar campos que a versão local desconhece. Se no futuro houver decodificação analítica, campos novos devem ser opcionais e a unidade de cada métrica precisa ser explícita. Esta comparação cobre apenas os tipos listados e as duas revisões estáveis fixadas, não todos os esquemas nem todas as versões de firmware. A revisão `develop` foi adicionada como faixa experimental separada; passar seus fixtures comuns não a torna uma versão estável nem substitui uma comparação de semântica dos campos.
+Implicação para o DevMesh: encaminhar envelopes sem reserializar continua sendo a opção mais segura para preservar campos que a versão local desconhece. Se no futuro houver decodificação analítica, campos novos devem ser opcionais e a unidade de cada métrica precisa ser explícita. Esta comparação cobre apenas os tipos listados nas duas revisões estáveis e no snapshot experimental fixados, não todos os esquemas nem todas as versões de firmware. A revisão `develop` foi adicionada como faixa experimental separada; passar seus fixtures comuns não a torna uma versão estável nem substitui uma comparação de semântica dos campos.
 
 ### Fase B: observação somente leitura
 - [x] Criar `scripts/audit_mqtt_capture.py`, uma ferramenta de observação limitada por tempo e quantidade, com assinatura MQTT somente leitura.
@@ -105,7 +105,7 @@ O script `scripts/audit_mqtt_capture.py` assina um filtro MQTT por até 300 segu
 
 ## Implementação inicial de CI
 
-O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. O script `scripts/check_meshtastic_schema_matrix.sh` compara os tipos comuns Position, Telemetry, User e MapReport entre os esquemas v2.7.26 e v2.8.0, também com commits fixados, e inclui um snapshot histórico de 2026-07-01 que antecede a baseline v2.8.0. Esse snapshot não deve ser descrito como desenvolvimento posterior. Também cobre payload vazio, omissão do booleano `false` padrão em MapReport e rejeição de mensagem truncada. O teste MQTT de downlink acrescenta um campo desconhecido sintético e confirma que o broker preserva todos os bytes sem tentar interpretar o envelope. Testes de CLI verificam que a chave não seja exibida nos logs e que o texto sensível possa ser fornecido por stdin, sem colocá-lo nos argumentos do processo. Essas verificações precisam passar no CI antes de serem consideradas validadas; são testes sintéticos e não decodificam tráfego real nem provam que todos os campos são enviados pelo firmware.
+O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. O script `scripts/check_meshtastic_schema_matrix.sh` compara os tipos comuns Position, Telemetry, User e MapReport entre os esquemas v2.7.26 e v2.8.0 e inclui o snapshot experimental `master` de 2026-10-12, todos fixados por SHA. Também cobre payload vazio, omissão do booleano `false` padrão em MapReport e rejeição de mensagem truncada. O teste MQTT de downlink acrescenta um campo desconhecido sintético e confirma que o broker preserva todos os bytes sem tentar interpretar o envelope. Testes de CLI verificam que a chave não seja exibida nos logs e que o texto sensível possa ser fornecido por stdin, sem colocá-lo nos argumentos do processo. Essas verificações precisam passar no CI antes de serem consideradas validadas; são testes sintéticos e não decodificam tráfego real nem provam que todos os campos são enviados pelo firmware.
 
 ## Resultado CI confirmado
 
