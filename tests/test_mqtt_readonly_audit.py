@@ -144,6 +144,51 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
                     with self.assertRaises(SystemExit):
                         main()
 
+    def test_cli_enables_system_ca_tls_when_requested(self):
+        from scripts import audit_mqtt_capture
+
+        class ReasonCode:
+            is_failure = False
+
+        class FakeClient:
+            on_connect = None
+            on_subscribe = None
+            on_disconnect = None
+            on_message = None
+
+            def __init__(self):
+                self.tls_enabled = False
+
+            def tls_set(self):
+                self.tls_enabled = True
+
+            def connect(self, host, port, keepalive):
+                return None
+
+            def loop_start(self):
+                self.on_connect(self, None, None, ReasonCode(), None)
+
+            def subscribe(self, topic, qos):
+                self.on_subscribe(self, None, 1, [ReasonCode()], None)
+                return audit_mqtt_capture.mqtt.MQTT_ERR_SUCCESS, 1
+
+            def disconnect(self):
+                return None
+
+            def loop_stop(self):
+                return None
+
+        fake_client = FakeClient()
+        output = StringIO()
+        with patch.object(sys, "argv", ["audit_mqtt_capture.py", "--tls", "--seconds", "1"]):
+            with patch.object(audit_mqtt_capture.mqtt, "Client", return_value=fake_client):
+                with patch.dict(os.environ, {}, clear=True):
+                    with redirect_stdout(output):
+                        self.assertEqual(main(), 0)
+
+        self.assertTrue(fake_client.tls_enabled)
+        self.assertTrue(json.loads(output.getvalue())["subscription_accepted"])
+
     def test_cli_rejects_unpaired_mqtt_credentials(self):
         credentials = {
             "DEVMESH_MQTT_USERNAME": "synthetic-user",
