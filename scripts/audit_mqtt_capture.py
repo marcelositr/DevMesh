@@ -3,7 +3,8 @@
 
 The tool subscribes for a bounded period and reports aggregate metadata only.
 It never prints topic names, node IDs, channel names, credentials, coordinates,
-or payload bytes, and it never publishes MQTT messages.
+or payload bytes, and it never publishes MQTT messages. Map reports are inspected
+only to count whether nonzero position fields are present; their values are discarded.
 """
 
 from __future__ import annotations
@@ -57,7 +58,36 @@ def classify_message(topic: str, payload: bytes) -> tuple[str, str]:
         return "encrypted_topic", "packet_without_payload"
 
     if topic.startswith("msh/2/map/"):
-        return "map_topic", "opaque_payload"
+        envelope = mqtt_pb2.ServiceEnvelope()
+        try:
+            envelope.ParseFromString(payload)
+        except (ValueError, TypeError):
+            return "map_topic", "opaque_payload"
+
+        if (
+            not envelope.HasField("packet")
+            or not envelope.channel_id
+            or not envelope.gateway_id
+            or not envelope.packet.HasField("decoded")
+        ):
+            return "map_topic", "opaque_payload"
+
+        try:
+            portnum = portnums_pb2.PortNum.Name(envelope.packet.decoded.portnum)
+        except (ValueError, KeyError):
+            return "map_topic", "opaque_payload"
+        if portnum != "MAP_REPORT_APP":
+            return "map_topic", "opaque_payload"
+
+        report = mqtt_pb2.MapReport()
+        try:
+            report.ParseFromString(envelope.packet.decoded.payload)
+        except (ValueError, TypeError):
+            return "map_topic", "invalid_map_report"
+
+        if report.latitude_i != 0 or report.longitude_i != 0:
+            return "map_topic", "map_report_position_present"
+        return "map_topic", "map_report_position_zero_or_absent"
     if topic.startswith("msh/"):
         return "other_meshtastic_topic", "opaque_payload"
     return "other_topic", "opaque_payload"
