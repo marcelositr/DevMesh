@@ -1,6 +1,11 @@
 import base64
+import os
+import subprocess
+import sys
 import struct
+import tempfile
 import unittest
+from pathlib import Path
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from meshtastic.protobuf import mesh_pb2, mqtt_pb2, portnums_pb2
@@ -76,6 +81,62 @@ class DownlinkBuilderTests(unittest.TestCase):
     def test_rejects_gateway_id_matching_local_radio(self):
         with self.assertRaisesRegex(ValueError, "gateway ID não pode ser o ID do rádio local"):
             self.build(gateway_id="!a35aa590")
+
+
+    def test_cli_does_not_log_channel_key_or_message_text(self):
+        secret_text = "private synthetic payload must stay local"
+        with tempfile.TemporaryDirectory() as directory:
+            output_path = Path(directory) / "envelope.bin"
+            env = os.environ.copy()
+            env["DEVMESH_CHANNEL_PSK_B64"] = self.key_b64
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/build_mqtt_downlink.py",
+                    "--channel", "PRIVATE_TEST",
+                    "--local-node-id", str(self.local_id),
+                    "--sender-id", "2135587861",
+                    "--gateway-id", "!deadbeef",
+                    "--packet-id", "270544960",
+                    "--text", secret_text,
+                    "--output", str(output_path),
+                ],
+                cwd=Path(__file__).resolve().parents[1],
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(output_path.is_file())
+            combined_output = result.stdout + result.stderr
+            self.assertNotIn(self.key_b64, combined_output)
+            self.assertNotIn(secret_text, combined_output)
+
+    def test_cli_does_not_echo_invalid_key(self):
+        secret_invalid_key = "!synthetic-secret-that-must-not-be-logged"
+        with tempfile.TemporaryDirectory() as directory:
+            env = os.environ.copy()
+            env["DEVMESH_CHANNEL_PSK_B64"] = secret_invalid_key
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/build_mqtt_downlink.py",
+                    "--channel", "PRIVATE_TEST",
+                    "--local-node-id", str(self.local_id),
+                    "--sender-id", "2135587861",
+                    "--gateway-id", "!deadbeef",
+                    "--packet-id", "270544960",
+                    "--output", str(Path(directory) / "envelope.bin"),
+                ],
+                cwd=Path(__file__).resolve().parents[1],
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertNotIn(secret_invalid_key, result.stdout + result.stderr)
 
 
 if __name__ == "__main__":
