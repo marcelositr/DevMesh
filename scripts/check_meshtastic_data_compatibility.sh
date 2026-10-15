@@ -73,7 +73,7 @@ check_message MapReport meshtastic/mqtt.proto $'long_name: "Synthetic Node" shor
     'long_name: "Synthetic Node"' 'firmware_version: "fixture"' 'latitude_i: 123456789' 'position_precision: 16' 'has_opted_report_location: true'
 
 # In proto3, a default false boolean is omitted from text output and the wire payload.
-printf '%s\\n' 'long_name: "Synthetic Node"' > "$TEMP_DIR/default-map-report.txt"
+printf '%s\n' 'long_name: "Synthetic Node"' > "$TEMP_DIR/default-map-report.txt"
 (cd "$PROTO_DIR" && protoc -I . --encode=meshtastic.MapReport meshtastic/mqtt.proto < "$TEMP_DIR/default-map-report.txt" > "$TEMP_DIR/default-map-report.bin") || fail "Falha ao codificar MapReport com campos opcionais ausentes."
 (cd "$PROTO_DIR" && protoc -I . --decode=meshtastic.MapReport meshtastic/mqtt.proto < "$TEMP_DIR/default-map-report.bin" > "$TEMP_DIR/default-map-report-decoded.txt") || fail "Falha ao decodificar MapReport com campos opcionais ausentes."
 if grep -q 'has_opted_report_location' "$TEMP_DIR/default-map-report-decoded.txt"; then
