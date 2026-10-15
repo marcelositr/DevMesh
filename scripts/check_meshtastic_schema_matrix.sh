@@ -14,7 +14,7 @@ done
 VERSIONS=(
     "v2.7.26:da60cee584c6dc1efbb4a3809b98666505179b85"
     "v2.8.0:7b2464c9b8c1521f93852261e4123826e5b25e11"
-    "develop-snapshot-2026-07-01:ba16bfc731ab7e23f6be5a8e73358b1973e73822"
+    "master-snapshot-2026-10-12:28f4f5f5c31c0323bfb86d890a1acaff15d1c4c6"
 )
 
 check_message() {
