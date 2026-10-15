@@ -58,7 +58,8 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 - [x] Acrescentar um campo Protobuf desconhecido sintético ao envelope no teste MQTT e verificar preservação byte a byte sem decodificar o payload no caminho de transporte.
 - [x] Acrescentar testes de regressão da CLI para garantir que a chave do canal, o texto da mensagem e uma chave inválida não apareçam em stdout/stderr.
 - [ ] Confirmar no CI os testes acima; a implementação está no branch, mas o resultado desta revisão ainda precisa ser consultado.
-- [ ] Ampliar a matriz de versões adicionais.
+- [x] Implementar matriz de compatibilidade de esquemas Protobuf para v2.7.26 e v2.8.0, com SHAs completos fixados e fixtures comuns de Position, Telemetry, User e MapReport.
+- [ ] Confirmar no CI a matriz de versões. O teste é de esquemas Protobuf, não de compatibilidade integral entre versões de firmware.
 - [ ] Manter baseline estável e executar testes adicionais contra o esquema mais novo sem promover automaticamente a versão nova a baseline.
 
 ### Fase B: observação somente leitura
@@ -75,7 +76,7 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 
 ## Implementação inicial de CI
 
-O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. Também cobre payload vazio, omissão do booleano `false` padrão em MapReport e rejeição de mensagem truncada. O teste MQTT de downlink acrescenta um campo desconhecido sintético e confirma que o broker preserva todos os bytes sem tentar interpretar o envelope. Testes de CLI verificam que chave e texto da mensagem não sejam exibidos nos logs. Essas verificações precisam passar no CI antes de serem consideradas validadas; são testes sintéticos e não decodificam tráfego real nem provam que todos os campos são enviados pelo firmware.
+O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. O script `scripts/check_meshtastic_schema_matrix.sh` compara os tipos comuns Position, Telemetry, User e MapReport entre os esquemas v2.7.26 e v2.8.0, também com commits fixados. Também cobre payload vazio, omissão do booleano `false` padrão em MapReport e rejeição de mensagem truncada. O teste MQTT de downlink acrescenta um campo desconhecido sintético e confirma que o broker preserva todos os bytes sem tentar interpretar o envelope. Testes de CLI verificam que chave e texto da mensagem não sejam exibidos nos logs. Essas verificações precisam passar no CI antes de serem consideradas validadas; são testes sintéticos e não decodificam tráfego real nem provam que todos os campos são enviados pelo firmware.
 
 ## Critério de aceitação
 
