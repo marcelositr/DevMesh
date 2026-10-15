@@ -61,6 +61,12 @@ class DownlinkBuilderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Canal público"):
             self.build(channel_name="LongFast")
 
+    def test_rejects_mqtt_wildcards_in_channel_name(self):
+        for channel_name in ("PRIVATE+", "PRIVATE#"):
+            with self.subTest(channel_name=channel_name):
+                with self.assertRaisesRegex(ValueError, "tópico MQTT"):
+                    self.build(channel_name=channel_name)
+
     def test_expands_default_psk_short_code(self):
         expanded = effective_psk("AQ==")
         self.assertEqual(len(expanded), 16)
@@ -112,6 +118,34 @@ class DownlinkBuilderTests(unittest.TestCase):
             combined_output = result.stdout + result.stderr
             self.assertNotIn(self.key_b64, combined_output)
             self.assertNotIn(secret_text, combined_output)
+
+    def test_cli_does_not_overwrite_existing_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output_path = Path(directory) / "envelope.bin"
+            original_content = b"preserve this file"
+            output_path.write_bytes(original_content)
+            env = os.environ.copy()
+            env["DEVMESH_CHANNEL_PSK_B64"] = self.key_b64
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/build_mqtt_downlink.py",
+                    "--channel", "PRIVATE_TEST",
+                    "--local-node-id", str(self.local_id),
+                    "--sender-id", "2135587861",
+                    "--gateway-id", "!deadbeef",
+                    "--packet-id", "270544960",
+                    "--output", str(output_path),
+                ],
+                cwd=Path(__file__).resolve().parents[1],
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(output_path.read_bytes(), original_content)
+            self.assertIn("não foi sobrescrito", result.stderr)
 
     def test_cli_does_not_echo_invalid_key(self):
         secret_invalid_key = "!synthetic-secret-that-must-not-be-logged"
