@@ -79,7 +79,9 @@ Implicação para o DevMesh: encaminhar envelopes sem reserializar continua send
 - [x] Criar `scripts/audit_mqtt_capture.py`, uma ferramenta de observação limitada por tempo e quantidade, com assinatura MQTT somente leitura.
 - [x] Garantir que o resumo não exponha tópicos completos, IDs de nós, nomes de canais, credenciais, coordenadas ou bytes de payload; não grava payloads nem publica mensagens.
 - [x] Adicionar testes sintéticos para envelopes cifrados, metadados ausentes e famílias de tópicos opacas.
+- [x] Cobrir a classificação sintética por `POSITION_APP` e `TELEMETRY_APP` quando o envelope já contém um payload decodificado; isso valida apenas a classificação pelo portnum, não a capacidade de identificar esses tipos dentro de ciphertext real.
 - [x] Acrescentar fixture sintética de MapReport em tópico de mapa; a classificação informa apenas se campos de posição não nulos existem e descarta seus valores.
+- [x] Cobrir um `MapReport` malformado e confirmar que o resumo retorna apenas um status genérico, sem reproduzir o payload.
 - [ ] Confirmar em captura autorizada se MapReport aparece no broker real; ainda não há evidência de captura dessa família.
 - [x] Executar a ferramenta no broker autorizado e registrar apenas o resumo sanitizado (captura real em 2026-10-15).
 - [x] Confirmar que a captura identifica envelopes MQTT cifrados sem expor payload ou identificadores; a janela observada teve 11 envelopes e 774 bytes agregados.
