@@ -80,6 +80,7 @@ Implicação para o DevMesh: encaminhar envelopes sem reserializar continua send
 - [x] Garantir que o resumo não exponha tópicos completos, IDs de nós, nomes de canais, credenciais, coordenadas ou bytes de payload; não grava payloads nem publica mensagens.
 - [x] Adicionar testes sintéticos para envelopes cifrados, metadados ausentes e famílias de tópicos opacas.
 - [x] Cobrir a classificação sintética por `POSITION_APP` e `TELEMETRY_APP` quando o envelope já contém um payload decodificado; isso valida apenas a classificação pelo portnum, não a capacidade de identificar esses tipos dentro de ciphertext real.
+- [x] Cobrir um portnum futuro desconhecido em envelope sintético; o auditor retorna `decoded_unknown_portnum` sem expor o número nem o payload. Isso valida tolerância do classificador, não a interpretação do tipo desconhecido.
 - [x] Acrescentar fixture sintética de MapReport em tópico de mapa; a classificação informa apenas se campos de posição não nulos existem e descarta seus valores.
 - [x] Cobrir um `MapReport` malformado e confirmar que o resumo retorna apenas um status genérico, sem reproduzir o payload.
 - [ ] Confirmar em captura autorizada se MapReport aparece no broker real; ainda não há evidência de captura dessa família.
