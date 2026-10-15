@@ -1,7 +1,7 @@
 import unittest
 
 from scripts.audit_mqtt_capture import classify_message, valid_topic_filter
-from meshtastic.protobuf import mqtt_pb2
+from meshtastic.protobuf import mqtt_pb2, portnums_pb2
 
 
 class ReadOnlyMqttAuditTests(unittest.TestCase):
@@ -23,7 +23,35 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
             ("encrypted_topic", "invalid_envelope"),
         )
 
-    def test_classifies_map_topics_as_opaque(self):
+    def test_classifies_map_report_position_without_exposing_coordinates(self):
+        envelope = mqtt_pb2.ServiceEnvelope()
+        envelope.channel_id = "PRIVATE_SYNTHETIC"
+        envelope.gateway_id = "!deadbeef"
+        envelope.packet.decoded.portnum = portnums_pb2.PortNum.MAP_REPORT_APP
+
+        report = mqtt_pb2.MapReport()
+        report.latitude_i = 123456789
+        report.longitude_i = -234567890
+        envelope.packet.decoded.payload = report.SerializeToString()
+
+        self.assertEqual(
+            classify_message("msh/2/map/region", envelope.SerializeToString()),
+            ("map_topic", "map_report_position_present"),
+        )
+
+    def test_classifies_map_report_without_position_values(self):
+        envelope = mqtt_pb2.ServiceEnvelope()
+        envelope.channel_id = "PRIVATE_SYNTHETIC"
+        envelope.gateway_id = "!deadbeef"
+        envelope.packet.decoded.portnum = portnums_pb2.PortNum.MAP_REPORT_APP
+        envelope.packet.decoded.payload = mqtt_pb2.MapReport().SerializeToString()
+
+        self.assertEqual(
+            classify_message("msh/2/map/region", envelope.SerializeToString()),
+            ("map_topic", "map_report_position_zero_or_absent"),
+        )
+
+    def test_keeps_unrecognized_map_payload_opaque(self):
         self.assertEqual(
             classify_message("msh/2/map/region", b"synthetic-map-payload"),
             ("map_topic", "opaque_payload"),
