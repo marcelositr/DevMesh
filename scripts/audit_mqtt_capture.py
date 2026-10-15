@@ -17,6 +17,7 @@ import time
 from collections import Counter
 
 import paho.mqtt.client as mqtt
+from google.protobuf.message import DecodeError
 from meshtastic.protobuf import mqtt_pb2, portnums_pb2
 
 DEFAULT_TOPIC = "msh/#"
@@ -40,7 +41,7 @@ def classify_message(topic: str, payload: bytes) -> tuple[str, str]:
         envelope = mqtt_pb2.ServiceEnvelope()
         try:
             envelope.ParseFromString(payload)
-        except (ValueError, TypeError):
+        except (DecodeError, ValueError, TypeError):
             return "encrypted_topic", "invalid_protobuf"
 
         if not envelope.HasField("packet") or not envelope.channel_id or not envelope.gateway_id:
@@ -61,7 +62,7 @@ def classify_message(topic: str, payload: bytes) -> tuple[str, str]:
         envelope = mqtt_pb2.ServiceEnvelope()
         try:
             envelope.ParseFromString(payload)
-        except (ValueError, TypeError):
+        except (DecodeError, ValueError, TypeError):
             return "map_topic", "opaque_payload"
 
         if (
@@ -82,7 +83,7 @@ def classify_message(topic: str, payload: bytes) -> tuple[str, str]:
         report = mqtt_pb2.MapReport()
         try:
             report.ParseFromString(envelope.packet.decoded.payload)
-        except (ValueError, TypeError):
+        except (DecodeError, ValueError, TypeError):
             return "map_topic", "invalid_map_report"
 
         if report.latitude_i != 0 or report.longitude_i != 0:
