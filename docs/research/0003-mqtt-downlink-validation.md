@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Separar três coisas diferentes: conectividade MQTT, entrega de um envelope Protobuf ao filtro usado pelo firmware e aceitação real do pacote pelo rádio. Um teste de broker sozinho não comprova a terceira etapa.
+Separar resultados diferentes: conectividade MQTT, transporte do envelope Protobuf, aceitação e exibição pelo firmware e eventual retransmissão/recepção por LoRa. Um teste de broker sozinho não comprova as etapas de hardware.
 
 ## Comportamento confirmado no firmware de referência
 
@@ -22,25 +22,34 @@ O script `scripts/check_meshtastic_downlink_transport.sh` sobe um Mosquitto desc
 
 Esse teste verifica somente a correspondência do tópico e o transporte de bytes pelo broker. O fixture é sintético; não é uma mensagem cifrada válida para o canal real do usuário e não deve ser publicado no broker doméstico.
 
-O novo `scripts/build_mqtt_downlink.py` constrói um envelope Protobuf de texto cifrado para um canal privado de teste. A chave é solicitada com entrada oculta ou lida de `DEVMESH_CHANNEL_PSK_B64`; ela não é impressa nem gravada no repositório. O script só grava um arquivo binário local, não conecta ao broker e não transmite LoRa. Ele bloqueia nomes de canais de preset público e exige que os IDs de origem e gateway sejam diferentes do ID local informado. Os testes unitários validam a estrutura, a decifragem de volta ao texto original e as proteções básicas.
+O script `scripts/build_mqtt_downlink.py` constrói um envelope Protobuf de texto cifrado para um canal privado de teste. A chave é solicitada com entrada oculta ou lida de `DEVMESH_CHANNEL_PSK_B64`; ela não é impressa nem gravada no repositório. O script só grava um arquivo binário local, não conecta ao broker e não transmite LoRa. Ele bloqueia nomes de canais de preset público e exige que os IDs de origem e gateway sejam diferentes do ID local informado. Os testes unitários validam a estrutura, a decifragem de volta ao texto original e as proteções básicas.
 
-Esses testes não comprovam, por si sós, que o firmware real aceita o envelope, que a PSK fornecida corresponde à configuração do rádio, ou que haverá transmissão/recepção LoRa.
+Os testes automatizados, por si sós, não comprovam que o firmware real aceita o envelope, que a PSK fornecida corresponde à configuração do rádio, ou que haverá transmissão/recepção LoRa.
 
-## Evidências atuais do teste físico
+## Evidências do teste físico
 
-Na configuração doméstica observada em 2026-10-14:
+### Observações anteriores, 2026-10-14
 
-- O nó `!a35aa590` autenticou no broker `192.168.0.2:1883`.
+- O nó `!a35aa590` autenticou no broker doméstico `192.168.0.2:1883`.
 - Os logs mostraram inscrições em `msh/2/e/LongFast/+`, `msh/2/e/ITUVERAVA/+` e `msh/2/e/PKI/+`.
 - O nó publicou envelopes em `msh/2/e/LongFast/!a35aa590`; o broker os entregou de volta ao próprio nó e a um assinante de teste.
-- Não foi observada, até aqui, uma mensagem de teste válida originada por outro gateway e aceita pelo firmware via MQTT.
+- Naquele momento, ainda não havia evidência de uma mensagem de teste externa aceita pelo firmware via MQTT.
 
-## Próxima etapa para o teste com hardware
+### Downlink cifrado validado, 2026-10-15
 
-1. Confirmar a região LoRa correta para o Brasil antes de qualquer transmissão.
-2. Escolher um canal privado de teste com downlink habilitado; não usar o canal público LongFast para esse teste.
-3. Gerar o envelope localmente com uma PSK que corresponda exatamente ao canal do rádio. Não guardar a PSK em arquivo versionado nem passá-la em argumento de linha de comando.
-4. Conferir o tópico impresso pelo gerador e publicar uma única mensagem, sem retenção, somente depois de verificar os IDs sintéticos e a configuração do broker.
-5. Conferir separadamente o log do broker, a aceitação pelo firmware e, se houver segundo nó de teste, a recepção LoRa.
+- Foi construído localmente um envelope `ServiceEnvelope` cifrado para o canal privado `ITUVERAVA`; a validação local confirmou a estrutura e a decifragem do payload de teste.
+- O envelope foi publicado **uma única vez**, com QoS 1 e retenção desativada, no tópico `msh/2/e/ITUVERAVA/!a1b2c3d4`, pelo usuário MQTT autorizado no broker doméstico.
+- O comando de publicação terminou com sucesso.
+- O operador confirmou que a mensagem de teste apareceu tanto no display da Heltec quanto no aplicativo Android Meshtastic.
+- Essa observação comprova, para esta configuração e este pacote de teste, o caminho MQTT até a aceitação/exibição pelo firmware e aplicativo. É evidência mais forte que o teste de transporte automatizado.
+- O teste não comprova alcance ou retransmissão LoRa para um segundo nó, nem compatibilidade de todas as famílias de dados. Não foram publicadas coordenadas ou segredos na documentação.
 
-Não publicar o fixture sintético nem texto puro como se fossem mensagens de rádio válidas. Não publicar pacotes de teste como retained. O gerador ainda não publica mensagens; essa etapa fica deliberadamente separada para evitar uma transmissão acidental.
+## Próximas etapas
+
+1. Preservar este resultado como evidência manual e não repetir a publicação só para reproduzir a confirmação.
+2. Revisar a implementação e os testes para que a validação local do envelope permaneça reproduzível, sem depender de segredos reais.
+3. Conferir o estado da CI no commit mais recente antes de ampliar a cobertura.
+4. Se houver um segundo nó de teste disponível, planejar separadamente um teste de recepção/retransmissão LoRa com dados controlados e frequência baixa.
+5. Para posição e telemetria, usar dados sintéticos ou controlados, sem expor localização real.
+
+Não publicar o fixture sintético nem texto puro como se fossem mensagens de rádio válidas. Não publicar pacotes de teste como retained. O gerador permanece separado da publicação MQTT para evitar transmissão acidental. A confirmação manual descrita acima é evidência observada, não um teste automatizado de hardware.
