@@ -54,10 +54,11 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 ### Fase A: CI sem hardware
 - [x] Fixar Protobufs oficiais por tag e commit imutável no script de teste inicial.
 - [x] Criar fixtures sintéticos iniciais para Position, Telemetry de dispositivo/ambiente/qualidade do ar, User, NeighborInfo, Waypoint e MapReport, usando Protobufs v2.8.0 fixado por commit.
-- [ ] Executar no CI a verificação decode/encode desses fixtures e a rejeição de uma mensagem truncada; o teste foi implementado, mas ainda não há resultado confirmado.
-- [ ] Testar explicitamente campos Protobuf desconhecidos. O teste de transporte existente verifica a preservação byte a byte de um envelope sintético, mas não substitui esse caso específico.
-- [ ] Verificar payload vazio, privacidade dos logs e matriz de versões adicionais.
-- [ ] Garantir que os logs de teste não exponham conteúdo sensível.
+- [x] Implementar no CI decode/encode dos fixtures, round-trip binário, payload vazio, omissão do booleano false padrão e rejeição de mensagem truncada.
+- [x] Acrescentar um campo Protobuf desconhecido sintético ao envelope no teste MQTT e verificar preservação byte a byte sem decodificar o payload no caminho de transporte.
+- [x] Acrescentar testes de regressão da CLI para garantir que a chave do canal, o texto da mensagem e uma chave inválida não apareçam em stdout/stderr.
+- [ ] Confirmar no CI os testes acima; a implementação está no branch, mas o resultado desta revisão ainda precisa ser consultado.
+- [ ] Ampliar a matriz de versões adicionais.
 - [ ] Manter baseline estável e executar testes adicionais contra o esquema mais novo sem promover automaticamente a versão nova a baseline.
 
 ### Fase B: observação somente leitura
@@ -74,7 +75,7 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 
 ## Implementação inicial de CI
 
-O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. Também cobre um payload vazio e a omissão esperada do booleano `false` padrão em MapReport. O workflow MQTT smoke executa o script. Essa etapa valida estrutura e round-trip dos tipos cobertos, não decodifica tráfego real nem prova que todos os campos são enviados pelo firmware. O resultado do CI após esses últimos casos precisa ser confirmado.
+O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. Também cobre payload vazio, omissão do booleano `false` padrão em MapReport e rejeição de mensagem truncada. O teste MQTT de downlink acrescenta um campo desconhecido sintético e confirma que o broker preserva todos os bytes sem tentar interpretar o envelope. Testes de CLI verificam que chave e texto da mensagem não sejam exibidos nos logs. Essas verificações precisam passar no CI antes de serem consideradas validadas; são testes sintéticos e não decodificam tráfego real nem provam que todos os campos são enviados pelo firmware.
 
 ## Critério de aceitação
 
