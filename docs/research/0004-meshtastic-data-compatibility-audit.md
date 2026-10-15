@@ -82,7 +82,8 @@ Implicação para o DevMesh: encaminhar envelopes sem reserializar continua send
 - [x] Executar a ferramenta no broker autorizado e registrar apenas o resumo sanitizado (captura real em 2026-10-15).
 - [x] Confirmar que a captura identifica envelopes MQTT cifrados sem expor payload ou identificadores; a janela observada teve 11 envelopes e 774 bytes agregados.
 - [ ] Comparar famílias de dados esperadas com tipos realmente identificáveis; como os envelopes estavam cifrados, a captura não identifica se eram texto, posição, telemetria ou outros tipos.
-- [ ] Confirmar que o encaminhamento preserva bytes e não aumenta tráfego inesperadamente.
+- [x] Confirmar em broker Mosquitto descartável que o transporte MQTT preserva byte a byte um ServiceEnvelope sintético, inclusive um campo Protobuf desconhecido; CI automatizada passou.
+- [ ] Medir em tráfego real se o encaminhamento aumenta tráfego inesperadamente; a captura de 11 envelopes não basta para determinar isso.
 
 ### Fase C: hardware
 - [ ] Confirmar região de rádio apropriada antes de qualquer transmissão.
