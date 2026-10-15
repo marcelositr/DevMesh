@@ -57,10 +57,23 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 - [x] Implementar no CI decode/encode dos fixtures, round-trip binário, payload vazio, omissão do booleano false padrão e rejeição de mensagem truncada.
 - [x] Acrescentar um campo Protobuf desconhecido sintético ao envelope no teste MQTT e verificar preservação byte a byte sem decodificar o payload no caminho de transporte.
 - [x] Acrescentar testes de regressão da CLI para garantir que a chave do canal, o texto da mensagem e uma chave inválida não apareçam em stdout/stderr.
-- [ ] Confirmar no CI os testes acima; a implementação está no branch, mas o resultado desta revisão ainda precisa ser consultado.
+- [x] Confirmar no CI os testes acima; o smoke check MQTT concluiu com sucesso em 2026-10-15.
 - [x] Implementar matriz de compatibilidade de esquemas Protobuf para v2.7.26 e v2.8.0, com SHAs completos fixados e fixtures comuns de Position, Telemetry, User e MapReport.
-- [ ] Confirmar no CI a matriz de versões. O teste é de esquemas Protobuf, não de compatibilidade integral entre versões de firmware.
+- [x] Confirmar no CI a matriz de versões; o smoke check MQTT concluiu com sucesso em 2026-10-15. O teste é de esquemas Protobuf, não de compatibilidade integral entre versões de firmware.
 - [ ] Manter baseline estável e executar testes adicionais contra o esquema mais novo sem promover automaticamente a versão nova a baseline.
+
+
+### Comparação de campos entre Protobufs v2.7.26 e v2.8.0
+
+A comparação dos campos declarados em `mesh.proto`, `telemetry.proto` e `mqtt.proto` identificou:
+
+- `Position`: mesmos nomes e números de campo nas duas versões. A descrição de `ground_speed` mudou de m/s em v2.7.26 para km/h em v2.8.0. Como o tipo e o número do campo permanecem iguais, a codificação binária não detecta essa mudança semântica. Não converter unidades sem identificar a versão/origem do dado.
+- `ServiceEnvelope` e `MapReport`: mesmos campos e números nas duas versões. `MapReport` inclui coordenadas, nome, identificadores indiretos e metadados do rádio, então continua sendo dado sensível mesmo sem o payload cifrado.
+- `EnvironmentMetrics`: v2.8.0 acrescenta campos opcionais de ADC (`adc_voltage_ch0` a `adc_voltage_ch7`), temperaturas One-Wire (`one_wire_temperature_ch0` a `one_wire_temperature_ch7`) e dois campos de raios (`lightning_strike_count_1h`, `lightning_distance_km`).
+- `AirQualityMetrics`: v2.8.0 acrescenta `pm_status_flags` no campo 26.
+- As mensagens `DeviceMetrics`, `PowerMetrics`, `LocalStats`, `HealthMetrics`, `HostMetrics` e o contêiner `Telemetry` não mostraram diferenças de campos nesta comparação.
+
+Implicação para o DevMesh: encaminhar envelopes sem reserializar continua sendo a opção mais segura para preservar campos que a versão local desconhece. Se no futuro houver decodificação analítica, campos novos devem ser opcionais e a unidade de cada métrica precisa ser explícita. Esta comparação cobre apenas os tipos listados e as duas revisões fixadas, não todos os esquemas nem todas as versões de firmware.
 
 ### Fase B: observação somente leitura
 - [ ] Capturar pequena amostra do broker autorizado, sem guardar credenciais ou coordenadas.
@@ -77,6 +90,10 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 ## Implementação inicial de CI
 
 O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. O script `scripts/check_meshtastic_schema_matrix.sh` compara os tipos comuns Position, Telemetry, User e MapReport entre os esquemas v2.7.26 e v2.8.0, também com commits fixados. Também cobre payload vazio, omissão do booleano `false` padrão em MapReport e rejeição de mensagem truncada. O teste MQTT de downlink acrescenta um campo desconhecido sintético e confirma que o broker preserva todos os bytes sem tentar interpretar o envelope. Testes de CLI verificam que chave e texto da mensagem não sejam exibidos nos logs. Essas verificações precisam passar no CI antes de serem consideradas validadas; são testes sintéticos e não decodificam tráfego real nem provam que todos os campos são enviados pelo firmware.
+
+## Resultado CI confirmado
+
+Em 2026-10-15, o job `MQTT connectivity and Meshtastic payload validation` passou, incluindo o teste de transporte MQTT, os fixtures de localização/telemetria, a matriz Protobuf v2.7.26/v2.8.0, o modelo de criptografia AES-CTR e os testes isolados de autenticação e ACL. O job de referência criptográfica upstream também passou. Isso confirma os testes automatizados executados, não a recepção de mensagens em hardware real.
 
 ## Critério de aceitação
 
