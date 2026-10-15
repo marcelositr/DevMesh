@@ -59,13 +59,15 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 - [x] Acrescentar testes de regressão da CLI para garantir que a chave do canal e uma chave inválida não apareçam em stdout/stderr; ler texto sensível pela entrada padrão para evitar expô-lo nos argumentos do processo.
 - [x] Confirmar no CI os testes acima; o smoke check MQTT concluiu com sucesso em 2026-10-15.
 - [x] Implementar matriz de compatibilidade de esquemas Protobuf para v2.7.26 e v2.8.0, com SHAs completos fixados e fixtures comuns de Position, Telemetry, User e MapReport.
-- [x] Confirmar no CI a matriz de versões; o smoke check MQTT concluiu com sucesso em 2026-10-15. O teste é de esquemas Protobuf, não de compatibilidade integral entre versões de firmware.
-- [ ] Manter baseline estável e executar testes adicionais contra o esquema mais novo sem promover automaticamente a versão nova a baseline.
+- [x] Confirmar no CI a matriz de versões estáveis; o smoke check MQTT concluiu com sucesso em 2026-10-15. O teste é de esquemas Protobuf, não de compatibilidade integral entre versões de firmware.
+- [x] Acrescentar a revisão de desenvolvimento `develop` fixada no commit `ba16bfc731ab7e23f6be5a8e73358b1973e73822` como faixa experimental separada, sem promovê-la a baseline estável.
+- [ ] Confirmar no CI a matriz ampliada com a revisão experimental de `develop`.
+- [ ] Revisar diferenças semânticas relevantes da revisão experimental antes de qualquer decisão de baseline.
 
 
 ### Comparação de campos entre Protobufs v2.7.26 e v2.8.0
 
-A comparação dos campos declarados em `mesh.proto`, `telemetry.proto` e `mqtt.proto` identificou:
+A comparação dos campos declarados em `mesh.proto`, `telemetry.proto` e `mqtt.proto` identificou nas versões estáveis v2.7.26 e v2.8.0:
 
 - `Position`: mesmos nomes e números de campo nas duas versões. A descrição de `ground_speed` mudou de m/s em v2.7.26 para km/h em v2.8.0. Como o tipo e o número do campo permanecem iguais, a codificação binária não detecta essa mudança semântica. Não converter unidades sem identificar a versão/origem do dado.
 - `ServiceEnvelope` e `MapReport`: mesmos campos e números nas duas versões. `MapReport` inclui coordenadas, nome, identificadores indiretos e metadados do rádio, então continua sendo dado sensível mesmo sem o payload cifrado.
@@ -73,7 +75,7 @@ A comparação dos campos declarados em `mesh.proto`, `telemetry.proto` e `mqtt.
 - `AirQualityMetrics`: v2.8.0 acrescenta `pm_status_flags` no campo 26.
 - As mensagens `DeviceMetrics`, `PowerMetrics`, `LocalStats`, `HealthMetrics`, `HostMetrics` e o contêiner `Telemetry` não mostraram diferenças de campos nesta comparação.
 
-Implicação para o DevMesh: encaminhar envelopes sem reserializar continua sendo a opção mais segura para preservar campos que a versão local desconhece. Se no futuro houver decodificação analítica, campos novos devem ser opcionais e a unidade de cada métrica precisa ser explícita. Esta comparação cobre apenas os tipos listados e as duas revisões fixadas, não todos os esquemas nem todas as versões de firmware.
+Implicação para o DevMesh: encaminhar envelopes sem reserializar continua sendo a opção mais segura para preservar campos que a versão local desconhece. Se no futuro houver decodificação analítica, campos novos devem ser opcionais e a unidade de cada métrica precisa ser explícita. Esta comparação cobre apenas os tipos listados e as duas revisões estáveis fixadas, não todos os esquemas nem todas as versões de firmware. A revisão `develop` foi adicionada como faixa experimental separada; passar seus fixtures comuns não a torna uma versão estável nem substitui uma comparação de semântica dos campos.
 
 ### Fase B: observação somente leitura
 - [x] Criar `scripts/audit_mqtt_capture.py`, uma ferramenta de observação limitada por tempo e quantidade, com assinatura MQTT somente leitura.
