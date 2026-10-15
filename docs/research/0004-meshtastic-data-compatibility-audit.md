@@ -60,13 +60,22 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 - [x] Confirmar no CI os testes acima; o smoke check MQTT concluiu com sucesso em 2026-10-15.
 - [x] Implementar matriz de compatibilidade de esquemas Protobuf para v2.7.26 e v2.8.0, com SHAs completos fixados e fixtures comuns de Position, Telemetry, User e MapReport.
 - [x] Confirmar no CI a matriz de versões estáveis; o smoke check MQTT concluiu com sucesso em 2026-10-15. O teste é de esquemas Protobuf, não de compatibilidade integral entre versões de firmware.
-- [x] Identificar que a branch oficial `develop` está atrasada em relação à v2.8.0 e não usá-la como revisão futura.
+- [x] Registrar a situação histórica da branch oficial `develop`: em 2026-10-12 ela ainda estava atrás da v2.8.0; em 2026-10-15 já estava 256 commits à frente da v2.8.0 (`a2a27f4f992e7d48d12cd5ee0dd486bac3f43e93`). A referência experimental de firmware é separada da matriz de Protobufs.
 - [x] Acrescentar o snapshot da branch oficial `master`, fixado no commit `28f4f5f5c31c0323bfb86d890a1acaff15d1c4c6` (2026-10-12), como faixa experimental separada.
 - [x] Confirmar no CI a matriz ampliada com o snapshot `master`; o smoke check MQTT do commit `4d362a6` concluiu com sucesso em 2026-10-15, incluindo as três revisões fixadas.
 - [x] Revisar diferenças semânticas relevantes entre v2.8.0 e `master`; as limitações e riscos conhecidos estão registrados abaixo.
 - [x] Investigar a falha da matriz experimental no CI de 2026-10-15: as duas versões estáveis passaram, mas a compilação de `master` não encontrou `google/protobuf/descriptor.proto`.
 - [x] Corrigir o script para incluir diretórios padrão do sistema que contenham os arquivos `.proto` do Protobuf, sem ignorar erros de compilação nem enfraquecer os fixtures.
 
+
+### Referências experimentais atuais: firmware e Protobufs
+
+As referências abaixo pertencem a repositórios diferentes e não devem ser confundidas:
+
+- **Firmware Meshtastic:** o commit de `develop` observado em 2026-10-15 é `a2a27f4f992e7d48d12cd5ee0dd486bac3f43e93`. Ele está 256 commits à frente do firmware v2.8.0 e 90 commits à frente da referência de release v2.8.1 usada anteriormente pela CI. A comparação inclui mudanças em `src/mesh/CryptoEngine.cpp`, `src/mesh/CryptoEngine.h` e `test/test_crypto/test_main.cpp`.
+- **Protobufs:** o snapshot `master` fixado em `28f4f5f5c31c0323bfb86d890a1acaff15d1c4c6` continua sendo a revisão usada pela matriz de esquemas. A branch `develop` do repositório Protobufs estava no commit `ba16bfc731ab7e23f6be5a8e73358b1973e73822`, de 2026-07-01, portanto não é substituta do snapshot `master` mais recente.
+
+A CI criptográfica foi ampliada para testar em faixas separadas a release v2.8.1 (`8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c`) e o snapshot imutável de firmware `develop` (`a2a27f4f992e7d48d12cd5ee0dd486bac3f43e93`). Cada faixa executa a suíte upstream de criptografia e os cinco vetores sintéticos AES-CTR comparados byte a byte com OpenSSL. Isso não valida todas as plataformas de hardware, todos os modos criptográficos, nem entrega física LoRa; o resultado de cada faixa deve ser confirmado no CI antes de considerar a atualização validada.
 
 ### Comparação de campos entre Protobufs v2.7.26 e v2.8.0
 
