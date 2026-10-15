@@ -51,6 +51,7 @@ jobs:
           bash -n scripts/check_meshtastic_mqtt.sh
           bash -n scripts/check_meshtastic_protobuf.sh
           bash -n scripts/check_meshtastic_data_compatibility.sh
+          bash -n scripts/check_meshtastic_schema_matrix.sh
           bash -n scripts/check_meshtastic_crypto_model.sh
           bash -n scripts/check_meshtastic_downlink_transport.sh
           bash -n scripts/check_home_deployment.sh
@@ -72,6 +73,9 @@ jobs:
 
       - name: Validate Meshtastic location and telemetry data schemas
         run: bash scripts/check_meshtastic_data_compatibility.sh
+
+      - name: Check compatibility across pinned Meshtastic Protobuf versions
+        run: bash scripts/check_meshtastic_schema_matrix.sh
 
       - name: Run Meshtastic AES-CTR channel encryption model check
         run: bash scripts/check_meshtastic_crypto_model.sh
