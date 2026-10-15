@@ -67,8 +67,8 @@ check_message NeighborInfo meshtastic/mesh.proto $'node_id: 305419896 last_sent_
 check_message Waypoint meshtastic/mesh.proto $'id: 42 latitude_i: 123456789 longitude_i: -234567890 name: "Synthetic waypoint" description: "Fixture only"' \
     'id: 42' 'latitude_i: 123456789' 'longitude_i: -234567890' 'name: "Synthetic waypoint"'
 
-check_message MapReport meshtastic/mqtt.proto $'long_name: "Synthetic Node" short_name: "SYN" firmware_version: "fixture" latitude_i: 123456789 longitude_i: -234567890 position_precision: 16 has_opted_report_location: false' \
-    'long_name: "Synthetic Node"' 'firmware_version: "fixture"' 'latitude_i: 123456789' 'position_precision: 16' 'has_opted_report_location: false'
+check_message MapReport meshtastic/mqtt.proto $'long_name: "Synthetic Node" short_name: "SYN" firmware_version: "fixture" latitude_i: 123456789 longitude_i: -234567890 position_precision: 16 has_opted_report_location: true' \
+    'long_name: "Synthetic Node"' 'firmware_version: "fixture"' 'latitude_i: 123456789' 'position_precision: 16' 'has_opted_report_location: true'
 
 # A truncated protobuf must be rejected rather than silently treated as valid.
 printf '\x0a\x05\x01' > "$TEMP_DIR/malformed.bin"
