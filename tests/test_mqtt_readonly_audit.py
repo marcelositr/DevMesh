@@ -1,6 +1,9 @@
+import json
 import os
 import sys
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from unittest.mock import patch
 
 from scripts.audit_mqtt_capture import classify_message, main, valid_topic_filter
@@ -150,6 +153,65 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
             with patch.dict(os.environ, credentials):
                 with self.assertRaisesRegex(SystemExit, "configure usuário e senha juntos"):
                     main()
+
+
+    def test_cli_reports_aggregates_without_leaking_message_identifiers(self):
+        from scripts import audit_mqtt_capture
+
+        class ReasonCode:
+            is_failure = False
+
+        class Message:
+            topic = "msh/2/e/PRIVATE_SYNTHETIC/!deadbeef"
+            payload = mqtt_pb2.ServiceEnvelope(
+                channel_id="PRIVATE_SYNTHETIC",
+                gateway_id="!deadbeef",
+            ).SerializeToString()
+
+        class FakeClient:
+            on_connect = None
+            on_subscribe = None
+            on_message = None
+
+            def username_pw_set(self, username, password):
+                raise AssertionError("unexpected credentials in this test")
+
+            def connect(self, host, port, keepalive):
+                self.connection = (host, port, keepalive)
+
+            def loop_start(self):
+                self.on_connect(self, None, None, ReasonCode(), None)
+                self.on_message(self, None, Message())
+
+            def subscribe(self, topic, qos):
+                self.on_subscribe(self, None, 1, [ReasonCode()], None)
+                return audit_mqtt_capture.mqtt.MQTT_ERR_SUCCESS, 1
+
+            def disconnect(self):
+                return None
+
+            def loop_stop(self):
+                return None
+
+            def publish(self, *args, **kwargs):
+                raise AssertionError("audit must never publish")
+
+        output = StringIO()
+        with patch.object(sys, "argv", ["audit_mqtt_capture.py", "--seconds", "1",
+                                        "--max-messages", "1"]):
+            with patch.object(audit_mqtt_capture.mqtt, "Client", return_value=FakeClient()):
+                with patch.dict(os.environ, {}, clear=True):
+                    with redirect_stdout(output):
+                        self.assertEqual(main(), 0)
+
+        rendered = output.getvalue()
+        report = json.loads(rendered)
+        self.assertEqual(report["messages_received"], 1)
+        self.assertEqual(report["payloads_saved"], False)
+        self.assertEqual(report["mqtt_publish_performed"], False)
+        self.assertNotIn("PRIVATE_SYNTHETIC", rendered)
+        self.assertNotIn("deadbeef", rendered)
+        self.assertNotIn("msh/2/e/", rendered)
 
 
 if __name__ == "__main__":
