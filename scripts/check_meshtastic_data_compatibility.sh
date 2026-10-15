@@ -22,7 +22,10 @@ PROTO_DIR="$TEMP_DIR/protobufs"
 COUNT=0
 
 check_message() {
-    local message="$1" schema="$2" input="$3"
+    local message schema input
+    message="$1"
+    schema="$2"
+    input="$3"
     shift 3
     local input_file="$TEMP_DIR/input.txt"
     local decoded_file="$TEMP_DIR/decoded.txt"
