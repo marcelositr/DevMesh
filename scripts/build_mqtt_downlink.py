@@ -3,7 +3,8 @@
 
 This tool only writes a protobuf envelope to a local file. It never connects to
 MQTT or transmits over LoRa. Keep channel PSKs out of command-line arguments,
-logs, source control, and issue reports.
+logs, source control, and issue reports. Use --text-stdin for sensitive message
+content because command-line arguments may be visible to other local processes.
 """
 
 from __future__ import annotations
@@ -143,7 +144,16 @@ def main() -> int:
     parser.add_argument("--sender-id", required=True, type=lambda s: int(s, 0), help="ID sintético, decimal ou 0xHEX.")
     parser.add_argument("--gateway-id", required=True, help="Gateway sintético, por exemplo !a1b2c3d4.")
     parser.add_argument("--packet-id", required=True, type=lambda s: int(s, 0), help="ID de pacote novo, decimal ou 0xHEX.")
-    parser.add_argument("--text", default="Teste MQTT downlink DevMesh", help="Texto de teste.")
+    text_group = parser.add_mutually_exclusive_group()
+    text_group.add_argument(
+        "--text",
+        help="Texto de teste não sensível; pode ficar visível na lista de processos.",
+    )
+    text_group.add_argument(
+        "--text-stdin",
+        action="store_true",
+        help="Lê o texto da entrada padrão para evitar colocá-lo nos argumentos do processo.",
+    )
     parser.add_argument("--output", required=True, type=Path, help="Arquivo local para o envelope binário.")
     args = parser.parse_args()
 
@@ -151,9 +161,15 @@ def main() -> int:
     if not encoded_key:
         encoded_key = getpass.getpass("PSK Base64 do canal privado (entrada oculta): ").strip()
 
+    text = sys.stdin.read() if args.text_stdin else (args.text or "Teste MQTT downlink DevMesh")
+    if args.text_stdin and text.endswith("\n"):
+        text = text[:-1]
+    if args.text_stdin and text.endswith("\r"):
+        text = text[:-1]
+
     try:
         topic, payload = build_envelope(
-            text=args.text,
+            text=text,
             channel_name=args.channel,
             psk_base64=encoded_key,
             sender_id=args.sender_id,
