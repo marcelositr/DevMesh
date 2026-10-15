@@ -341,5 +341,47 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
         self.assertFalse(report["subscription_accepted"])
 
 
+    def test_cli_fails_when_local_subscribe_request_is_rejected(self):
+        from scripts import audit_mqtt_capture
+
+        class ReasonCode:
+            is_failure = False
+
+        class FakeClient:
+            on_connect = None
+            on_subscribe = None
+            on_message = None
+
+            def connect(self, host, port, keepalive):
+                return None
+
+            def loop_start(self):
+                self.on_connect(self, None, None, ReasonCode(), None)
+
+            def subscribe(self, topic, qos):
+                return audit_mqtt_capture.mqtt.MQTT_ERR_NO_CONN, 1
+
+            def disconnect(self):
+                return None
+
+            def loop_stop(self):
+                return None
+
+            def publish(self, *args, **kwargs):
+                raise AssertionError("audit must never publish")
+
+        output = StringIO()
+        with patch.object(sys, "argv", ["audit_mqtt_capture.py", "--seconds", "1"]):
+            with patch.object(audit_mqtt_capture.mqtt, "Client", return_value=FakeClient()):
+                with patch.dict(os.environ, {}, clear=True):
+                    with redirect_stdout(output):
+                        self.assertEqual(main(), 2)
+
+        report = json.loads(output.getvalue())
+        self.assertTrue(report["connected"])
+        self.assertFalse(report["subscription_accepted"])
+        self.assertFalse(report["mqtt_publish_performed"])
+
+
 if __name__ == "__main__":
     unittest.main()
