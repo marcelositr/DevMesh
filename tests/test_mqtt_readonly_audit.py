@@ -23,6 +23,30 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
             ("encrypted_topic", "invalid_envelope"),
         )
 
+    def test_classifies_synthetic_decoded_position_by_portnum_only(self):
+        envelope = mqtt_pb2.ServiceEnvelope()
+        envelope.channel_id = "PRIVATE_SYNTHETIC"
+        envelope.gateway_id = "!deadbeef"
+        envelope.packet.decoded.portnum = portnums_pb2.PortNum.POSITION_APP
+        envelope.packet.decoded.payload = b"synthetic-position-payload"
+
+        self.assertEqual(
+            classify_message("msh/2/e/PRIVATE_SYNTHETIC/!deadbeef", envelope.SerializeToString()),
+            ("encrypted_topic", "decoded_position_app"),
+        )
+
+    def test_classifies_synthetic_decoded_telemetry_by_portnum_only(self):
+        envelope = mqtt_pb2.ServiceEnvelope()
+        envelope.channel_id = "PRIVATE_SYNTHETIC"
+        envelope.gateway_id = "!deadbeef"
+        envelope.packet.decoded.portnum = portnums_pb2.PortNum.TELEMETRY_APP
+        envelope.packet.decoded.payload = b"synthetic-telemetry-payload"
+
+        self.assertEqual(
+            classify_message("msh/2/e/PRIVATE_SYNTHETIC/!deadbeef", envelope.SerializeToString()),
+            ("encrypted_topic", "decoded_telemetry_app"),
+        )
+
     def test_classifies_map_report_position_without_exposing_coordinates(self):
         envelope = mqtt_pb2.ServiceEnvelope()
         envelope.channel_id = "PRIVATE_SYNTHETIC"
