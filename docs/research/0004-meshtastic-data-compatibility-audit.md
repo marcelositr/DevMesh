@@ -55,7 +55,7 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 - [x] Fixar Protobufs oficiais por tag e commit imutável no script de teste inicial.
 - [x] Criar fixtures sintéticos iniciais para Position, Telemetry de dispositivo/ambiente/qualidade do ar, User, NeighborInfo, Waypoint e MapReport, usando Protobufs v2.8.0 fixado por commit.
 - [ ] Executar no CI a verificação decode/encode desses fixtures e a rejeição de uma mensagem truncada; o teste foi implementado, mas ainda não há resultado confirmado.
-- [ ] Testar preservação de campos desconhecidos e tipos de payload desconhecidos; isso ainda não está coberto pelo script inicial.
+- [ ] Testar explicitamente campos Protobuf desconhecidos. O teste de transporte existente verifica a preservação byte a byte de um envelope sintético, mas não substitui esse caso específico.
 - [ ] Verificar payload vazio, privacidade dos logs e matriz de versões adicionais.
 - [ ] Garantir que os logs de teste não exponham conteúdo sensível.
 - [ ] Manter baseline estável e executar testes adicionais contra o esquema mais novo sem promover automaticamente a versão nova a baseline.
@@ -74,7 +74,7 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 
 ## Implementação inicial de CI
 
-O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. O workflow MQTT smoke executa o script. Essa etapa valida estrutura e round-trip dos tipos cobertos, não decodifica tráfego real nem prova que todos os campos são enviados pelo firmware. O resultado do CI do commit mais recente ainda precisa ser confirmado.
+O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures sintéticos contra os esquemas oficiais Protobufs v2.8.0, fixados por tag e commit. Também cobre um payload vazio e a omissão esperada do booleano `false` padrão em MapReport. O workflow MQTT smoke executa o script. Essa etapa valida estrutura e round-trip dos tipos cobertos, não decodifica tráfego real nem prova que todos os campos são enviados pelo firmware. O resultado do CI após esses últimos casos precisa ser confirmado.
 
 ## Critério de aceitação
 
