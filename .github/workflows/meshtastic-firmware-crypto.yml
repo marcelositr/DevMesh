@@ -16,9 +16,17 @@ concurrency:
 
 jobs:
   upstream-crypto-tests:
-    name: Run pinned upstream crypto test suite
+    name: Crypto tests (${{ matrix.reference }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - reference: release-2.8.1
+            firmware_ref: 8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c
+          - reference: develop-2026-10-15
+            firmware_ref: a2a27f4f992e7d48d12cd5ee0dd486bac3f43e93
 
     steps:
       - name: Check out DevMesh
@@ -31,11 +39,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check out pinned Meshtastic firmware source
+      - name: Check out pinned Meshtastic firmware source (${{ matrix.reference }})
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: meshtastic/firmware
-          ref: 8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c
+          ref: ${{ matrix.firmware_ref }}
           path: firmware
           persist-credentials: false
 
