@@ -54,11 +54,12 @@ check_message DeviceMetrics meshtastic/telemetry.proto ''
 check_message Telemetry meshtastic/telemetry.proto $'time: 1700000000\ndevice_metrics { battery_level: 87 voltage: 4.1 uptime_seconds: 900 }' \
     'device_metrics {' 'battery_level: 87' 'voltage: 4.1' 'uptime_seconds: 900'
 
-check_message Telemetry meshtastic/telemetry.proto $'environment_metrics { temperature: 22.5 relative_humidity: 48.0 barometric_pressure: 1008.2 }' \
-    'environment_metrics {' 'temperature: 22.5' 'relative_humidity: 48' 'barometric_pressure: 1008.2'
+check_message Telemetry meshtastic/telemetry.proto $'environment_metrics { temperature: 22.5 relative_humidity: 48.0 barometric_pressure: 1008.2 adc_voltage_ch0: 3.3 one_wire_temperature_ch0: 18.75 lightning_strike_count_1h: 2 lightning_distance_km: 4.5 }' \
+    'environment_metrics {' 'temperature: 22.5' 'relative_humidity: 48' 'barometric_pressure: 1008.2' \
+    'adc_voltage_ch0: 3.3' 'one_wire_temperature_ch0: 18.75' 'lightning_strike_count_1h: 2' 'lightning_distance_km: 4.5'
 
-check_message Telemetry meshtastic/telemetry.proto $'air_quality_metrics { pm25_standard: 12 co2: 640 }' \
-    'air_quality_metrics {' 'pm25_standard: 12' 'co2: 640'
+check_message Telemetry meshtastic/telemetry.proto $'air_quality_metrics { pm25_standard: 12 co2: 640 pm_status_flags: 3 }' \
+    'air_quality_metrics {' 'pm25_standard: 12' 'co2: 640' 'pm_status_flags: 3'
 
 check_message User meshtastic/mesh.proto $'id: "!12345678" long_name: "Synthetic Node" short_name: "SYN" is_licensed: false' \
     'id: "!12345678"' 'long_name: "Synthetic Node"' 'short_name: "SYN"'
@@ -89,6 +90,6 @@ if (cd "$PROTO_DIR" && protoc -I . --decode=meshtastic.Position meshtastic/mesh.
 fi
 
 printf 'OK: %s fixtures sintéticos validados contra Meshtastic Protobufs %s.\n' "$COUNT" "$PROTOBUF_TAG"
-printf 'OK: Position, telemetry vazia e de dispositivo/ambiente/qualidade do ar, User, NeighborInfo, Waypoint e MapReport.\n'
+printf 'OK: Position, telemetria de dispositivo/ambiente/qualidade do ar (incluindo campos opcionais recentes), User, NeighborInfo, Waypoint e MapReport.\n'
 printf 'OK: round-trip binário e rejeição de fixture truncado.\n'
 printf 'LIMITE: não valida firmware, descriptografia, política de privacidade em produção, MQTT real ou entrega LoRa.\n'
