@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - "test/**"
+      - "work/**"
   pull_request:
   workflow_dispatch:
 
