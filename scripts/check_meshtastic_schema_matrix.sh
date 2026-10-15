@@ -14,6 +14,7 @@ done
 VERSIONS=(
     "v2.7.26:da60cee584c6dc1efbb4a3809b98666505179b85"
     "v2.8.0:7b2464c9b8c1521f93852261e4123826e5b25e11"
+    "develop-2026-10-15:ba16bfc731ab7e23f6be5a8e73358b1973e73822"
 )
 
 check_message() {
@@ -45,10 +46,13 @@ for version_spec in "${VERSIONS[@]}"; do
     expected_commit="${version_spec#*:}"
     version_dir="$TEMP_DIR/protobufs-$version"
 
-    git clone --quiet --depth 1 --branch "$version" \
-        https://github.com/meshtastic/protobufs.git "$version_dir"
+    git init --quiet "$version_dir"
+    git -C "$version_dir" remote add origin https://github.com/meshtastic/protobufs.git
+    git -C "$version_dir" fetch --quiet --depth 1 origin "$expected_commit" \
+        || fail "$version: não foi possível obter o commit fixado $expected_commit."
+    git -C "$version_dir" checkout --quiet --detach FETCH_HEAD
     actual_commit="$(git -C "$version_dir" rev-parse HEAD)"
-    [[ "$actual_commit" == "$expected_commit" ]] || fail "$version aponta para $actual_commit, esperado $expected_commit."
+    [[ "$actual_commit" == "$expected_commit" ]] || fail "$version resolve para $actual_commit, esperado $expected_commit."
 
     check_message "$version_dir" "$version" Position meshtastic/mesh.proto \
         $'latitude_i: 123456789\nlongitude_i: -234567890\naltitude: 321\nprecision_bits: 16' \
@@ -69,5 +73,5 @@ for version_spec in "${VERSIONS[@]}"; do
     printf 'OK: %s (%s): Position, Telemetry, User e MapReport passaram encode/decode/round-trip.\n' "$version" "$actual_commit"
 done
 
-printf 'OK: matriz de compatibilidade concluída nas duas versões fixadas.\n'
+printf 'OK: matriz de compatibilidade concluída nas revisões fixadas.\n'
 printf 'LIMITE: fixtures sintéticos; não comprova compatibilidade de firmware, criptografia ou entrega LoRa real.\n'
