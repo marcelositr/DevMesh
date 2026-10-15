@@ -35,6 +35,10 @@ tr -d '[:space:]' < "$ROOT_DIR/tests/fixtures/meshtastic-service-envelope.hex" \
     | xxd -r -p > "$TEMP_DIR/service-envelope.bin"
 [[ -s "$TEMP_DIR/service-envelope.bin" ]] || fail "Fixture binário vazio."
 
+# Acrescenta um campo desconhecido (field 100, varint 42) ao envelope. O transporte
+# deve tratar o payload como bytes opacos e preservar esse campo futuro sem decodificá-lo.
+printf '\\xa0\\x06\\x2a' >> "$TEMP_DIR/service-envelope.bin"
+
 # Habilita logs somente no broker descartável para sincronizar com a inscrição real do assinante.
 sed 's/^log_type error$/log_type all/' "$ROOT_DIR/tests/mosquitto/mosquitto.conf" \
     > "$TEMP_DIR/mosquitto.conf"
@@ -79,5 +83,5 @@ cmp --silent "$TEMP_DIR/service-envelope.bin" "$OUTPUT" \
     || fail "Os bytes recebidos diferem do ServiceEnvelope publicado."
 
 printf 'OK: o filtro %s recebeu o envelope publicado em %s.\n' "$RADIO_FILTER" "$DOWNLINK_TOPIC"
-printf 'OK: o broker preservou os bytes do ServiceEnvelope.\n'
+printf 'OK: o broker preservou byte a byte o ServiceEnvelope, incluindo o campo desconhecido.\n'
 printf 'LIMITE: simula somente broker/tópico; não valida a aceitação pelo firmware, chaves, decifragem ou transmissão LoRa.\n'
