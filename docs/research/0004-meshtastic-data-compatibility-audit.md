@@ -76,8 +76,10 @@ A comparação dos campos declarados em `mesh.proto`, `telemetry.proto` e `mqtt.
 Implicação para o DevMesh: encaminhar envelopes sem reserializar continua sendo a opção mais segura para preservar campos que a versão local desconhece. Se no futuro houver decodificação analítica, campos novos devem ser opcionais e a unidade de cada métrica precisa ser explícita. Esta comparação cobre apenas os tipos listados e as duas revisões fixadas, não todos os esquemas nem todas as versões de firmware.
 
 ### Fase B: observação somente leitura
-- [ ] Capturar pequena amostra do broker autorizado, sem guardar credenciais ou coordenadas.
-- [ ] Classificar somente metadados necessários; conteúdo cifrado sem chave permanece opaco.
+- [x] Criar `scripts/audit_mqtt_capture.py`, uma ferramenta de observação limitada por tempo e quantidade, com assinatura MQTT somente leitura.
+- [x] Garantir que o resumo não exponha tópicos completos, IDs de nós, nomes de canais, credenciais, coordenadas ou bytes de payload; não grava payloads nem publica mensagens.
+- [x] Adicionar testes sintéticos para envelopes cifrados, metadados ausentes e famílias de tópicos opacas.
+- [ ] Executar a ferramenta no broker autorizado e registrar apenas o resumo sanitizado; ainda não houve captura real nesta etapa.
 - [ ] Comparar famílias esperadas com tipos realmente vistos e marcar ausência como inconclusiva.
 - [ ] Confirmar que o encaminhamento preserva bytes e não aumenta tráfego inesperadamente.
 
@@ -86,6 +88,10 @@ Implicação para o DevMesh: encaminhar envelopes sem reserializar continua send
 - [ ] Usar canal privado e mensagens de baixa frequência.
 - [ ] Verificar separadamente MQTT, aceitação pelo firmware e recepção LoRa por segundo nó, se disponível.
 - [ ] Testar posição/telemetria com dados controlados sem divulgar localização real.
+
+## Ferramenta de observação somente leitura
+
+O script `scripts/audit_mqtt_capture.py` assina um filtro MQTT por até 300 segundos e para após até 10.000 mensagens (padrões: 30 segundos e 500 mensagens). O padrão é `msh/#`; ele pode ser limitado com `--topic`. Credenciais, quando necessárias, são lidas das variáveis `DEVMESH_MQTT_USERNAME` e `DEVMESH_MQTT_PASSWORD`, nunca de argumentos. O resumo inclui somente contagens agregadas, categorias de tópicos, estado de conexão e volume total de bytes. Não publica, não grava payloads e não exibe tópicos completos ou metadados pessoais. O teste de CI usa fixtures sintéticos; a captura real no broker autorizado continua pendente e deve ser feita localmente. Uma observação sem mensagens é inconclusiva, não prova ausência de tráfego.
 
 ## Implementação inicial de CI
 
