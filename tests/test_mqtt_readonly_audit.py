@@ -213,6 +213,51 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
         self.assertNotIn("deadbeef", rendered)
         self.assertNotIn("msh/2/e/", rendered)
 
+    def test_cli_fails_when_mqtt_disconnects_unexpectedly(self):
+        from scripts import audit_mqtt_capture
+
+        class ReasonCode:
+            def __init__(self, failed=False):
+                self.is_failure = failed
+
+        class FakeClient:
+            on_connect = None
+            on_disconnect = None
+            on_subscribe = None
+            on_message = None
+
+            def connect(self, host, port, keepalive):
+                return None
+
+            def loop_start(self):
+                self.on_connect(self, None, None, ReasonCode(), None)
+                self.on_disconnect(self, None, None, ReasonCode(failed=True), None)
+
+            def subscribe(self, topic, qos):
+                self.on_subscribe(self, None, 1, [ReasonCode()], None)
+                return audit_mqtt_capture.mqtt.MQTT_ERR_SUCCESS, 1
+
+            def disconnect(self):
+                return None
+
+            def loop_stop(self):
+                return None
+
+            def publish(self, *args, **kwargs):
+                raise AssertionError("audit must never publish")
+
+        output = StringIO()
+        with patch.object(sys, "argv", ["audit_mqtt_capture.py", "--seconds", "1"]):
+            with patch.object(audit_mqtt_capture.mqtt, "Client", return_value=FakeClient()):
+                with patch.dict(os.environ, {}, clear=True):
+                    with redirect_stdout(output):
+                        self.assertEqual(main(), 2)
+
+        report = json.loads(output.getvalue())
+        self.assertFalse(report["connected"])
+        self.assertFalse(report["subscription_accepted"])
+        self.assertFalse(report["mqtt_publish_performed"])
+
 
 if __name__ == "__main__":
     unittest.main()
