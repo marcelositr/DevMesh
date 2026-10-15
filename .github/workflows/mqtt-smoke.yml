@@ -43,7 +43,7 @@ jobs:
       - name: Install Protocol Buffers compiler
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y protobuf-compiler
+          sudo apt-get install --no-install-recommends -y protobuf-compiler libprotobuf-dev
 
       - name: Check shell syntax
         run: |
