@@ -128,6 +128,7 @@ def main() -> int:
     subscription_ready = threading.Event()
     finished = threading.Event()
     connection_failed = threading.Event()
+    stopping = threading.Event()
 
     client = mqtt.Client(
         callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
@@ -156,7 +157,7 @@ def main() -> int:
         subscription_ready.set()
 
     def on_disconnect(client, userdata, disconnect_flags, reason_code, properties):
-        if reason_code.is_failure:
+        if not stopping.is_set():
             connected.clear()
             connection_failed.set()
             finished.set()
@@ -190,6 +191,7 @@ def main() -> int:
     except (OSError, mqtt.MQTTException):
         connection_failed.set()
     finally:
+        stopping.set()
         try:
             client.disconnect()
         finally:
