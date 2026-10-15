@@ -67,6 +67,22 @@ class DownlinkBuilderTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "tópico MQTT"):
                     self.build(channel_name=channel_name)
 
+    def test_rejects_slashes_and_control_characters_in_channel_name(self):
+        for channel_name in ("PRIVATE/TEST", "PRIVATE\nTEST", "PRIVATE\x7fTEST"):
+            with self.subTest(channel_name=repr(channel_name)):
+                with self.assertRaisesRegex(ValueError, "tópico MQTT"):
+                    self.build(channel_name=channel_name)
+
+    def test_rejects_text_over_utf8_byte_limit(self):
+        with self.assertRaisesRegex(ValueError, "180 bytes UTF-8"):
+            self.build(text="ç" * 91)
+
+    def test_rejects_invalid_hop_limit(self):
+        for hop_limit in (0, 8):
+            with self.subTest(hop_limit=hop_limit):
+                with self.assertRaisesRegex(ValueError, "hop_limit"):
+                    self.build(hop_limit=hop_limit)
+
     def test_expands_default_psk_short_code(self):
         expanded = effective_psk("AQ==")
         self.assertEqual(len(expanded), 16)
@@ -75,6 +91,28 @@ class DownlinkBuilderTests(unittest.TestCase):
     def test_rejects_disabled_encryption(self):
         with self.assertRaisesRegex(ValueError, "sem criptografia"):
             effective_psk("")
+
+    def test_rejects_invalid_base64_psk(self):
+        with self.assertRaisesRegex(ValueError, "PSK inválida"):
+            effective_psk("not-base64!")
+
+    def test_rejects_psk_longer_than_32_bytes(self):
+        encoded = base64.b64encode(bytes(range(33))).decode("ascii")
+        with self.assertRaisesRegex(ValueError, "no máximo 32 bytes"):
+            effective_psk(encoded)
+
+    def test_expands_psk_lengths_to_supported_aes_keys(self):
+        for raw_key, expected_length in (
+            (bytes(range(2)), 16),
+            (bytes(range(15)), 16),
+            (bytes(range(16)), 16),
+            (bytes(range(17)), 32),
+            (bytes(range(31)), 32),
+            (bytes(range(32)), 32),
+        ):
+            with self.subTest(raw_length=len(raw_key)):
+                encoded = base64.b64encode(raw_key).decode("ascii")
+                self.assertEqual(len(effective_psk(encoded)), expected_length)
 
     def test_rejects_invalid_gateway_id(self):
         with self.assertRaisesRegex(ValueError, "Gateway ID"):
