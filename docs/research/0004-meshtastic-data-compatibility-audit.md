@@ -62,7 +62,7 @@ Esta matriz lista categorias possíveis, não garante que cada dispositivo ou ve
 - [x] Confirmar no CI a matriz de versões estáveis; o smoke check MQTT concluiu com sucesso em 2026-10-15. O teste é de esquemas Protobuf, não de compatibilidade integral entre versões de firmware.
 - [x] Identificar que a branch oficial `develop` está atrasada em relação à v2.8.0 e não usá-la como revisão futura.
 - [x] Acrescentar o snapshot da branch oficial `master`, fixado no commit `28f4f5f5c31c0323bfb86d890a1acaff15d1c4c6` (2026-10-12), como faixa experimental separada.
-- [ ] Confirmar no CI a matriz ampliada com o snapshot `master`, após corrigir os diretórios de inclusão do compilador Protobuf.
+- [x] Confirmar no CI a matriz ampliada com o snapshot `master`; o smoke check MQTT do commit `4d362a6` concluiu com sucesso em 2026-10-15, incluindo as três revisões fixadas.
 - [x] Revisar diferenças semânticas relevantes entre v2.8.0 e `master`; as limitações e riscos conhecidos estão registrados abaixo.
 - [x] Investigar a falha da matriz experimental no CI de 2026-10-15: as duas versões estáveis passaram, mas a compilação de `master` não encontrou `google/protobuf/descriptor.proto`.
 - [x] Corrigir o script para incluir diretórios padrão do sistema que contenham os arquivos `.proto` do Protobuf, sem ignorar erros de compilação nem enfraquecer os fixtures.
@@ -78,7 +78,7 @@ A comparação dos campos declarados em `mesh.proto`, `telemetry.proto` e `mqtt.
 - `AirQualityMetrics`: v2.8.0 acrescenta `pm_status_flags` no campo 26.
 - As mensagens `DeviceMetrics`, `PowerMetrics`, `LocalStats`, `HealthMetrics`, `HostMetrics` e o contêiner `Telemetry` não mostraram diferenças de campos nesta comparação.
 
-Implicação para o DevMesh: encaminhar envelopes sem reserializar continua sendo a opção mais segura para preservar campos que a versão local desconhece. Se no futuro houver decodificação analítica, campos novos devem ser opcionais e a unidade de cada métrica precisa ser explícita. Esta comparação cobre apenas os tipos listados nas duas revisões estáveis e no snapshot experimental fixados, não todos os esquemas nem todas as versões de firmware. A revisão `develop` foi adicionada como faixa experimental separada; passar seus fixtures comuns não a torna uma versão estável nem substitui uma comparação de semântica dos campos.
+Implicação para o DevMesh: encaminhar envelopes sem reserializar continua sendo a opção mais segura para preservar campos que a versão local desconhece. Se no futuro houver decodificação analítica, campos novos devem ser opcionais e a unidade de cada métrica precisa ser explícita. Esta comparação cobre apenas os tipos listados nas duas revisões estáveis e no snapshot experimental fixados, não todos os esquemas nem todas as versões de firmware. O snapshot `master` foi adicionado como faixa experimental separada; passar seus fixtures comuns não o torna uma versão estável nem substitui uma comparação de semântica dos campos.
 
 ### Incidente de CI: includes do Protobuf no snapshot experimental
 
@@ -88,7 +88,7 @@ Em 2026-10-15, a execução `38791804483` passou pelas etapas anteriores, inclui
 
 **Correção complementar aplicada:** o workflow `.github/workflows/mqtt-smoke.yml` agora instala `libprotobuf-dev` junto com `protobuf-compiler`. O script `scripts/check_meshtastic_schema_matrix.sh` mantém a inclusão explícita dos diretórios e uma falha clara caso `descriptor.proto` realmente esteja ausente. Não ignoramos erros de compilação nem removemos o snapshot experimental.
 
-**Critério de conclusão:** a correção só será considerada validada quando uma nova execução do CI concluir a matriz para as três revisões. Até lá, a alteração foi aplicada, mas o resultado permanece pendente de CI.
+**Resultado da correção:** validado pelo smoke check MQTT `38794503973`, concluído com sucesso em 2026-10-15 no commit `4d362a6dab271b945541610bcdfdfc7f4fe6b516`. A execução incluiu a matriz das revisões v2.7.26, v2.8.0 e do snapshot experimental `master`. Isso confirma a compilação e os fixtures definidos, não compatibilidade integral do firmware.
 
 ### Diferenças relevantes entre v2.8.0 e o snapshot experimental master
 
