@@ -106,6 +106,7 @@ A comparação oficial de commits entre v2.8.0 (`7b2464c9b8c1521f93852261e412382
 - [x] Garantir que o resumo não exponha tópicos completos, IDs de nós, nomes de canais, credenciais, coordenadas ou bytes de payload; não grava payloads nem publica mensagens.
 - [x] Adicionar testes sintéticos para envelopes cifrados, metadados ausentes e famílias de tópicos opacas.
 - [x] Tratar desconexão MQTT inesperada como falha da auditoria e cobrir o comportamento com cliente sintético, evitando um resultado aparentemente bem-sucedido após queda do broker.
+- [x] Cobrir rejeição de conexão pelo broker e rejeição da assinatura MQTT; ambos devem retornar falha e sinalizar corretamente os estados de conexão/assinatura.
 - [x] Cobrir a classificação sintética por `POSITION_APP` e `TELEMETRY_APP` quando o envelope já contém um payload decodificado; isso valida apenas a classificação pelo portnum, não a capacidade de identificar esses tipos dentro de ciphertext real.
 - [x] Cobrir um portnum futuro desconhecido em envelope sintético; o auditor retorna `decoded_unknown_portnum` sem expor o número nem o payload. Isso valida tolerância do classificador, não a interpretação do tipo desconhecido.
 - [x] Acrescentar fixture sintética de MapReport em tópico de mapa; a classificação informa apenas se campos de posição não nulos existem e descarta seus valores.
