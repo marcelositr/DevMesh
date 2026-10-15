@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import binascii
 import getpass
 import os
 import re
@@ -32,7 +33,7 @@ def effective_psk(encoded: str) -> bytes:
     """Match firmware channel PSK expansion for standard AES-CTR channels."""
     try:
         raw = base64.b64decode(encoded, validate=True)
-    except Exception as exc:
+    except (binascii.Error, ValueError) as exc:
         raise ValueError("PSK inválida: informe uma chave em Base64.") from exc
 
     if len(raw) == 0:
