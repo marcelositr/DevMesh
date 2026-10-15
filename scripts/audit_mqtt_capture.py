@@ -155,6 +155,11 @@ def main() -> int:
             return
         subscription_ready.set()
 
+    def on_disconnect(client, userdata, disconnect_flags, reason_code, properties):
+        if reason_code.is_failure:
+            connection_failed.set()
+            finished.set()
+
     def on_message(client, userdata, message):
         nonlocal total_bytes, received
         family, status = classify_message(message.topic, message.payload)
@@ -166,6 +171,7 @@ def main() -> int:
             finished.set()
 
     client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
     client.on_subscribe = on_subscribe
     client.on_message = on_message
 
