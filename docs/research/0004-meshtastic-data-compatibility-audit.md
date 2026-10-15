@@ -78,6 +78,17 @@ A comparação dos campos declarados em `mesh.proto`, `telemetry.proto` e `mqtt.
 
 Implicação para o DevMesh: encaminhar envelopes sem reserializar continua sendo a opção mais segura para preservar campos que a versão local desconhece. Se no futuro houver decodificação analítica, campos novos devem ser opcionais e a unidade de cada métrica precisa ser explícita. Esta comparação cobre apenas os tipos listados nas duas revisões estáveis e no snapshot experimental fixados, não todos os esquemas nem todas as versões de firmware. A revisão `develop` foi adicionada como faixa experimental separada; passar seus fixtures comuns não a torna uma versão estável nem substitui uma comparação de semântica dos campos.
 
+### Diferenças relevantes entre v2.8.0 e o snapshot experimental master
+
+A comparação oficial de commits entre v2.8.0 (`7b2464c9b8c1521f93852261e4123826e5b25e11`) e o snapshot `master` (`28f4f5f5c31c0323bfb86d890a1acaff15d1c4c6`) indica 149 commits à frente. A revisão de arquivos identificou mudanças que merecem acompanhamento:
+
+- **Criptografia de canal:** `ChannelSettings.use_aead = 8` habilita experimentalmente AES-CCM com tag de autenticação de 12 bytes. A documentação do esquema diz que todos os nós do canal precisam estar configurados de forma compatível; não se deve presumir que AES-CTR e AES-CCM sejam intercambiáveis. O DevMesh deve continuar encaminhando o envelope opaco sem tentar decifrá-lo ou reserializá-lo.
+- **Novo tipo de aplicação:** `PAGING_APP = 38`, com payload `PagingPacket`, para alertas que exigem confirmação humana. O classificador atual não interpreta semanticamente esse tipo futuro.
+- **Telemetria ambiental:** novos tipos/campos incluem `SoilWaterMetrics`; o esquema reserva números e nomes antes presentes em `EnvironmentMetrics`. Isso reforça que consumidores não devem assumir que todas as métricas ambientais residem em uma única mensagem.
+- **Roteamento e identidade de hardware:** o esquema adiciona campos de prova de ACK/NACK e novos valores de `HardwareModel`. Os valores desconhecidos devem continuar preservados no encaminhamento transparente.
+
+**Limite da validação:** a matriz automatizada exercita fixtures comuns de Position, Telemetry, User e MapReport. Ela não valida a semântica de `use_aead`, não decodifica `PagingPacket`, não cobre todos os novos campos de telemetria/roteamento e não demonstra compatibilidade integral do firmware. Essas diferenças ficam registradas como riscos conhecidos, não como funcionalidades já suportadas pelo auditor.
+
 ### Fase B: observação somente leitura
 - [x] Criar `scripts/audit_mqtt_capture.py`, uma ferramenta de observação limitada por tempo e quantidade, com assinatura MQTT somente leitura.
 - [x] Garantir que o resumo não exponha tópicos completos, IDs de nós, nomes de canais, credenciais, coordenadas ou bytes de payload; não grava payloads nem publica mensagens.
