@@ -49,6 +49,8 @@ check_message() {
 check_message Position meshtastic/mesh.proto $'latitude_i: 123456789\nlongitude_i: -234567890\naltitude: 321\nprecision_bits: 16' \
     'latitude_i: 123456789' 'longitude_i: -234567890' 'altitude: 321' 'precision_bits: 16'
 
+check_message DeviceMetrics meshtastic/telemetry.proto ''
+
 check_message Telemetry meshtastic/telemetry.proto $'time: 1700000000\ndevice_metrics { battery_level: 87 voltage: 4.1 uptime_seconds: 900 }' \
     'device_metrics {' 'battery_level: 87' 'voltage: 4.1' 'uptime_seconds: 900'
 
@@ -70,6 +72,16 @@ check_message Waypoint meshtastic/mesh.proto $'id: 42 latitude_i: 123456789 long
 check_message MapReport meshtastic/mqtt.proto $'long_name: "Synthetic Node" short_name: "SYN" firmware_version: "fixture" latitude_i: 123456789 longitude_i: -234567890 position_precision: 16 has_opted_report_location: true' \
     'long_name: "Synthetic Node"' 'firmware_version: "fixture"' 'latitude_i: 123456789' 'position_precision: 16' 'has_opted_report_location: true'
 
+# In proto3, a default false boolean is omitted from text output and the wire payload.
+printf '%s\\n' 'long_name: "Synthetic Node"' > "$TEMP_DIR/default-map-report.txt"
+(cd "$PROTO_DIR" && protoc -I . --encode=meshtastic.MapReport meshtastic/mqtt.proto < "$TEMP_DIR/default-map-report.txt" > "$TEMP_DIR/default-map-report.bin") || fail "Falha ao codificar MapReport com campos opcionais ausentes."
+(cd "$PROTO_DIR" && protoc -I . --decode=meshtastic.MapReport meshtastic/mqtt.proto < "$TEMP_DIR/default-map-report.bin" > "$TEMP_DIR/default-map-report-decoded.txt") || fail "Falha ao decodificar MapReport com campos opcionais ausentes."
+if grep -q 'has_opted_report_location' "$TEMP_DIR/default-map-report-decoded.txt"; then
+    fail "MapReport não respeitou a omissão do booleano false padrão."
+fi
+COUNT=$((COUNT + 1))
+
+
 # A truncated protobuf must be rejected rather than silently treated as valid.
 printf '\x0a\x05\x01' > "$TEMP_DIR/malformed.bin"
 if (cd "$PROTO_DIR" && protoc -I . --decode=meshtastic.Position meshtastic/mesh.proto < "$TEMP_DIR/malformed.bin" > /dev/null 2>&1); then
@@ -77,6 +89,6 @@ if (cd "$PROTO_DIR" && protoc -I . --decode=meshtastic.Position meshtastic/mesh.
 fi
 
 printf 'OK: %s fixtures sintéticos validados contra Meshtastic Protobufs %s.\n' "$COUNT" "$PROTOBUF_TAG"
-printf 'OK: Position, device/environment/air-quality telemetry, User, NeighborInfo, Waypoint e MapReport.\n'
+printf 'OK: Position, telemetry vazia e de dispositivo/ambiente/qualidade do ar, User, NeighborInfo, Waypoint e MapReport.\n'
 printf 'OK: round-trip binário e rejeição de fixture truncado.\n'
 printf 'LIMITE: não valida firmware, descriptografia, política de privacidade em produção, MQTT real ou entrega LoRa.\n'
