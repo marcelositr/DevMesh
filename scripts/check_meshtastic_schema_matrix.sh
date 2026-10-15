@@ -17,6 +17,17 @@ VERSIONS=(
     "master-snapshot-2026-10-12:28f4f5f5c31c0323bfb86d890a1acaff15d1c4c6"
 )
 
+# Os esquemas oficiais importam well-known types do Protobuf. O protoc do
+# Ubuntu instala esses .proto fora do checkout Meshtastic, então incluímos
+# apenas diretórios padrão que realmente contenham descriptor.proto.
+PROTO_INCLUDE_ARGS=(-I .)
+for include_dir in /usr/include /usr/local/include; do
+    if [[ -f "$include_dir/google/protobuf/descriptor.proto" ]]; then
+        PROTO_INCLUDE_ARGS+=("-I" "$include_dir")
+    fi
+done
+[[ ${#PROTO_INCLUDE_ARGS[@]} -gt 1 ]] || fail "google/protobuf/descriptor.proto não encontrado nos diretórios padrão do sistema."
+
 check_message() {
     local version_dir="$1" version="$2" message="$3" schema="$4" input="$5"
     shift 5
@@ -26,9 +37,9 @@ check_message() {
     local roundtrip_file="$TEMP_DIR/roundtrip.bin"
 
     printf '%s\n' "$input" > "$input_file"
-    (cd "$version_dir" && protoc -I . --encode="meshtastic.$message" "$schema" < "$input_file" > "$binary_file") \
+    (cd "$version_dir" && protoc "${PROTO_INCLUDE_ARGS[@]}" --encode="meshtastic.$message" "$schema" < "$input_file" > "$binary_file") \
         || fail "$version: falha ao codificar $message."
-    (cd "$version_dir" && protoc -I . --decode="meshtastic.$message" "$schema" < "$binary_file" > "$decoded_file") \
+    (cd "$version_dir" && protoc "${PROTO_INCLUDE_ARGS[@]}" --decode="meshtastic.$message" "$schema" < "$binary_file" > "$decoded_file") \
         || fail "$version: falha ao decodificar $message."
 
     local expected
@@ -36,7 +47,7 @@ check_message() {
         grep -Fq "$expected" "$decoded_file" || fail "$version: $message não contém o campo esperado: $expected"
     done
 
-    (cd "$version_dir" && protoc -I . --encode="meshtastic.$message" "$schema" < "$decoded_file" > "$roundtrip_file") \
+    (cd "$version_dir" && protoc "${PROTO_INCLUDE_ARGS[@]}" --encode="meshtastic.$message" "$schema" < "$decoded_file" > "$roundtrip_file") \
         || fail "$version: falha no round-trip de $message."
     cmp --silent "$binary_file" "$roundtrip_file" || fail "$version: round-trip alterou bytes de $message."
 }
