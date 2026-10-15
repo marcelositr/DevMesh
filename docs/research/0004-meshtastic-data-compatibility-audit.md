@@ -84,9 +84,11 @@ Implicação para o DevMesh: encaminhar envelopes sem reserializar continua send
 
 Em 2026-10-15, a execução `38791804483` passou pelas etapas anteriores, incluindo a validação de esquemas estáveis v2.7.26 e v2.8.0. A etapa da matriz falhou somente ao compilar o snapshot experimental `master`: `protoc` não encontrou `google/protobuf/descriptor.proto`, seguido por erros em cascata nos imports e tipos de configuração. A evidência aponta para uma falha na resolução de dependências de compilação, não para uma incompatibilidade demonstrada dos fixtures com o esquema experimental.
 
-**Correção aplicada:** `scripts/check_meshtastic_schema_matrix.sh` agora detecta `descriptor.proto` nos diretórios padrão `/usr/include` e `/usr/local/include` e adiciona o diretório encontrado aos argumentos de inclusão de todas as invocações `protoc`. Se nenhum diretório contiver o arquivo, o script termina com uma mensagem direta. A matriz continua fixada em commits completos, exige encode/decode/round-trip e falha normalmente diante de erros reais. Nenhuma versão experimental foi reclassificada como estável.
+**Primeira correção e causa raiz:** a tentativa inicial de localizar `descriptor.proto` nos diretórios padrão não bastou. O log da nova execução (`38794149745`) repetiu a ausência do arquivo, mostrando que a imagem do runner instalava `protobuf-compiler`, mas não o pacote de desenvolvimento que fornece os `.proto` padrão. A matriz estável continuou passando; o erro ocorreu na compilação do snapshot experimental.
 
-**Critério de conclusão:** esta correção só será considerada validada quando uma nova execução do CI concluir a matriz para as três revisões. Até lá, a alteração foi aplicada, mas o resultado permanece pendente de CI.
+**Correção complementar aplicada:** o workflow `.github/workflows/mqtt-smoke.yml` agora instala `libprotobuf-dev` junto com `protobuf-compiler`. O script `scripts/check_meshtastic_schema_matrix.sh` mantém a inclusão explícita dos diretórios e uma falha clara caso `descriptor.proto` realmente esteja ausente. Não ignoramos erros de compilação nem removemos o snapshot experimental.
+
+**Critério de conclusão:** a correção só será considerada validada quando uma nova execução do CI concluir a matriz para as três revisões. Até lá, a alteração foi aplicada, mas o resultado permanece pendente de CI.
 
 ### Diferenças relevantes entre v2.8.0 e o snapshot experimental master
 
