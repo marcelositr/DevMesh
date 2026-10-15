@@ -147,6 +147,8 @@ def main() -> int:
                 break
         if not connected.is_set() and not connection_failed.is_set():
             connection_failed.set()
+        if connected.is_set() and not subscription_ready.is_set() and not connection_failed.is_set():
+            connection_failed.set()
     except (OSError, mqtt.MQTTException):
         connection_failed.set()
     finally:
