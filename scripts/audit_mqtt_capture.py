@@ -98,6 +98,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--host", default="127.0.0.1", help="Broker autorizado; padrão: 127.0.0.1.")
     parser.add_argument("--port", type=int, default=1883, help="Porta MQTT; padrão: 1883.")
+    parser.add_argument("--tls", action="store_true", help="Habilita TLS com as autoridades certificadoras do sistema.")
     parser.add_argument("--topic", default=DEFAULT_TOPIC, help="Filtro de leitura; padrão: msh/#.")
     parser.add_argument("--seconds", type=int, default=30, help="Duração da observação (1 a 300 s).")
     parser.add_argument("--max-messages", type=int, default=500, help="Limite de mensagens (1 a 10000).")
@@ -135,6 +136,8 @@ def main() -> int:
         client_id="",
         protocol=mqtt.MQTTv311,
     )
+    if args.tls:
+        client.tls_set()
     if username:
         client.username_pw_set(username, password)
 
