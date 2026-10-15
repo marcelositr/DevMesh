@@ -157,6 +157,7 @@ def main() -> int:
 
     def on_disconnect(client, userdata, disconnect_flags, reason_code, properties):
         if reason_code.is_failure:
+            connected.clear()
             connection_failed.set()
             finished.set()
 
@@ -196,7 +197,7 @@ def main() -> int:
 
     result = {
         "mode": "read_only",
-        "connected": connected.is_set() and not connection_failed.is_set(),
+        "connected": connected.is_set(),
         "subscription_accepted": subscription_ready.is_set() and not connection_failed.is_set(),
         "observation_seconds_limit": args.seconds,
         "message_limit": args.max_messages,
