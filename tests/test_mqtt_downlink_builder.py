@@ -147,7 +147,7 @@ class DownlinkBuilderTests(unittest.TestCase):
                 ],
                 cwd=Path(__file__).resolve().parents[1],
                 env=env,
-                input=secret_text + "\\n",
+                input=secret_text + "\n",
                 capture_output=True,
                 text=True,
                 check=False,
