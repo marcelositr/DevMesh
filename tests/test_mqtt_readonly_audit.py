@@ -473,5 +473,70 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
         self.assertFalse(report["mqtt_publish_performed"])
 
 
+    def test_cli_never_emits_map_report_coordinates(self):
+        from scripts import audit_mqtt_capture
+
+        class ReasonCode:
+            is_failure = False
+
+        report_payload = mqtt_pb2.MapReport(
+            latitude_i=123456789,
+            longitude_i=-234567890,
+        ).SerializeToString()
+        envelope = mqtt_pb2.ServiceEnvelope(
+            channel_id="PRIVATE_SYNTHETIC",
+            gateway_id="!deadbeef",
+        )
+        envelope.packet.decoded.portnum = portnums_pb2.PortNum.MAP_REPORT_APP
+        envelope.packet.decoded.payload = report_payload
+
+        class Message:
+            topic = "msh/2/map/PRIVATE_SYNTHETIC"
+            payload = envelope.SerializeToString()
+
+        class FakeClient:
+            on_connect = None
+            on_subscribe = None
+            on_disconnect = None
+            on_message = None
+
+            def connect(self, host, port, keepalive):
+                return None
+
+            def loop_start(self):
+                self.on_connect(self, None, None, ReasonCode(), None)
+                self.on_message(self, None, Message())
+
+            def subscribe(self, topic, qos):
+                self.on_subscribe(self, None, 1, [ReasonCode()], None)
+                return audit_mqtt_capture.mqtt.MQTT_ERR_SUCCESS, 1
+
+            def disconnect(self):
+                return None
+
+            def loop_stop(self):
+                return None
+
+            def publish(self, *args, **kwargs):
+                raise AssertionError("audit must never publish")
+
+        output = StringIO()
+        with patch.object(sys, "argv", ["audit_mqtt_capture.py", "--seconds", "1",
+                                        "--max-messages", "1", "--topic", "msh/#"]):
+            with patch.object(audit_mqtt_capture.mqtt, "Client", return_value=FakeClient()):
+                with patch.dict(os.environ, {}, clear=True):
+                    with redirect_stdout(output):
+                        self.assertEqual(main(), 0)
+
+        rendered = output.getvalue()
+        result = json.loads(rendered)
+        self.assertEqual(result["messages_received"], 1)
+        self.assertEqual(result["message_statuses"], {"map_report_position_present": 1})
+        self.assertNotIn("123456789", rendered)
+        self.assertNotIn("-234567890", rendered)
+        self.assertNotIn("PRIVATE_SYNTHETIC", rendered)
+        self.assertNotIn("deadbeef", rendered)
+
+
 if __name__ == "__main__":
     unittest.main()
