@@ -195,3 +195,19 @@ Esta captura confirma que o auditor conecta, assina e classifica os envelopes ci
 
 A captura foi feita sem TLS no transporte local MQTT. As mensagens Meshtastic observadas eram envelopes cifrados, mas isso não equivale a criptografia do transporte entre cliente e broker. A observação não publica, não altera a configuração do rádio e não comprova entrega física LoRa.
 
+## Validação CI atualizada em 2026-10-16 após bloqueio da PSK pública
+
+No HEAD `742221889a7368d38e5cf9dbb9e9749eaae69840`, os quatro jobs passaram:
+- [MQTT smoke check, PR](https://github.com/marcelositr/DevMesh/actions/runs/38960468322)
+- [Referência criptográfica Meshtastic, PR](https://github.com/marcelositr/DevMesh/actions/runs/38960468347)
+- [MQTT smoke check, push](https://github.com/marcelositr/DevMesh/actions/runs/38960465747)
+- [Referência criptográfica Meshtastic, push](https://github.com/marcelositr/DevMesh/actions/runs/38960465553)
+
+A alteração mais recente bloqueia a PSK pública padrão do Meshtastic ao construir um envelope destinado a um canal privado de teste e adiciona um teste de regressão. O resultado valida a execução automatizada desse commit, mas não prova configuração privada no rádio, entrega LoRa ou comportamento de todos os firmwares.
+
+Pendências para encerrar a auditoria sem hardware:
+- obter uma janela autorizada e representativa para procurar tópicos MapReport e medir volume de tráfego, mantendo a captura somente leitura e sanitizada;
+- documentar que os envelopes cifrados não permitem identificar tipos internos de mensagem sem a chave do canal;
+- manter separadas as alegações de compatibilidade de transporte MQTT, interpretação Protobuf e entrega física LoRa.
+
+A fase de hardware continua adiada até o fim, conforme o plano. O PR #3 permanece aberto como rascunho e não foi integrado.
