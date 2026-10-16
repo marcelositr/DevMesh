@@ -168,15 +168,16 @@ Declarar apenas **compatibilidade de encaminhamento MQTT** quando envelopes fore
 
 O firmware oficial pode acrescentar o sufixo regional à raiz quando usa o servidor e a raiz padrão; em servidores personalizados, a raiz configurada pelo usuário prevalece. Para evitar presumir que toda instalação usa `msh`, o construtor `scripts/build_mqtt_downlink.py` aceita `--root-topic` (padrão `msh`) e valida o valor antes de compor o tópico. Por exemplo, uma instalação configurada explicitamente com raiz `msh/ANZ` pode gerar tópicos sob `msh/ANZ/2/e/...`. Isso altera apenas o tópico do envelope local gerado; não conecta ao broker nem transmite. O comportamento precisa ser confirmado pela CI antes de ser considerado validado.
 
-## Validação CI atualizada em 2026-10-16
+## Registro histórico de CI de 2026-10-16
 
-No HEAD `4c490dcc60d91bb338862c343df4a4568acefd5b`, os quatro runs mais recentes passaram:
+Os quatro jobs listados abaixo passaram no commit histórico `4c490dcc60d91bb338862c343df4a4568acefd5b`:
 - [MQTT smoke check, PR](https://github.com/marcelositr/DevMesh/actions/runs/38950612799)
 - [Referência criptográfica Meshtastic, PR](https://github.com/marcelositr/DevMesh/actions/runs/38950612813)
 - [MQTT smoke check, push](https://github.com/marcelositr/DevMesh/actions/runs/38950606124)
 - [Referência criptográfica Meshtastic, push](https://github.com/marcelositr/DevMesh/actions/runs/38950606293)
 
-A revisão atual inclui a correção de classificação de tópicos com raiz regional e o teste de regressão para entrada com quebra de linha no construtor de downlink. Isso confirma a CI automatizada nesse commit; não substitui a nova captura autorizada do broker doméstico. A captura de 11 envelopes e 774 bytes permanece histórica e sua classificação por família ainda precisa ser revalidada. A observação real continua pendente.
+Este registro é histórico. A captura real foi refeita depois e está documentada na seção seguinte; não usar este bloco antigo para descrever o estado atual da auditoria.
+
 
 
 ### Captura real revalidada após a correção de raiz regional (2026-10-16)
@@ -195,19 +196,32 @@ Esta captura confirma que o auditor conecta, assina e classifica os envelopes ci
 
 A captura foi feita sem TLS no transporte local MQTT. As mensagens Meshtastic observadas eram envelopes cifrados, mas isso não equivale a criptografia do transporte entre cliente e broker. A observação não publica, não altera a configuração do rádio e não comprova entrega física LoRa.
 
-## Validação CI atualizada em 2026-10-16 após bloqueio da PSK pública
+## Estado consolidado da auditoria em 2026-10-16
 
-No HEAD `742221889a7368d38e5cf9dbb9e9749eaae69840`, os quatro jobs passaram:
-- [MQTT smoke check, PR](https://github.com/marcelositr/DevMesh/actions/runs/38960468322)
-- [Referência criptográfica Meshtastic, PR](https://github.com/marcelositr/DevMesh/actions/runs/38960468347)
-- [MQTT smoke check, push](https://github.com/marcelositr/DevMesh/actions/runs/38960465747)
-- [Referência criptográfica Meshtastic, push](https://github.com/marcelositr/DevMesh/actions/runs/38960465553)
+**Referência do código:** commit `98935c40daaca20fbe26bc32cbd6682360ad5619` (`98935c4`), branch `work/read-only-mqtt-audit`.
 
-A alteração mais recente bloqueia a PSK pública padrão do Meshtastic ao construir um envelope destinado a um canal privado de teste e adiciona um teste de regressão. O resultado valida a execução automatizada desse commit, mas não prova configuração privada no rádio, entrega LoRa ou comportamento de todos os firmwares.
+### Validação de software concluída nesta rodada
 
-Pendências para encerrar a auditoria sem hardware:
-- obter uma janela autorizada e representativa para procurar tópicos MapReport e medir volume de tráfego, mantendo a captura somente leitura e sanitizada;
-- documentar que os envelopes cifrados não permitem identificar tipos internos de mensagem sem a chave do canal;
-- manter separadas as alegações de compatibilidade de transporte MQTT, interpretação Protobuf e entrega física LoRa.
+- A suíte local executada pelo mantenedor passou: **45 testes aprovados**. Este resultado foi informado no registro de trabalho da rodada.
+- Os quatro jobs de CI do commit atual concluíram com sucesso:
+  - [MQTT smoke check, PR](https://github.com/marcelositr/DevMesh/actions/runs/38961898195)
+  - [Referência criptográfica Meshtastic, PR](https://github.com/marcelositr/DevMesh/actions/runs/38961898097)
+  - [MQTT smoke check, push](https://github.com/marcelositr/DevMesh/actions/runs/38961891841)
+  - [Referência criptográfica Meshtastic, push](https://github.com/marcelositr/DevMesh/actions/runs/38961891852)
+- O construtor de downlink bloqueia a PSK pública padrão ao criar um envelope para canal privado de teste; há teste de regressão correspondente.
+- O auditor somente leitura conectou ao broker autorizado, teve a assinatura aceita e recebeu 10 envelopes cifrados em 60 segundos (770 bytes agregados). Não publicou mensagens nem salvou payloads.
+- O teste com Mosquitto descartável confirmou preservação byte a byte de um ServiceEnvelope sintético, inclusive campo Protobuf desconhecido.
+- O relatório de trabalho registrou a árvore local limpa e sincronizada com `origin/work/read-only-mqtt-audit`.
 
-A fase de hardware continua adiada até o fim, conforme o plano. O PR #3 permanece aberto como rascunho e não foi integrado.
+### Limites e pendências reais
+
+- **MapReport em broker real:** não foi observado na janela de 60 segundos. Isso não prova ausência permanente; requer janela autorizada mais representativa.
+- **Tipos internos dos envelopes cifrados:** não identificáveis na captura sem a chave do canal. Portanto, não se pode afirmar que a captura real continha texto, posição ou telemetria.
+- **Volume representativo:** as capturas curtas de 11 mensagens/774 bytes e 10 mensagens/770 bytes não bastam para avaliar tendências ou aumento inesperado de tráfego.
+- **Hardware:** permanece deliberadamente adiado para a última etapa. Ainda será necessário confirmar a região de rádio apropriada antes de transmitir, usar canal privado e mensagens pouco frequentes, e separar aceitação MQTT, aceitação pelo firmware e recepção LoRa por um segundo nó, se disponível. Posição/telemetria devem usar dados controlados sem divulgar localização real.
+
+### Conclusão desta rodada
+
+A evidência sustenta **validação automatizada de software e compatibilidade de encaminhamento MQTT nos cenários testados**. Não sustenta uma alegação de compatibilidade total com Meshtastic, identificação das famílias internas no tráfego cifrado, nem entrega física LoRa.
+
+Não foram acrescentados testes novos nesta consolidação. O PR [#3](https://github.com/marcelositr/DevMesh/pull/3) continua aberto como rascunho e não foi integrado. A próxima etapa é revisar este relatório; os testes físicos ficam para o final, conforme combinado.
