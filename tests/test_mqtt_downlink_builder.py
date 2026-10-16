@@ -71,6 +71,13 @@ class DownlinkBuilderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Canal público"):
             self.build(channel_name="LongFast")
 
+    def test_rejects_short_index_or_padded_psk_for_private_channel(self):
+        for raw_key in (b"\\x01", b"short-key", bytes(range(15))):
+            with self.subTest(raw_length=len(raw_key)):
+                encoded = base64.b64encode(raw_key).decode("ascii")
+                with self.assertRaisesRegex(ValueError, "16 ou 32 bytes"):
+                    self.build(psk_base64=encoded)
+
     def test_rejects_mqtt_wildcards_in_channel_name(self):
         for channel_name in ("PRIVATE+", "PRIVATE#"):
             with self.subTest(channel_name=channel_name):
