@@ -37,7 +37,17 @@ def valid_topic_filter(topic: str) -> bool:
 
 def classify_message(topic: str, payload: bytes) -> tuple[str, str]:
     """Return a privacy-safe family/status pair without exposing message data."""
-    if topic.startswith("msh/2/e/"):
+    topic_levels = topic.split("/")
+    # Meshtastic may use either the root "msh" or a regional root such as
+    # "msh/ANZ"; in both cases the protocol suffix is /2/<family>/...
+    protocol_offset = 1 if len(topic_levels) > 1 and topic_levels[1] == "2" else 2
+    has_protocol_family = (
+        len(topic_levels) > protocol_offset + 1
+        and topic_levels[0] == "msh"
+        and topic_levels[protocol_offset] == "2"
+    )
+    family_level = protocol_offset + 1
+    if has_protocol_family and topic_levels[family_level] == "e":
         envelope = mqtt_pb2.ServiceEnvelope()
         try:
             envelope.ParseFromString(payload)
@@ -58,7 +68,7 @@ def classify_message(topic: str, payload: bytes) -> tuple[str, str]:
             return "encrypted_topic", f"decoded_{portnum.lower()}"
         return "encrypted_topic", "packet_without_payload"
 
-    if topic.startswith("msh/2/map/"):
+    if has_protocol_family and topic_levels[family_level] == "map":
         envelope = mqtt_pb2.ServiceEnvelope()
         try:
             envelope.ParseFromString(payload)
