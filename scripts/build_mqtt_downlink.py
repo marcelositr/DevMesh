@@ -84,7 +84,18 @@ def build_envelope(
     gateway_id: str,
     packet_id: int,
     hop_limit: int = 3,
+    root_topic: str = "msh",
 ) -> tuple[str, bytes]:
+    if (
+        not root_topic
+        or root_topic.startswith("/")
+        or root_topic.endswith("/")
+        or any(not level for level in root_topic.split("/"))
+        or "+" in root_topic
+        or "#" in root_topic
+        or any(ord(char) < 32 or ord(char) == 127 for char in root_topic)
+    ):
+        raise ValueError("Tópico raiz MQTT inválido.")
     if (
         not channel_name
         or "/" in channel_name
@@ -133,13 +144,14 @@ def build_envelope(
     envelope.packet.CopyFrom(packet)
     envelope.channel_id = channel_name
     envelope.gateway_id = gateway_id
-    topic = f"msh/2/e/{channel_name}/{gateway_id}"
+    topic = f"{root_topic}/2/e/{channel_name}/{gateway_id}"
     return topic, envelope.SerializeToString()
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--channel", required=True, help="Nome exato do canal privado no rádio.")
+    parser.add_argument("--root-topic", default="msh", help="Raiz MQTT configurada no nó; padrão: msh. Exemplo regional: msh/ANZ.")
     parser.add_argument("--local-node-id", required=True, type=lambda s: int(s, 0), help="ID do rádio local, decimal ou 0xHEX.")
     parser.add_argument("--sender-id", required=True, type=lambda s: int(s, 0), help="ID sintético, decimal ou 0xHEX.")
     parser.add_argument("--gateway-id", required=True, help="Gateway sintético, por exemplo !a1b2c3d4.")
@@ -176,6 +188,7 @@ def main() -> int:
             local_node_id=args.local_node_id,
             gateway_id=args.gateway_id,
             packet_id=args.packet_id,
+            root_topic=args.root_topic,
         )
     except (ValueError, TypeError) as exc:
         print(f"FALHA: {exc}", file=sys.stderr)
