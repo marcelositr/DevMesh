@@ -62,7 +62,7 @@ class DownlinkBuilderTests(unittest.TestCase):
         self.assertEqual(topic, "msh/ANZ/2/e/ITUVERAVA/!deadbeef")
 
     def test_rejects_invalid_root_topic(self):
-        for root_topic in ("", "/msh", "msh/", "msh//ANZ", "msh/+", "msh/#", "msh/ANZ\\n"):
+        for root_topic in ("", "/msh", "msh/", "msh//ANZ", "msh/+", "msh/#", "msh/ANZ\n"):
             with self.subTest(root_topic=repr(root_topic)):
                 with self.assertRaisesRegex(ValueError, "Tópico raiz MQTT inválido"):
                     self.build(root_topic=root_topic)
