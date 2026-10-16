@@ -167,6 +167,11 @@ def main() -> int:
 
     def on_message(client, userdata, message):
         nonlocal total_bytes, received
+        # Enforce the hard cap even if callbacks arrive before the main loop
+        # reacts to finished.set() and disconnects the client.
+        if received >= args.max_messages:
+            finished.set()
+            return
         family, status = classify_message(message.topic, message.payload)
         topic_families[family] += 1
         message_statuses[status] += 1
