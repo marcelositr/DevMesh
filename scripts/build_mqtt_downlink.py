@@ -126,6 +126,11 @@ def build_envelope(
         raise ValueError("A mensagem deve ter entre 1 e 180 bytes UTF-8.")
 
     key = effective_psk(psk_base64)
+    raw_psk = base64.b64decode(psk_base64, validate=True)
+    if len(raw_psk) not in (16, 32):
+        raise ValueError(
+            "Para canal privado, a PSK deve conter 16 ou 32 bytes; chaves curtas ou de índice não são privadas."
+        )
     data = mesh_pb2.Data()
     data.portnum = portnums_pb2.TEXT_MESSAGE_APP
     data.payload = text.encode("utf-8")
