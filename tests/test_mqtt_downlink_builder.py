@@ -71,6 +71,12 @@ class DownlinkBuilderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Canal público"):
             self.build(channel_name="LongFast")
 
+    def test_rejects_default_public_psk_for_private_channel(self):
+        public_key = base64.b64decode("1PG7OiApB1nwvP+rz05pAQ==")
+        encoded = base64.b64encode(public_key).decode("ascii")
+        with self.assertRaisesRegex(ValueError, "PSK padrão pública"):
+            self.build(psk_base64=encoded)
+
     def test_rejects_short_index_or_padded_psk_for_private_channel(self):
         for raw_key in (b"\x01", b"short-key", bytes(range(15))):
             with self.subTest(raw_length=len(raw_key)):
