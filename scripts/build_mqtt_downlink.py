@@ -127,6 +127,8 @@ def build_envelope(
 
     key = effective_psk(psk_base64)
     raw_psk = base64.b64decode(psk_base64, validate=True)
+    if raw_psk == DEFAULT_PSK:
+        raise ValueError("A PSK padrão pública do Meshtastic não é permitida para um canal privado de teste.")
     if len(raw_psk) not in (16, 32):
         raise ValueError(
             "Para canal privado, a PSK deve conter 16 ou 32 bytes; chaves curtas ou de índice não são privadas."
