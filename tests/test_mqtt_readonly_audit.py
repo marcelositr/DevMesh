@@ -21,6 +21,30 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
             ("encrypted_topic", "encrypted_envelope"),
         )
 
+    def test_classifies_region_prefixed_encrypted_topic(self):
+        envelope = mqtt_pb2.ServiceEnvelope()
+        envelope.channel_id = "PRIVATE_SYNTHETIC"
+        envelope.gateway_id = "!deadbeef"
+        envelope.packet.encrypted = b"synthetic-ciphertext"
+
+        self.assertEqual(
+            classify_message("msh/ANZ/2/e/PRIVATE_SYNTHETIC/!deadbeef", envelope.SerializeToString()),
+            ("encrypted_topic", "encrypted_envelope"),
+        )
+
+    def test_classifies_region_prefixed_map_report(self):
+        envelope = mqtt_pb2.ServiceEnvelope()
+        envelope.channel_id = "PRIVATE_SYNTHETIC"
+        envelope.gateway_id = "!deadbeef"
+        envelope.packet.decoded.portnum = portnums_pb2.PortNum.MAP_REPORT_APP
+        report = mqtt_pb2.MapReport(latitude_i=123456789, longitude_i=-234567890)
+        envelope.packet.decoded.payload = report.SerializeToString()
+
+        self.assertEqual(
+            classify_message("msh/ANZ/2/map/region", envelope.SerializeToString()),
+            ("map_topic", "map_report_position_present"),
+        )
+
     def test_rejects_envelope_missing_required_metadata(self):
         envelope = mqtt_pb2.ServiceEnvelope()
         envelope.packet.encrypted = b"synthetic-ciphertext"
