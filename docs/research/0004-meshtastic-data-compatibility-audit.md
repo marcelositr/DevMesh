@@ -144,7 +144,7 @@ O script `scripts/check_meshtastic_data_compatibility.sh` cria e valida fixtures
 
 ## Resultado CI confirmado
 
-Em 2026-10-15, o job `MQTT connectivity and Meshtastic payload validation` passou, incluindo o teste de transporte MQTT, os fixtures de localização/telemetria, a matriz Protobuf v2.7.26/v2.8.0, o modelo de criptografia AES-CTR e os testes isolados de autenticação e ACL. O job de referência criptográfica upstream também passou. Isso confirma os testes automatizados executados, não a recepção de mensagens em hardware real.
+Em 2026-10-15, no commit `876e9034b7b12155f77cca1cdb99f2ca9c9793bd`, o MQTT smoke check passou na execução [#175](https://github.com/marcelositr/DevMesh/actions/runs/38826458816), incluindo transporte MQTT, fixtures de localização/telemetria, matriz Protobuf v2.7.26/v2.8.0 e snapshot experimental `master`, modelo AES-CTR e verificações isoladas de autenticação/ACL. A CI criptográfica passou nas duas referências fixadas na execução [#138](https://github.com/marcelositr/DevMesh/actions/runs/38826458820): firmware release v2.8.1 e snapshot `develop` de 2026-10-15. Em ambas, a suíte upstream, cinco vetores AES-CTR comparados byte a byte com OpenSSL e a validação sintética Protobuf/MQTT concluíram com sucesso. Isso confirma somente os testes automatizados executados, não a recepção de mensagens em hardware real nem a transmissão LoRa.
 
 ## Critério de aceitação
 
