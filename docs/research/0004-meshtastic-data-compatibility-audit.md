@@ -177,3 +177,21 @@ No HEAD `4c490dcc60d91bb338862c343df4a4568acefd5b`, os quatro runs mais recentes
 - [Referência criptográfica Meshtastic, push](https://github.com/marcelositr/DevMesh/actions/runs/38950606293)
 
 A revisão atual inclui a correção de classificação de tópicos com raiz regional e o teste de regressão para entrada com quebra de linha no construtor de downlink. Isso confirma a CI automatizada nesse commit; não substitui a nova captura autorizada do broker doméstico. A captura de 11 envelopes e 774 bytes permanece histórica e sua classificação por família ainda precisa ser revalidada. A observação real continua pendente.
+
+
+### Captura real revalidada após a correção de raiz regional (2026-10-16)
+
+Uma nova observação autorizada de 60 segundos foi executada no broker doméstico após a correção do classificador regional, no ambiente local com `paho-mqtt 2.1.0`. Resultado sanitizado:
+
+- Conexão MQTT estabelecida: `connected: true`.
+- Assinatura aceita pelo broker: `subscription_accepted: true`.
+- Mensagens recebidas: **10**.
+- Volume agregado de payloads: **770 bytes**.
+- Classificação: 10 mensagens em `encrypted_topic`, com status `encrypted_envelope`.
+- Publicação MQTT realizada: **não** (`mqtt_publish_performed: false`).
+- Payloads gravados: **não** (`payloads_saved: false`).
+
+Esta captura confirma que o auditor conecta, assina e classifica os envelopes cifrados observados na raiz MQTT usada pelo broker, sem expor payloads ou identificadores. Nenhum tópico da família `map` foi contado nesta janela; isso **não prova que MapReport nunca seja publicado**, apenas que não foi observado nessa captura. Como os envelopes estão cifrados, não é possível inferir se o conteúdo interno representa texto, posição, telemetria ou outra aplicação. A captura anterior de 11 envelopes/774 bytes continua sendo uma observação histórica separada; não somar os dois resultados como se fossem uma única janela.
+
+A captura foi feita sem TLS no transporte local MQTT. As mensagens Meshtastic observadas eram envelopes cifrados, mas isso não equivale a criptografia do transporte entre cliente e broker. A observação não publica, não altera a configuração do rádio e não comprova entrega física LoRa.
+
