@@ -226,6 +226,8 @@ class ReadOnlyMqttAuditTests(unittest.TestCase):
 
             def loop_start(self):
                 self.on_connect(self, None, None, ReasonCode(), None)
+                # Simulate queued callbacks arriving after the cap is reached.
+                self.on_message(self, None, Message())
                 self.on_message(self, None, Message())
 
             def subscribe(self, topic, qos):
