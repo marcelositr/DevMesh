@@ -1,0 +1,9 @@
+# Segredos e dados locais do broker doméstico
+/deploy/home/passwordfile
+/deploy/home/data/
+/deploy/home/backups/
+
+# Variáveis de ambiente locais
+.env
+.env.*
+!.env.example

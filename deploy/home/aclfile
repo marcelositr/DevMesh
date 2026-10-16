@@ -1,0 +1,5 @@
+# Conta compartilhada para os nós Meshtastic autorizados nesta instalação doméstica.
+# Esta ACL permite ler e publicar em todos os tópicos sob msh/.
+# A separação de confidencialidade depende da criptografia Meshtastic dos payloads.
+user devmesh
+topic readwrite msh/#

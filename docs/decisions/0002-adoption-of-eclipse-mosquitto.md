@@ -15,7 +15,7 @@ A comparação documental inicial de brokers está registrada em [0001: compara�
 
 Adotar o **Eclipse Mosquitto** como broker MQTT da arquitetura inicial do DevMesh.
 
-Esta decisão autoriza o uso do Mosquitto como escolha inicial de arquitetura. Não significa que o serviço já esteja implementado, implantado, protegido ou validado em testes.
+Esta decisão registra o Mosquitto como escolha inicial de arquitetura. A configuração doméstica inicial foi implementada em `deploy/home/` e é exercitada pelo CI; isso não significa que o serviço esteja implantado pelo projeto, pronto para produção ou protegido para redes não confiáveis.
 
 ## Motivos
 
@@ -27,8 +27,9 @@ Esta decisão autoriza o uso do Mosquitto como escolha inicial de arquitetura. N
 ## Consequências
 
 - A documentação técnica e os próximos planos de implementação devem usar o Mosquitto como broker de referência.
-- O projeto ainda precisará definir configuração, versão, implantação, persistência, monitoramento, atualização e recuperação.
-- Autenticação, autorização por tópico, proteção do tráfego administrativo e TLS devem ser planejados antes de disponibilizar o serviço em uma rede não confiável.
+- `deploy/home/` fornece uma configuração inicial versionada com imagem definida, autenticação obrigatória, ACL para `msh/#` e persistência em volume Docker; o CI testa essa configuração com um broker descartável.
+- Monitoramento, atualização e recuperação ainda precisam de procedimentos definidos e testados.
+- A configuração inicial não usa TLS e compartilha uma conta entre os nós autorizados. Antes de disponibilizar o serviço em redes não confiáveis, será necessário configurar e testar proteção do transporte e permissões mais específicas.
 - A integração específica com Meshtastic e qualquer retransmissão de mensagens para rádio ainda precisam de definição; a adoção do broker não comprova essa integração.
 - APIs de serviços públicos brasileiros e bots permanecem fora do escopo imediato até que a base MQTT esteja definida.
 
@@ -44,7 +45,7 @@ A implementação deverá, no mínimo:
 6. Manter credenciais e chaves privadas fora do controle de versão.
 7. Documentar procedimentos de atualização, cópia de segurança e recuperação.
 
-Estes são requisitos para o trabalho futuro, não controles que já estejam ativos.
+Os controles da configuração doméstica inicial são limitados e estão descritos em `deploy/home/README.md`; os demais pontos continuam como requisitos de evolução.
 
 ## Alternativas consideradas
 

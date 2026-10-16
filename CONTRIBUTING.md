@@ -2,7 +2,7 @@
 
 Obrigado pelo interesse em contribuir com o DevMesh. São bem-vindos relatos de erros, melhorias na documentação, testes, ideias e código.
 
-O DevMesh é um projeto independente e comunitário de infraestrutura MQTT, planejado para dar suporte a redes de rádio compatíveis com Meshtastic e a futuras integrações. Não é um projeto oficial do Meshtastic. Consulte o [README.md](README.md) para conhecer o projeto e [GOVERNANCE.md](GOVERNANCE.md) para entender os papéis e o processo de decisão.
+O DevMesh é um projeto independente e comunitário de infraestrutura MQTT, planejado para dar suporte a redes de rádio compatíveis com Meshtastic e a futuras integrações. Não é um projeto oficial do Meshtastic. Consulte o [README.md](README.md) para conhecer o escopo atual e [GOVERNANCE.md](GOVERNANCE.md) para entender os papéis e o processo de decisão.
 
 ## Antes de contribuir
 
@@ -40,15 +40,17 @@ Não introduza dependências, mudanças de protocolo, APIs públicas ou alteraç
 
 ## Considerações técnicas e de rede
 
-Como o DevMesh pretende trabalhar com MQTT e redes de rádio, as contribuições devem considerar:
+Como o DevMesh pretende trabalhar com MQTT e redes de rádio, as contribuições devem considerar, de acordo com o escopo afetado:
 
 - volume desnecessário de mensagens e possível impacto no tempo de transmissão LoRa;
 - formatos de pacotes, compatibilidade e limites da criptografia;
-- autenticação e autorização por tópico;
+- autenticação, permissões por tópico e exposição da rede, de forma proporcional ao cenário de uso;
 - metadados sensíveis à privacidade e registros de eventos;
 - tratamento de falhas, reconexões e mensagens duplicadas.
 
-Esses itens são critérios de revisão, não afirmações de que todos os controles ou projetos técnicos já estejam implementados. O comportamento confirmado será documentado à medida que os testes avançarem.
+O cenário inicial é uma instalação doméstica local com três nós simulados. Acesso remoto, operação pública multiusuário e integrações de serviços públicos estão fora do escopo inicial. Consulte a [decisão de escopo e segurança](docs/decisions/0003-home-first-scope-and-proportionate-security.md) antes de propor controles ou infraestrutura adicionais.
+
+Esses itens são critérios de revisão, não afirmações de que todos os controles ou recursos técnicos já estejam implementados. O comportamento confirmado será documentado à medida que os testes avançarem.
 
 ## Revisão e decisões
 

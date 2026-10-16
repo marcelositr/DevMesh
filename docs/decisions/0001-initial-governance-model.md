@@ -37,7 +37,7 @@ Adotar inicialmente um modelo híbrido liderado pelo fundador:
 
 - [x] Criar CONTRIBUTING.md, SECURITY.md e TRADEMARKS.md sem duplicar a política de governança.
 - [x] Registrar o procedimento de continuidade e sucessão em [docs/CONTINUITY.md](../CONTINUITY.md).
-- [ ] Incorporar e conferir o texto integral da licença escolhida no arquivo LICENSE, considerando também o histórico de licenciamento do repositório.
+- [x] Incorporar e conferir o texto integral da licença escolhida no arquivo LICENSE, considerando também o histórico de licenciamento do repositório.
 - [ ] Configurar proteções de branch e requisitos de revisão quando as configurações do repositório e o plano permitirem.
 - [ ] Estabelecer um canal privado real para relatos de segurança antes do uso em produção ou de uma divulgação pública mais ampla.
 - [ ] Revisar as políticas após os primeiros testes práticos e quando novas pessoas assumirem responsabilidades.

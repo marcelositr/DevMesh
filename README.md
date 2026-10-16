@@ -2,16 +2,30 @@
 
 Infraestrutura comunitária e independente de comunicação por MQTT, com foco em redes de rádio compatíveis com Meshtastic, interoperabilidade e futuras integrações com serviços públicos brasileiros.
 
-O DevMesh está em fase inicial de planejamento e validação. As escolhas técnicas e os recursos ainda precisam ser avaliados por meio de pesquisa e testes. Este repositório não deve ser interpretado como evidência de funcionalidades que ainda não foram implementadas.
+O DevMesh está em fase inicial de implementação e validação. Algumas verificações e uma configuração doméstica inicial do Mosquitto já existem, mas o projeto ainda não está pronto para produção. Este repositório distingue recursos implementados, testados e ainda planejados.
 
 O DevMesh não é um projeto oficial do Meshtastic e não deve sugerir afiliação ou endosso oficial.
 
+## Escopo inicial
+
+A primeira etapa valida uma base simples para uso doméstico, inclusive numa Raspberry Pi. A configuração inicial em [deploy/home](deploy/home/README.md) usa Mosquitto com autenticação, ACL limitada ao prefixo `msh/#` e volume persistente. Os testes usam três nós simulados, sem depender de hardware de rádio nem expor o broker à internet.
+
+O CI verifica conectividade MQTT, roteamento por tópico, autenticação básica e ACLs num broker descartável. Também simula o nó A publicando um fixture binário Meshtastic sintético que os nós B e C recebem sem alteração. A validação estrutural usa `protoc` com as definições oficiais Meshtastic fixadas numa versão específica, decodifica o `ServiceEnvelope`, verifica campos esperados e confirma o ciclo de recodificação. Isso valida a estrutura do fixture e o transporte MQTT, não interoperabilidade integral com firmware ou rádio LoRa.
+
+A workflow criptográfica compila a suíte oficial `test_crypto` do firmware fixado no commit `8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c` e injeta testes temporários de interoperabilidade no checkout descartável do CI. Cinco casos chamam `CryptoEngine::encryptPacket()` com chave, nonce e mensagens sintéticos e comparam o ciphertext byte a byte com OpenSSL AES-128-CTR. Um teste separado demonstra que alterar um bit no ciphertext AES-CTR altera o plaintext correspondente sem detecção de autenticação, pois CTR isolado não autentica os dados. A mesma suíte upstream executa testes AES-CCM/AEAD para rejeição de adulteração, tag inválida, chave incorreta e alterações nos parâmetros autenticados. Um teste integrado leva ciphertext sintético do firmware a um `ServiceEnvelope`, valida a codificação e decodificação com o esquema Protobuf oficial fixado e verifica que dois assinantes MQTT recebem os bytes idênticos. O código do firmware é usado somente no CI, não incorporado ao produto DevMesh. Nada disso substitui testes com hardware ou dados capturados de rádio físico.
+
+**Criptografia Meshtastic e ACL MQTT são coisas diferentes.** O teste de ACL impede que o nó C acesse um tópico restrito no broker. O teste de transporte mostra que os assinantes recebem os mesmos bytes, sem validar por si só a autenticidade criptográfica desses bytes. AES-CTR não fornece autenticação; AES-CCM/AEAD pode detectar adulteração quando é realmente usado e validado pelo destinatário. No código do firmware fixado em [8e6a88d](https://github.com/meshtastic/firmware/blob/8e6a88d06f44cad26f1e8d7cd402939ccacb9b4c/src/mqtt/MQTT.cpp), `encryption_enabled` seleciona o pacote cifrado no uplink e faz o downlink rejeitar mensagens já decodificadas. Isso é comportamento verificado por inspeção do código, não um teste de configuração de dispositivo real. A chave de canal, sozinha, não garante que o payload publicado no broker continue cifrado.
+
+A configuração anônima usada em alguns testes existe somente para brokers efêmeros de CI e não deve ser reutilizada numa instalação real. As credenciais dos testes são temporárias. A configuração doméstica inicial exige autenticação e limita o acesso ao prefixo `msh/#`, mas usa MQTT sem TLS e uma conta compartilhada; destina-se apenas a uma rede doméstica confiável. Não exponha a porta diretamente à internet. Antes de permitir acesso por redes não confiáveis, será necessário configurar e testar proteção do transporte e permissões adequadas. Atenção: no commit de firmware fixado acima, o caminho MQTT com TLS chama `mqttClientTLS.setInsecure()`, que desativa a validação normal do certificado do servidor. Portanto, não considerar esse TLS suficiente para autenticar o broker sem verificar a versão e o comportamento real do cliente; até lá, preferir uma VPN corretamente configurada. O acesso remoto não faz parte do escopo inicial.
+
+Consulte a [decisão sobre escopo doméstico e segurança proporcional](docs/decisions/0003-home-first-scope-and-proportionate-security.md) para os limites e os critérios de evolução.
+
 ## Documentação
 
-- [Índice da documentação técnica](docs/README.md): organização dos documentos, decisões e contexto de trabalho.
-- [Governança](GOVERNANCE.md): papéis, responsabilidades e decisões.
+- [Instalação doméstica do broker](deploy/home/README.md): configuração inicial, execução e limites de segurança.
+- [Índice da documentação técnica](docs/README.md): organização dos documentos, pesquisas e decisões.
 - [Como contribuir](CONTRIBUTING.md): propostas, alterações e revisões.
-- [Código de Conduta](CODE_OF_CONDUCT.md): convivência na comunidade.
+- [Código de Conduta](CODE_OF_CONDUCT.md): convivência com a comunidade.
 - [Política de Segurança](SECURITY.md): comunicação e tratamento de vulnerabilidades.
 - [Nome e identidade visual](TRADEMARKS.md): uso da marca e prevenção de confusão.
 - [Continuidade e sucessão](docs/CONTINUITY.md): responsabilidades, acesso e sucessão.
@@ -24,4 +38,4 @@ A documentação voltada às pessoas, os comentários explicativos no código e 
 
 ## Situação atual
 
-O projeto ainda não deve ser considerado pronto para produção. As decisões técnicas serão tomadas depois de pesquisa, testes reproduzíveis e registro dos resultados.
+O projeto ainda não deve ser considerado pronto para produção. As decisões técnicas serão tomadas depois de pesquisa, testes reproduzíveis e registro dos resultados. A aprovação de testes isolados no CI não significa que todos os controles de segurança ou a integração com Meshtastic estejam implementados ou validados.
