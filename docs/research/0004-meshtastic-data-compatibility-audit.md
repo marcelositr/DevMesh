@@ -162,3 +162,8 @@ Declarar apenas **compatibilidade de encaminhamento MQTT** quando envelopes fore
 - Cliente Python: https://github.com/meshtastic/python
 - Lançamentos de firmware: https://github.com/meshtastic/firmware/releases
 - Lançamentos Protobuf: https://github.com/meshtastic/protobufs/releases
+
+
+### Raiz MQTT no construtor de downlink
+
+O firmware oficial pode acrescentar o sufixo regional à raiz quando usa o servidor e a raiz padrão; em servidores personalizados, a raiz configurada pelo usuário prevalece. Para evitar presumir que toda instalação usa `msh`, o construtor `scripts/build_mqtt_downlink.py` aceita `--root-topic` (padrão `msh`) e valida o valor antes de compor o tópico. Por exemplo, uma instalação configurada explicitamente com raiz `msh/ANZ` pode gerar tópicos sob `msh/ANZ/2/e/...`. Isso altera apenas o tópico do envelope local gerado; não conecta ao broker nem transmite. O comportamento precisa ser confirmado pela CI antes de ser considerado validado.
