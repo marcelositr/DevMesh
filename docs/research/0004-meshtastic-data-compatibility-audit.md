@@ -120,6 +120,7 @@ A comparação oficial de commits entre v2.8.0 (`7b2464c9b8c1521f93852261e412382
 - [x] Cobrir a classificação sintética por `POSITION_APP` e `TELEMETRY_APP` quando o envelope já contém um payload decodificado; isso valida apenas a classificação pelo portnum, não a capacidade de identificar esses tipos dentro de ciphertext real.
 - [x] Cobrir um portnum futuro desconhecido em envelope sintético; o auditor retorna `decoded_unknown_portnum` sem expor o número nem o payload. Isso valida tolerância do classificador, não a interpretação do tipo desconhecido.
 - [x] Acrescentar fixture sintética de MapReport em tópico de mapa; a classificação informa apenas se campos de posição não nulos existem e descarta seus valores.
+- [x] Acrescentar regressão de ponta a ponta da CLI para MapReport: confirma que coordenadas, canal e ID do nó não aparecem no relatório e que o cliente MQTT simulado não publica mensagens.
 - [x] Cobrir um `MapReport` malformado e confirmar que o resumo retorna apenas um status genérico, sem reproduzir o payload.
 - [ ] Confirmar em captura autorizada se MapReport aparece no broker real; ainda não há evidência de captura dessa família.
 - [x] Executar a ferramenta no broker autorizado e registrar apenas o resumo sanitizado (captura real em 2026-10-15).
