@@ -57,6 +57,16 @@ class DownlinkBuilderTests(unittest.TestCase):
         self.assertEqual(data.portnum, portnums_pb2.TEXT_MESSAGE_APP)
         self.assertEqual(data.payload, "Teste isolado".encode("utf-8"))
 
+    def test_supports_custom_and_regional_root_topics(self):
+        topic, _ = self.build(root_topic="msh/ANZ")
+        self.assertEqual(topic, "msh/ANZ/2/e/ITUVERAVA/!deadbeef")
+
+    def test_rejects_invalid_root_topic(self):
+        for root_topic in ("", "/msh", "msh/", "msh//ANZ", "msh/+", "msh/#", "msh/ANZ\\n"):
+            with self.subTest(root_topic=repr(root_topic)):
+                with self.assertRaisesRegex(ValueError, "Tópico raiz MQTT inválido"):
+                    self.build(root_topic=root_topic)
+
     def test_blocks_public_preset_channel(self):
         with self.assertRaisesRegex(ValueError, "Canal público"):
             self.build(channel_name="LongFast")
