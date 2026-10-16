@@ -167,3 +167,13 @@ Declarar apenas **compatibilidade de encaminhamento MQTT** quando envelopes fore
 ### Raiz MQTT no construtor de downlink
 
 O firmware oficial pode acrescentar o sufixo regional à raiz quando usa o servidor e a raiz padrão; em servidores personalizados, a raiz configurada pelo usuário prevalece. Para evitar presumir que toda instalação usa `msh`, o construtor `scripts/build_mqtt_downlink.py` aceita `--root-topic` (padrão `msh`) e valida o valor antes de compor o tópico. Por exemplo, uma instalação configurada explicitamente com raiz `msh/ANZ` pode gerar tópicos sob `msh/ANZ/2/e/...`. Isso altera apenas o tópico do envelope local gerado; não conecta ao broker nem transmite. O comportamento precisa ser confirmado pela CI antes de ser considerado validado.
+
+## Validação CI atualizada em 2026-10-16
+
+No HEAD `4c490dcc60d91bb338862c343df4a4568acefd5b`, os quatro runs mais recentes passaram:
+- [MQTT smoke check, PR](https://github.com/marcelositr/DevMesh/actions/runs/38950612799)
+- [Referência criptográfica Meshtastic, PR](https://github.com/marcelositr/DevMesh/actions/runs/38950612813)
+- [MQTT smoke check, push](https://github.com/marcelositr/DevMesh/actions/runs/38950606124)
+- [Referência criptográfica Meshtastic, push](https://github.com/marcelositr/DevMesh/actions/runs/38950606293)
+
+A revisão atual inclui a correção de classificação de tópicos com raiz regional e o teste de regressão para entrada com quebra de linha no construtor de downlink. Isso confirma a CI automatizada nesse commit; não substitui a nova captura autorizada do broker doméstico. A captura de 11 envelopes e 774 bytes permanece histórica e sua classificação por família ainda precisa ser revalidada. A observação real continua pendente.
