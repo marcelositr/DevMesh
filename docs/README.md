@@ -8,6 +8,8 @@ Esta pasta reúne a documentação técnica, as pesquisas, os registros de decis
 - [Registros de decisões](decisions/README.md): decisões aprovadas, seus fundamentos e como registrar revisões.
 - [Comparação inicial de brokers MQTT](research/0001-mqtt-broker-initial-comparison.md): pesquisa documental e requisitos técnicos, com distinção entre prioridades iniciais e verificações futuras.
 - [Levantamento de equipamento Meshtastic](research/0002-meshtastic-device-inventory-and-traffic-survey.md): inventário de hardware, firmware, interfaces e observações de tráfego ainda incompletas.
+- [Validação do downlink MQTT Meshtastic](research/0003-mqtt-downlink-validation.md): comportamento do firmware, testes de transporte e gerador local de envelope cifrado para canal privado.
+- [Auditoria de compatibilidade dos dados Meshtastic](research/0004-meshtastic-data-compatibility-audit.md): localização, telemetria, metadados, privacidade, versões e plano de validação cruzada.
 - [Contexto para ferramentas de IA](ai/README.md): orientações para retomar o trabalho sem confundir decisões aprovadas com hipóteses.
 
 ## Escopo e estado das informações
